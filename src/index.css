@@ -1,0 +1,72 @@
+/* Estilo do Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 100px; /* Largura levemente reduzida para caber melhor na grid */
+  height: 28px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 9px;
+  font-weight: bold;
+  text-transform: uppercase;
+  overflow: hidden;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+input:checked + .slider {
+  background-color: #4caf50;
+}
+
+/* Move a bolinha para a direita quando checado */
+input:checked + .slider:before {
+  transform: translateX(72px);
+}
+
+.slider-text {
+  z-index: 1;
+  transition: .4s;
+  /* Garante que o texto fique visível independente da posição da bolinha */
+  width: 100%;
+  text-align: center;
+  padding-left: 10px;
+}
+
+input:checked + .slider .slider-text {
+  padding-left: 0;
+  padding-right: 10px;
+}
+
+/* Animação para a mensagem de salvo */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
