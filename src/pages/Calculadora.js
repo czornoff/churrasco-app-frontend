@@ -40,7 +40,7 @@ export default function Calculadora({ opcoes }) {
     return (
         <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
             <header style={{ textAlign: 'center', marginBottom: '30px' }}>
-                <h1>🔥 Churrascômetro Pro</h1>
+                <h1>🔥 Calculadora de Churrasco</h1>
                 <p>Calcule a quantidade exata para o seu churrasco</p>
             </header>
             

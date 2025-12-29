@@ -152,16 +152,16 @@ export default function Admin({ opcoes, setOpcoes }) {
 
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                     {cat === 'carnes' && (
-                        <div style={{fontSize: '12px'}}>Peso Rel: <input type="number" style={{width: '45px'}} value={item.pesoRelativo} onChange={(e) => atualizarCampoItem(cat, item.id, 'pesoRelativo', e.target.value)} /></div>
+                        <div style={{fontSize: '12px'}}>Peso Relativo: <input type="number" style={{width: '45px'}} value={item.pesoRelativo} onChange={(e) => atualizarCampoItem(cat, item.id, 'pesoRelativo', e.target.value)} />%</div>
                     )}
                     {cat === 'bebidas' && (
-                        <div style={{fontSize: '12px'}}>Cons: <input type="number" style={{width: '50px'}} value={item.mlPorAdulto} onChange={(e) => atualizarCampoItem(cat, item.id, 'mlPorAdulto', e.target.value)} />ml | Emb: <input type="number" style={{width: '50px'}} value={item.embalagem} onChange={(e) => atualizarCampoItem(cat, item.id, 'embalagem', e.target.value)} />ml</div>
+                        <div style={{fontSize: '12px'}}>Consumo: <input type="number" style={{width: '50px'}} value={item.mlPorAdulto} onChange={(e) => atualizarCampoItem(cat, item.id, 'mlPorAdulto', e.target.value)} />ml | Emb: <input type="number" style={{width: '50px'}} value={item.embalagem} onChange={(e) => atualizarCampoItem(cat, item.id, 'embalagem', e.target.value)} />ml</div>
                     )}
                     {(cat === 'acompanhamentos' || cat === 'adicionais') && (
-                        <div style={{fontSize: '12px'}}>Qtd: <input type="number" style={{width: '50px'}} value={item.gramasPorAdulto || item.qtdPorAdulto} onChange={(e) => atualizarCampoItem(cat, item.id, item.gramasPorAdulto ? 'gramasPorAdulto' : 'qtdPorAdulto', e.target.value)} /> {item.unidade || 'g'}</div>
+                        <div style={{fontSize: '12px'}}>Quantidade: <input type="number" style={{width: '50px'}} value={item.gramasPorAdulto || item.qtdPorAdulto} onChange={(e) => atualizarCampoItem(cat, item.id, item.gramasPorAdulto ? 'gramasPorAdulto' : 'qtdPorAdulto', e.target.value)} /> {item.unidade || 'g'}</div>
                     )}
                     {cat === 'utensilios' && (
-                        <div style={{fontSize: '12px'}}>Fat: <input type="number" step="0.1" style={{width: '40px'}} value={item.fator} onChange={(e) => atualizarCampoItem(cat, item.id, 'fator', e.target.value)} /> 
+                        <div style={{fontSize: '12px'}}><input type="number" step="0.1" style={{width: '40px'}} value={item.fator} onChange={(e) => atualizarCampoItem(cat, item.id, 'fator', e.target.value)} /> 
                             <select style={{fontSize: '10px', marginLeft: '5px'}} value={item.base} onChange={(e) => atualizarCampoItem(cat, item.id, 'base', e.target.value)}>
                                 <option value="pessoa">p/ Pessoa</option>
                                 <option value="carne">p/ kg Carne</option>
