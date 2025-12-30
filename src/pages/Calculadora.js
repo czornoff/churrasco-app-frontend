@@ -2,9 +2,23 @@ import React, { useState } from 'react';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
+const EMOJIS = {
+    'Bovina': '🥩',
+    'Suína': '🥓',
+    'Frango': '🐔',
+    'Linguiça': '🌭',
+    'Outras': '🍖',
+    'bebidas': '🍺',
+    'adicionais': '🧂',
+    'acompanhamentos': '🥗',
+    'utensilios': '🍴'
+};
+
+let obs, obsW = '';
+
 export default function Calculadora({ opcoes }) {
     const [selecionados, setSelecionados] = useState([]);
-    const [pessoas, setPessoas] = useState({ adultos: 0, criancas: 0 });
+    const [pessoas, setPessoas] = useState({ adultos: 0, criancas: 0, adultosQueBebem: 0 });
     const [resultado, setResultado] = useState(null);
     const [modalAberto, setModalAberto] = useState(false);
 
@@ -49,8 +63,12 @@ export default function Calculadora({ opcoes }) {
             if (unit === 'g' && valor >= 1000) {
                 valorFormatado = (valor / 1000).toFixed(2);
             } 
-
-            texto += `• *${item.nome}*: ${valorFormatado}\n`;
+            if (item.subtipo === 'observacao') {
+                texto += `_${item.nome}:  ${valorFormatado}_\n`;
+            } else {
+                texto += `• *${item.nome}*: ${valorFormatado}\n`;
+            }
+            
         });
 
         texto += `\n_Gerado pelo Cálculo de Churrasco 🚀_`;
@@ -64,8 +82,11 @@ export default function Calculadora({ opcoes }) {
 
     const ColunaCarne = (sub) => (
         <div key={sub} style={{ flex: 1, border: '1px solid #ddd', padding: '10px', borderRadius: '4px', minWidth: '150px' }}>
-            <strong style={{ color: '#e53935', display: 'block', marginBottom: '8px' }}>{sub}</strong>
-            {opcoes.carnes.filter(c => c.subcategoria === sub && c.ativo).map(c => (
+            <strong style={{ color: '#e53935', display: 'block', marginBottom: '8px' }}>{EMOJIS[sub]} {sub.toUpperCase()}</strong>
+            {opcoes.carnes
+            .filter(c => c.subcategoria === sub && c.ativo)
+            .sort((a, b) => a.nome.localeCompare(b.nome))
+            .map(c => (
                 <div key={c.id} style={{ marginBottom: '4px' }}>
                     <input type="checkbox" id={`it-${c.id}`} onChange={() => handleToggle(c.id)} />
                     <label htmlFor={`it-${c.id}`} style={{ marginLeft: '5px', cursor: 'pointer' }}>{c.nome}</label>
@@ -82,6 +103,22 @@ export default function Calculadora({ opcoes }) {
                     <input type="number" min="0" value={pessoas.adultos} style={{ width: '80%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc' }}
                             onChange={e => setPessoas({ ...pessoas, adultos: parseInt(e.target.value) || 0 })} />
                 </div>
+
+                <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Adultos que consomem álcool</label>
+                    <input 
+                        type="number" 
+                        value={pessoas.adultosQueBebem} 
+                        min="0"
+                        max={pessoas.adultos} 
+                        onChange={e => {
+                            const val = parseInt(e.target.value) || 0;
+                            setPessoas({ ...pessoas, adultosQueBebem: val > pessoas.adultos ? pessoas.adultos : val || 0 });   
+                        }} 
+                        style={{ width: '80%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc' }}
+                    />
+                </div>
+                
                 <div style={{ flex: 1 }}>
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Crianças</label>
                     <input type="number" min="0" value={pessoas.criancas} style={{ width: '80%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc' }}
@@ -90,16 +127,18 @@ export default function Calculadora({ opcoes }) {
             </div>
 
             <section>
-                <h3>🥩 Selecione as Carnes</h3>
+                <h3>Selecione as Carnes</h3>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '25px' }}>
                     {['Bovina', 'Suína', 'Frango', 'Linguiça', 'Outras'].map(s => ColunaCarne(s))}
                 </div>
             </section>
-
+            <h3>Outros Itens</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
                 {['bebidas', 'adicionais', 'acompanhamentos', 'utensilios'].map(cat => (
                     <div key={cat} style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '8px', background: '#fff' }}>
-                        <strong style={{ textTransform: 'uppercase', fontSize: '12px', color: '#666', display: 'block', marginBottom: '10px' }}>{cat}</strong>
+                        <strong style={{ textTransform: 'uppercase', fontSize: '16px', color: '#666', display: 'block', marginBottom: '10px' }}>
+                            {EMOJIS[cat]} {cat}
+                        </strong>
                         {opcoes[cat].filter(i => i.ativo).map(i => (
                             <div key={i.id} style={{ marginBottom: '6px', display: 'flex', alignItems: 'center' }}>
                                 <input type="checkbox" id={`it-${i.id}`} onChange={() => handleToggle(i.id)} />
@@ -116,7 +155,7 @@ export default function Calculadora({ opcoes }) {
                 fontSize: '18px', border: 'none', borderRadius: '8px', cursor: 'pointer',
                 boxShadow: '0 4px 15px rgba(229, 57, 53, 0.3)' 
             }}>
-                GERAR LISTA DE COMPRAS
+                📑 GERAR LISTA DE COMPRAS
             </button>
 
             {modalAberto && (
@@ -164,13 +203,14 @@ function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar }) {
                     </div>
                 )}
                 <hr />
-                {['comida', 'bebida', 'outros'].map(tipo => (
+                {['comida', 'bebida', 'outros',].map(tipo => (
                     <div key={tipo} style={{ marginBottom: '20px' }}>
                         <h4 style={{ textTransform: 'uppercase', color: '#777', marginBottom: '10px' }}>{tipo}</h4>
                         {resultado.filter(r => r.tipo === tipo).map((r, i) => (
                             <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #eee' }}>
-                                <span>{r.nome}</span>
-                                <strong>{r.quantidade}</strong>
+                                {obs = r.subtipo === 'observacao'}
+                                <span style={{ fontSize: obs ? '12px' : '16px', color: obs ? '#777' : '#333', }}>{ r.nome }</span>
+                                <strong style={{ fontSize: obs ? '12px' : '16px', color: obs ? '#777' : '#333', }}>{ r.quantidade }</strong>
                             </div>
                         ))}
                     </div>

@@ -5,7 +5,6 @@ import AdminPanel from './pages/Admin';
 import Login from './components/Login';
 import Header from './components/Header';
 
-
 const API_URL = process.env.REACT_APP_API_URL;
 
 export default function App() {
