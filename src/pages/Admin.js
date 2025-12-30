@@ -93,7 +93,7 @@ export default function Admin({ opcoes, setOpcoes }) {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto', fontFamily: 'sans-serif' }}>
+    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
       
       {mensagem && (
         <div style={{

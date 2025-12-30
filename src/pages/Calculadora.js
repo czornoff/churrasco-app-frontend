@@ -25,6 +25,43 @@ export default function Calculadora({ opcoes }) {
         setModalAberto(true);
     };
 
+    const enviarWhatsApp = (adultos, criancas, resultados) => {
+        const nomeResponsavel = prompt("Qual o seu nome?", "Mestre do Churrasco");
+
+        if (nomeResponsavel === null) return;
+
+        let texto = `*🔥 LISTA DE CHURRASCO 🔥*\n`;
+        texto += `----------------------------\n`;
+        texto += `👤 *Organizador:* ${nomeResponsavel}\n`;
+        texto += `👥 *Público:*\n`;
+        texto += `• Adultos: ${adultos}\n`;
+        texto += `• Crianças: ${criancas}\n`;
+        texto += `----------------------------\n\n`;
+        
+        texto += `*📋 ITENS NECESSÁRIOS:*\n`;
+
+        resultados.forEach(item => {
+            const unit = item.ml ? 'ml' : (item.unidade || 'g');
+            const valor = item.quantidade || item.ml || 0;
+            
+            let valorFormatado = valor;
+
+            if (unit === 'g' && valor >= 1000) {
+                valorFormatado = (valor / 1000).toFixed(2);
+            } 
+
+            texto += `• *${item.nome}*: ${valorFormatado}\n`;
+        });
+
+        texto += `\n_Gerado pelo Cálculo de Churrasco 🚀_`;
+
+        // 2. O SEGREDO: Usamos o encodeURIComponent para proteger os emojis e acentos
+        const linkFinal = `https://api.whatsapp.com/send/?text=${encodeURIComponent(texto)}`;
+
+        // 3. Abrir o link
+        window.open(linkFinal, '_blank');
+    };
+
     const ColunaCarne = (sub) => (
         <div key={sub} style={{ flex: 1, border: '1px solid #ddd', padding: '10px', borderRadius: '4px', minWidth: '150px' }}>
             <strong style={{ color: '#e53935', display: 'block', marginBottom: '8px' }}>{sub}</strong>
@@ -39,11 +76,6 @@ export default function Calculadora({ opcoes }) {
 
     return (
         <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
-            <header style={{ textAlign: 'center', marginBottom: '30px' }}>
-                <h1>🔥 Calculadora de Churrasco</h1>
-                <p>Calcule a quantidade exata para o seu churrasco</p>
-            </header>
-            
             <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', background: '#f9f9f9', padding: '25px', borderRadius: '12px', border: '1px solid #eee' }}>
                 <div style={{ flex: 1 }}>
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Adultos</label>
@@ -87,17 +119,50 @@ export default function Calculadora({ opcoes }) {
                 GERAR LISTA DE COMPRAS
             </button>
 
-            {modalAberto && <ModalResultado resultado={resultado} fechar={() => setModalAberto(false)} />}
+            {modalAberto && (
+                <ModalResultado 
+                    resultado={resultado} 
+                    pessoas={pessoas} 
+                    enviarWhatsApp={enviarWhatsApp} 
+                    fechar={() => setModalAberto(false)} 
+                />
+            )}
         </div>
     );
 }
 
 // Sub-componente do Modal (pode ser movido para arquivo próprio depois)
-function ModalResultado({ resultado, fechar }) {
+function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar }) {
     return (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2000 }}>
             <div style={{ background: 'white', padding: '30px', borderRadius: '15px', width: '90%', maxWidth: '500px', maxHeight: '85vh', overflowY: 'auto' }}>
                 <h2 style={{ color: '#e53935', marginTop: 0 }}>📋 Lista Gerada</h2>
+                <hr />
+                {resultado && resultado.length > 0 && (
+                    <div style={{ marginBottom: '20px' }}>
+                        <button 
+                            onClick={() => enviarWhatsApp(pessoas.adultos, pessoas.criancas, resultado)}
+                            style={{
+                                backgroundColor: '#25D366',
+                                color: 'white',
+                                padding: '15px',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                                fontSize: '16px',
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                                marginBottom: '15px'
+                            }}
+                        >
+                            <span>📱 Enviar Lista para o WhatsApp</span>
+                        </button>
+                    </div>
+                )}
                 <hr />
                 {['comida', 'bebida', 'outros'].map(tipo => (
                     <div key={tipo} style={{ marginBottom: '20px' }}>

@@ -1,4 +1,8 @@
 /* Estilo do Switch */
+html {
+  overflow-y: scroll;
+}
+
 .switch {
   position: relative;
   display: inline-block;
