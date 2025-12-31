@@ -1,48 +1,30 @@
 import React, { useState } from 'react';
 import { commonStyles as styles, modalStyles } from '../components/Styles';
 
-const Receitas = () => {
+// Recebemos 'dados' que vem do App.js (do MongoDB)
+const Receitas = ({ dados }) => {
     const [receitaAtiva, setReceitaAtiva] = useState(null);
 
-    const listaReceitas = [
-        { 
-            id: 1, 
-            prato: "Picanha no Alho", 
-            tempo: "40 min", 
-            dificuldade: "Fácil",
-            ingredientes: ["1 peça de Picanha", "5 dentes de alho amassados", "Sal grosso", "Azeite"],
-            preparo: "Misture o alho com azeite e passe na carne. Cubra com sal grosso e leve à grelha com a gordura para cima primeiro."
-        },
-        { 
-            id: 2, 
-            prato: "Maionese de Batata", 
-            tempo: "30 min", 
-            dificuldade: "Média",
-            ingredientes: ["500g de batatas", "3 ovos cozidos", "Maionese a gosto", "Cheiro verde"],
-            preparo: "Cozinhe as batatas em cubos. Misture com os ovos picados e a maionese. Finalize com cheiro verde."
-        },
-        { 
-            id: 3, 
-            prato: "Pão de Alho Caseiro", 
-            tempo: "15 min", 
-            dificuldade: "Fácil",
-            ingredientes: ["Pão francês", "Maionese", "Alho", "Queijo parmesão", "Orégano"],
-            preparo: "Corte os pães sem separar as fatias. Recheie com o creme de alho e queijo. Leve à churrasqueira até dourar."
-        }
-    ];
+    // Se o banco ainda não carregou, exibe um carregando amigável
+    if (!dados) return <div style={{padding: '50px', textAlign: 'center'}}>Carregando receitas...</div>;
+
+    // Usamos os itens vindos do banco, ou uma lista vazia caso não existam
+    const listaReceitas = dados.itens || [];
 
     return (
         <div style={styles.container}>
             <header style={styles.header}>
-                <h1 style={styles.title}>Receitas de Sucesso</h1>
-                <p style={styles.subtitle}>Acompanhamentos e preparos especiais</p>
+                {/* Título e Subtítulo agora vêm do Admin */}
+                <h1 style={styles.title}>{dados.titulo || "Receitas de Sucesso"}</h1>
+                <p style={styles.subtitle}>{dados.subtitulo || "Acompanhamentos e preparos especiais"}</p>
             </header>
+
             <div style={styles.grid}>
-                {listaReceitas.map(r => (
-                    <div key={r.id} style={{...styles.card, borderTopColor: '#4caf50'}}>
-                        <h3 style={styles.cardTitle}>🍳 {r.prato}</h3>
+                {listaReceitas.map((r, index) => (
+                    <div key={index} style={{...styles.card, borderTopColor: '#4caf50'}}>
+                        <h3 style={styles.cardTitle}>{r.icone || '🍳'} {r.titulo}</h3>
                         <div style={{fontSize: '13px', color: '#888', marginTop: '5px'}}>
-                            ⏱ {r.tempo} | 📊 {r.dificuldade}
+                            ⏱ {r.tempo || 'N/A'} | 📊 {r.nivel || 'Fácil'}
                         </div>
                         <button 
                             style={styles.viewBtn}
@@ -52,24 +34,36 @@ const Receitas = () => {
                 ))}
             </div>
 
-            {/* MODAL */}
+            {/* MODAL DE DETALHES */}
             {receitaAtiva && (
                 <div style={modalStyles.overlay} onClick={() => setReceitaAtiva(null)}>
                     <div style={modalStyles.content} onClick={e => e.stopPropagation()}>
                         <button style={modalStyles.closeBtn} onClick={() => setReceitaAtiva(null)}>✕</button>
-                        <h2 style={{color: '#1a1a1a'}}>{receitaAtiva.prato}</h2>
                         
-                        <h4 style={modalStyles.sectionTitle}>🛒 Ingredientes:</h4>
-                        <ul style={modalStyles.list}>
-                            {receitaAtiva.ingredientes.map((ing, i) => <li key={i}>{ing}</li>)}
-                        </ul>
-
+                        <h2 style={{color: '#1a1a1a', marginBottom: '10px'}}>{receitaAtiva.titulo}</h2>
+                        
+                        <div style={{display: 'flex', gap: '15px', marginBottom: '20px', fontSize: '14px', color: '#666'}}>
+                            <span>⏱ <strong>Tempo:</strong> {receitaAtiva.tempo}</span>
+                            <span>📊 <strong>Nível:</strong> {receitaAtiva.nivel}</span>
+                        </div>
+                        <h4 style={modalStyles.sectionTitle}>🛒 Ingredientes</h4>
+                        <p style={{...modalStyles.text, whiteSpace: 'pre-line'}}>
+                            {Array.isArray(receitaAtiva.ingredientes) ? receitaAtiva.ingredientes.join('\n') : receitaAtiva.ingredientes || ''}
+                        </p>
                         <h4 style={modalStyles.sectionTitle}>👨‍🍳 Modo de Preparo:</h4>
-                        <p style={modalStyles.text}>{receitaAtiva.preparo}</p>
+                        {/* Renderiza o texto respeitando as quebras de linha do Admin */}
+                        <p style={{...modalStyles.text, whiteSpace: 'pre-line'}}>
+                            {receitaAtiva.preparo}
+                        </p>
                     </div>
                 </div>
+            )}
+
+            {listaReceitas.length === 0 && (
+                <p style={{textAlign: 'center', color: '#888', marginTop: '50px'}}>Nenhuma receita cadastrada no momento.</p>
             )}
         </div>
     );
 };
+
 export default Receitas;

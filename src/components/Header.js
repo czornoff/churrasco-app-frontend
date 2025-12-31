@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
+
 export default function Header({ usuario }) {
     const [menuAberto, setMenuAberto] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [dropdownAberto, setDropdownAberto] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
@@ -27,7 +29,7 @@ export default function Header({ usuario }) {
                     <Link to="/" style={styles.logoLink} onClick={() => setMenuAberto(false)}>
                         <img 
                             src="/logo.png" 
-                            alt="Logo ChurrasApp" 
+                            alt="Logo Calculadora de Churrasco" 
                             style={styles.logoImg} 
                         /><span style={styles.logoText}>Calculadora de Churrasco</span>
                     </Link>
@@ -38,6 +40,7 @@ export default function Header({ usuario }) {
                             <Link to="/produtos" style={styles.navLink}>Produtos</Link>
                             <Link to="/receitas" style={styles.navLink}>Receitas</Link>
                             <Link to="/utensilios" style={styles.navLink}>Utensílios</Link>
+                            <Link to="/sobre" style={styles.navLink}>Sobre</Link>
                         </nav>
                     )}
                 </div>
@@ -45,8 +48,30 @@ export default function Header({ usuario }) {
                 <div style={styles.rightSection}>
                     {usuario ? (
                         <div style={styles.userSection}>
-                            {usuario.role === 'admin' && !isMobile && (
-                                <Link to="/admin" style={styles.adminLink}>Painel Admin</Link>
+                            {usuario?.role === 'admin' && !isMobile && (
+                                <div 
+                                    style={styles.dropdownContainer}
+                                    onMouseEnter={() => setDropdownAberto(true)}
+                                    onMouseLeave={() => setDropdownAberto(false)}
+                                >
+                                    <button style={styles.adminDropdownBtn}>
+                                        🛠️ Admin ▼
+                                    </button>
+
+                                    {dropdownAberto && (
+                                        <div style={styles.dropdownMenu}>
+                                            <Link to="/admin" style={styles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                                ⚙️ Itens
+                                            </Link>
+                                            <Link to="/admin/conteudo" style={styles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                                📝 Conteúdo
+                                            </Link>
+                                            <Link to="/admin/usuarios" style={styles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                                👥 Usuários
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div>
                             )}
                             
                             <div style={styles.profile}>
@@ -77,10 +102,16 @@ export default function Header({ usuario }) {
                     <Link to="/produtos" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>Produtos</Link>
                     <Link to="/receitas" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>Receitas</Link>
                     <Link to="/utensilios" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>Utensílios</Link>
+                    <Link to="/sobre" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>Sobre</Link>
                     <hr style={styles.divider} />
-                    {usuario?.role === 'admin' && (
-                        <Link to="/admin" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>Painel Admin</Link>
-                    )}
+                    <span style={{color: '#FFC107'}}>Administração:</span>
+                        {usuario?.role === 'admin' && (
+                            <>
+                                <Link to="/admin" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>⚙️ Itens</Link>
+                                <Link to="/admin/conteudo" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>📝 Conteúdo</Link>
+                                <Link to="/admin/usuarios" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>👥 Usuários</Link>
+                            </>
+                        )}
                     <button onClick={handleLogout} style={styles.mobileLogoutBtn}>Sair da Conta</button>
                 </div>
             )}
@@ -232,5 +263,49 @@ const styles = {
         padding: '8px 20px',
         borderRadius: '4px',
         fontWeight: 'bold'
-    }
+    },
+    dropdownContainer: {
+        position: 'relative',
+        display: 'inline-block'
+    },
+    adminDropdownBtn: {
+        backgroundColor: '#333',
+        color: '#ffc107',
+        border: '1px solid #ffc107',
+        padding: '8px 15px',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        fontSize: '13px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '5px'
+    },
+    dropdownMenu: {
+        position: 'absolute',
+        top: '100%',
+        right: 0,
+        backgroundColor: '#222',
+        minWidth: '180px',
+        boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
+        borderRadius: '4px',
+        zIndex: 1100,
+        padding: '5px 0',
+        border: '1px solid #444',
+        marginTop: '5px'
+    },
+    dropdownItem: {
+        color: '#fff',
+        padding: '12px 16px',
+        textDecoration: 'none',
+        display: 'block',
+        fontSize: '14px',
+        transition: 'background 0.2s',
+        textAlign: 'left'
+    },
+    dropdownDivider: {
+        height: '1px',
+        backgroundColor: '#444',
+        margin: '5px 0'
+    },
 };
