@@ -25,7 +25,11 @@ export default function Header({ usuario }) {
             <div style={styles.container}>
                 <div style={styles.leftSection}>
                     <Link to="/" style={styles.logoLink} onClick={() => setMenuAberto(false)}>
-                        🔥 <span style={styles.logoText}>Calculadora de Churrasco</span>
+                        <img 
+                            src="/logo.png" 
+                            alt="Logo ChurrasApp" 
+                            style={styles.logoImg} 
+                        /><span style={styles.logoText}>Calculadora de Churrasco</span>
                     </Link>
 
                     {!isMobile && (
@@ -113,6 +117,12 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         gap: '8px'
+    },
+    logoImg: {
+        height: '100px',  // Ajuste a altura conforme necessário
+        width: 'auto',   // Mantém a proporção
+        display: 'block',
+        marginTop: '30px' // Ajuste vertical para alinhar com o texto
     },
     logoText: {
         fontSize: '22px',
