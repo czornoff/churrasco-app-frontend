@@ -5,6 +5,12 @@ import AdminPanel from './pages/Admin';
 import Login from './components/Login';
 import Header from './components/Header';
 
+// Importe as novas páginas (Certifique-se de criar estes arquivos na pasta pages)
+import Produtos from './pages/Produtos';
+import Utensilios from './pages/Utensilios';
+import Receitas from './pages/Receitas';
+import Dicas from './pages/Dicas';
+
 const API_URL = process.env.REACT_APP_API_URL;
 
 export default function App() {
@@ -40,20 +46,28 @@ export default function App() {
     {/* O Header fica fora do Routes para aparecer em tudo */}
     <Header usuario={usuario} /> 
     
-    <div style={{ marginTop: '20px' }}> {/* Espaçamento para o conteúdo não grudar no header */}
+    <div style={{ marginTop: '0px' }}> {/* Espaçamento para o conteúdo não grudar no header */}
         <Routes>
             <Route path="/" element={<Calculadora opcoes={opcoes} />} />
+            <Route path="/dicas" element={<Dicas />} />
+            <Route path="/produtos" element={<Produtos />} />
+            <Route path="/receitas" element={<Receitas />} />
+            <Route path="/utensilios" element={<Utensilios />} />
+
+            {/* Autenticação e Admin */}
             <Route path="/login" element={usuario ? <Navigate to="/" /> : <Login />} />
             <Route 
-            path="/admin" 
-            element={
-                usuario?.role === 'admin' ? (
-                <AdminPanel opcoes={opcoes} setOpcoes={setOpcoes} />
-                ) : (
-                <Navigate to="/login" />
-                )
-            } 
+                path="/admin" 
+                element={
+                    usuario?.role === 'admin' ? (
+                        <AdminPanel opcoes={opcoes} setOpcoes={setOpcoes} />
+                    ) : (
+                        <Navigate to="/login" />
+                    )
+                } 
             />
+
+            {/* Fallback para home */}
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>
     </div>

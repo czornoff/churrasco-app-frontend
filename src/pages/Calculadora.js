@@ -14,11 +14,16 @@ const EMOJIS = {
     'utensilios': '🍴'
 };
 
-let obs, obsW = '';
-
 export default function Calculadora({ opcoes }) {
     const [selecionados, setSelecionados] = useState([]);
-    const [pessoas, setPessoas] = useState({ adultos: 0, criancas: 0, adultosQueBebem: 0 });
+    // 1. ESTADO ATUALIZADO
+    const [pessoas, setPessoas] = useState({ 
+        homens: 0, 
+        mulheres: 0, 
+        criancas: 0, 
+        adultosQueBebem: 0,
+        horas: 4 // Valor padrão sugerido
+    });
     const [resultado, setResultado] = useState(null);
     const [modalAberto, setModalAberto] = useState(false);
 
@@ -27,7 +32,9 @@ export default function Calculadora({ opcoes }) {
     );
 
     const calcular = async () => {
-        if (pessoas.adultos === 0 && pessoas.criancas === 0) return alert("Informe o número de pessoas");
+        if (pessoas.homens === 0 && pessoas.mulheres === 0 && pessoas.criancas === 0) {
+            return alert("Informe o número de pessoas");
+        }
         
         const res = await fetch(`${API_URL}/calcular`, {
             method: 'POST',
@@ -39,44 +46,58 @@ export default function Calculadora({ opcoes }) {
         setModalAberto(true);
     };
 
-    const enviarWhatsApp = (adultos, criancas, resultados) => {
+    // 2. WHATSAPP ATUALIZADO COM HOMENS E MULHERES
+    const enviarWhatsApp = (p, resultados) => {
         const nomeResponsavel = prompt("Qual o seu nome?", "Mestre do Churrasco");
-
         if (nomeResponsavel === null) return;
 
         let texto = `*🔥 LISTA DE CHURRASCO 🔥*\n`;
         texto += `----------------------------\n`;
         texto += `👤 *Organizador:* ${nomeResponsavel}\n`;
-        texto += `👥 *Público:*\n`;
-        texto += `• Adultos: ${adultos}\n`;
-        texto += `• Crianças: ${criancas}\n`;
+        texto += `👥 *Público:* \n`;
+        texto += `🧔 ${p.homens} Homens | 👩 ${p.mulheres} Mulheres | 👶 ${p.criancas} Crianças\n`;
+        texto += `🍻 Bebem álcool: ${p.adultosQueBebem}\n`;
         texto += `----------------------------\n\n`;
         
         texto += `*📋 ITENS NECESSÁRIOS:*\n`;
 
-        resultados.forEach(item => {
-            const unit = item.ml ? 'ml' : (item.unidade || 'g');
-            const valor = item.quantidade || item.ml || 0;
-            
-            let valorFormatado = valor;
+        // Separando categorias para a mensagem
+        const comida = resultados.filter(r => r.tipo === 'comida');
+        const naoAlcoolicas = resultados.filter(r => r.tipo === 'bebida' && !r.nome.includes('🍻') && r.subtipo !== 'observacao');
+        const alcoolicas = resultados.filter(r => r.tipo === 'bebida' && r.nome.includes('🍻'));
+        const outros = resultados.filter(r => r.tipo === 'outros');
+        
+        // Pegando as observações de litros
+        const obsNaoAlcool = resultados.find(r => r.nome.includes('NÃO alcoólica'))?.quantidade;
+        const obsAlcool = resultados.find(r => r.nome.includes('alcoólica') && !r.nome.includes('NÃO'))?.quantidade;
 
-            if (unit === 'g' && valor >= 1000) {
-                valorFormatado = (valor / 1000).toFixed(2);
-            } 
-            if (item.subtipo === 'observacao') {
-                texto += `_${item.nome}:  ${valorFormatado}_\n`;
-            } else {
-                texto += `• *${item.nome}*: ${valorFormatado}\n`;
-            }
-            
-        });
+        if (comida.length > 0) {
+            texto += `*🥩 COMIDA:* \n`;
+            comida.forEach(item => texto += `• ${item.nome}: ${item.quantidade}\n`);
+            texto += `\n`;
+        }
 
-        texto += `\n_Gerado pelo Cálculo de Churrasco 🚀_`;
+        if (naoAlcoolicas.length > 0) {
+            texto += `*🥤 BEBIDAS NÃO ALCOÓLICAS:* \n`;
+            if (obsNaoAlcool) texto += `_Total estimado: ${obsNaoAlcool}_\n`;
+            naoAlcoolicas.forEach(item => texto += `• ${item.nome.replace('🥤 ', '')}: ${item.quantidade}\n`);
+            texto += `\n`;
+        }
 
-        // 2. O SEGREDO: Usamos o encodeURIComponent para proteger os emojis e acentos
+        if (alcoolicas.length > 0) {
+            texto += `*🍻 BEBIDAS ALCOÓLICAS:* \n`;
+            if (obsAlcool) texto += `_Total estimado: ${obsAlcool}_\n`;
+            alcoolicas.forEach(item => texto += `• ${item.nome.replace('🍻 ', '')}: ${item.quantidade}\n`);
+            texto += `\n`;
+        }
+
+        if (outros.length > 0) {
+            texto += `*🍴 UTENSÍLIOS:* \n`;
+            outros.forEach(item => texto += `• ${item.nome.replace('🍴 ', '')}: ${item.quantidade}\n`);
+        }
+
+        texto += `\n_Gerado por ChurrasCalculadora_`;
         const linkFinal = `https://api.whatsapp.com/send/?text=${encodeURIComponent(texto)}`;
-
-        // 3. Abrir o link
         window.open(linkFinal, '_blank');
     };
 
@@ -97,32 +118,55 @@ export default function Calculadora({ opcoes }) {
 
     return (
         <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
-            <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', background: '#f9f9f9', padding: '25px', borderRadius: '12px', border: '1px solid #eee' }}>
-                <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Adultos</label>
-                    <input type="number" min="0" value={pessoas.adultos} style={{ width: '80%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc' }}
-                            onChange={e => setPessoas({ ...pessoas, adultos: parseInt(e.target.value) || 0 })} />
+            {/* 3. INPUTS DE PESSOAS ATUALIZADOS */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '20px', marginBottom: '20px', background: '#f9f9f9', padding: '25px', borderRadius: '12px', border: '1px solid #eee' }}>
+                <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>🧔 Homens</label>
+                    <input type="number" min="0" value={pessoas.homens} style={{ width: '90%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc' }}
+                            onChange={e => setPessoas({ ...pessoas, homens: parseInt(e.target.value) || 0 })} />
                 </div>
 
-                <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Adultos que consomem álcool</label>
+                <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>👩 Mulheres</label>
+                    <input type="number" min="0" value={pessoas.mulheres} style={{ width: '90%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc' }}
+                            onChange={e => setPessoas({ ...pessoas, mulheres: parseInt(e.target.value) || 0 })} />
+                </div>
+
+                <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>🍺 Bebem Álcool</label>
                     <input 
                         type="number" 
+                        min="0" 
+                        // A trava visual: o valor máximo permitido é a soma de homens + mulheres
+                        max={pessoas.homens + pessoas.mulheres} 
                         value={pessoas.adultosQueBebem} 
-                        min="0"
-                        max={pessoas.adultos} 
+                        style={{ width: '90%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc' }}
                         onChange={e => {
-                            const val = parseInt(e.target.value) || 0;
-                            setPessoas({ ...pessoas, adultosQueBebem: val > pessoas.adultos ? pessoas.adultos : val || 0 });   
+                            const totalAdultos = pessoas.homens + pessoas.mulheres;
+                            let valor = parseInt(e.target.value) || 0;
+                            
+                            // Se o usuário tentar digitar um número maior que o total de adultos
+                            if (valor > totalAdultos) {
+                                valor = totalAdultos;
+                            }
+                            
+                            setPessoas({ ...pessoas, adultosQueBebem: valor });
                         }} 
-                        style={{ width: '80%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc' }}
                     />
+                    <small style={{ color: '#888', fontSize: '10px' }}>Máximo: {pessoas.homens + pessoas.mulheres} adultos</small>
                 </div>
-                
-                <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Crianças</label>
-                    <input type="number" min="0" value={pessoas.criancas} style={{ width: '80%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc' }}
+
+                <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>👶 Crianças</label>
+                    <input type="number" min="0" value={pessoas.criancas} style={{ width: '90%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc' }}
                             onChange={e => setPessoas({ ...pessoas, criancas: parseInt(e.target.value) || 0 })} />
+                </div>
+
+                <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>⏱️ Horas</label>
+                    <input type="number" min="4" value={pessoas.horas} style={{ width: '90%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc' }}
+                            onChange={e => setPessoas({ ...pessoas, horas: parseInt(e.target.value) || 1 })} />
+                    <small style={{ color: '#888', fontSize: '10px' }}>Mínimo: 4 horas</small>
                 </div>
             </div>
 
@@ -132,6 +176,8 @@ export default function Calculadora({ opcoes }) {
                     {['Bovina', 'Suína', 'Frango', 'Linguiça', 'Outras'].map(s => ColunaCarne(s))}
                 </div>
             </section>
+
+            {/* Restante do código (Outros itens, botão calcular) permanece similar */}
             <h3>Outros Itens</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
                 {['bebidas', 'adicionais', 'acompanhamentos', 'utensilios'].map(cat => (
@@ -170,49 +216,41 @@ export default function Calculadora({ opcoes }) {
     );
 }
 
-// Sub-componente do Modal (pode ser movido para arquivo próprio depois)
 function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar }) {
     return (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2000 }}>
             <div style={{ background: 'white', padding: '30px', borderRadius: '15px', width: '90%', maxWidth: '500px', maxHeight: '85vh', overflowY: 'auto' }}>
                 <h2 style={{ color: '#e53935', marginTop: 0 }}>📋 Lista Gerada</h2>
+                
+                {/* INFO DE PESSOAS NO MODAL */}
+                <div style={{ fontSize: '14px', background: '#f5f5f5', padding: '10px', borderRadius: '8px', marginBottom: '15px' }}>
+                    🧔 {pessoas.homens} | 👩 {pessoas.mulheres} | 👶 {pessoas.criancas} | ⏱️ {pessoas.horas}h
+                </div>
+
+                <button 
+                    onClick={() => enviarWhatsApp(pessoas, resultado)}
+                    style={{
+                        backgroundColor: '#25D366', color: 'white', padding: '15px', border: 'none',
+                        borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', width: '100%',
+                        marginBottom: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                    }}
+                >
+                    📱 Enviar para WhatsApp
+                </button>
+
                 <hr />
-                {resultado && resultado.length > 0 && (
-                    <div style={{ marginBottom: '20px' }}>
-                        <button 
-                            onClick={() => enviarWhatsApp(pessoas.adultos, pessoas.criancas, resultado)}
-                            style={{
-                                backgroundColor: '#25D366',
-                                color: 'white',
-                                padding: '15px',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontWeight: 'bold',
-                                cursor: 'pointer',
-                                fontSize: '16px',
-                                width: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '8px',
-                                marginBottom: '15px'
-                            }}
-                        >
-                            <span>📱 Enviar Lista para o WhatsApp</span>
-                        </button>
-                    </div>
-                )}
-                <hr />
-                {['comida', 'bebida', 'outros',].map(tipo => (
+                {['comida', 'bebida', 'outros'].map(tipo => (
                     <div key={tipo} style={{ marginBottom: '20px' }}>
                         <h4 style={{ textTransform: 'uppercase', color: '#777', marginBottom: '10px' }}>{tipo}</h4>
-                        {resultado.filter(r => r.tipo === tipo).map((r, i) => (
-                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #eee' }}>
-                                {obs = r.subtipo === 'observacao'}
-                                <span style={{ fontSize: obs ? '12px' : '16px', color: obs ? '#777' : '#333', }}>{ r.nome }</span>
-                                <strong style={{ fontSize: obs ? '12px' : '16px', color: obs ? '#777' : '#333', }}>{ r.quantidade }</strong>
-                            </div>
-                        ))}
+                        {resultado.filter(r => r.tipo === tipo).map((r, i) => {
+                            const isObs = r.subtipo === 'observacao';
+                            return (
+                                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #eee' }}>
+                                    <span style={{ fontSize: isObs ? '12px' : '16px', color: isObs ? '#777' : '#333' }}>{ r.nome }</span>
+                                    <strong style={{ fontSize: isObs ? '12px' : '16px', color: isObs ? '#777' : '#333' }}>{ r.quantidade }</strong>
+                                </div>
+                            );
+                        })}
                     </div>
                 ))}
                 <button onClick={fechar} style={{ width: '100%', padding: '15px', background: '#333', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', marginTop: '10px' }}>FECHAR</button>
