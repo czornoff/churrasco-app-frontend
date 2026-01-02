@@ -30,7 +30,7 @@ export default function Usuarios() {
     }, []);
 
     const carregarUsuarios = () => {
-        fetch(`${API_URL}/admin/usuarios`, { credentials: 'include' })
+        fetch(`${API_URL}/api/usuario`, { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
                 setListaUsuarios(data);
@@ -45,7 +45,7 @@ export default function Usuarios() {
     const handleAtualizar = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch(`${API_URL}/admin/usuarios/${usuarioEditando._id}`, {
+            const res = await fetch(`${API_URL}/admin/usuario/salvar/${usuarioEditando._id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -72,7 +72,7 @@ export default function Usuarios() {
         // 1. Confirmação para evitar cliques acidentais
         if (window.confirm("⚠️ ATENÇÃO: Tem certeza que deseja excluir permanentemente este usuário?")) {
             try {
-                const res = await fetch(`${API_URL}/admin/usuarios/${id}`, { 
+                const res = await fetch(`${API_URL}/admin/usuario/excluir/${id}`, { 
                     method: 'DELETE',
                     credentials: 'include' // Essencial para o middleware eAdmin funcionar
                 });
@@ -209,7 +209,7 @@ export default function Usuarios() {
                         <h3 style={{ marginTop: 0 }}>Cadastrar Novo Usuário</h3>
                         <form onSubmit={async (e) => {
                             e.preventDefault();
-                            const res = await fetch(`${API_URL}/admin/usuarios`, {
+                            const res = await fetch(`${API_URL}/admin/usuario/salvar`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(novoUsuario),
