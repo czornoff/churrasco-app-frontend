@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { footerStyles as styles } from '../components/Styles';
 
 export default function Footer() {
     return (
@@ -46,48 +47,3 @@ export default function Footer() {
         </footer>
     );
 }
-
-const styles = {
-    footer: {
-        backgroundColor: '#1a1a1a',
-        color: '#ccc',
-        padding: '40px 0 0 0',
-        marginTop: '60px',
-        borderTop: '3px solid #ff5252',
-        fontFamily: "'Segoe UI', Roboto, sans-serif"
-    },
-    container: {
-        maxWidth: '1200px',
-        margin: '0 auto',
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-        padding: '0 20px',
-        gap: '30px'
-    },
-    column: {
-        flex: '1',
-        minWidth: '250px'
-    },
-    logoSection: {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '10px',
-        marginBottom: '15px'
-    },
-    logoImg: { height: '35px', width: 'auto' },
-    logoText: { color: '#ff5252', fontSize: '20px', fontWeight: 'bold' },
-    description: { fontSize: '14px', lineHeight: '1.6' },
-    heading: { color: '#fff', fontSize: '16px', marginBottom: '15px', textTransform: 'uppercase' },
-    nav: { display: 'flex', flexDirection: 'column', gap: '10px' },
-    link: { color: '#aaa', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' },
-    socialRow: { marginTop: '10px' },
-    socialIcon: { color: '#ff5252', textDecoration: 'none', fontSize: '14px', fontWeight: 'bold' },
-    bottomBar: {
-        borderTop: '1px solid #333',
-        marginTop: '40px',
-        padding: '20px',
-        textAlign: 'center'
-    },
-    copyright: { fontSize: '12px', color: '#666', margin: 0 }
-};

@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Calculadora de Churrasco",
+  "name": "A solução inteligente para organizar seu churrasco sem desperdícios.",
   "icons": [
     {
       "src": "favicon.ico",

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { loginStyles as styles } from '../components/Styles';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -124,21 +125,3 @@ export default function Login() {
         </div>
     );
 }
-
-// Os estilos permanecem os mesmos que você já tem...
-const styles = {
-    container: { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '85vh', fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif', backgroundColor: '#f5f5f5' },
-    card: { background: '#fff', padding: '30px', borderRadius: '12px', boxShadow: '0 8px 30px rgba(0,0,0,0.1)', textAlign: 'center', maxWidth: '380px', width: '90%' },
-    titulo: { color: '#333', marginBottom: '20px', fontSize: '24px' },
-    googleBtn: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '12px', backgroundColor: '#fff', border: '1px solid #dadce0', borderRadius: '6px', cursor: 'pointer', fontSize: '15px', fontWeight: '600', color: '#3c4043', marginBottom: '15px' },
-    divisor: { borderBottom: '1px solid #eee', lineHeight: '0.1em', margin: '20px 0' },
-    divisorTexto: { background: '#fff', padding: '0 10px', color: '#999', fontSize: '13px' },
-    form: { display: 'flex', flexDirection: 'column', gap: '12px' },
-    input: { padding: '12px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '15px' },
-    submitBtn: { padding: '12px', borderRadius: '6px', border: 'none', backgroundColor: '#e53935', color: '#fff', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', marginTop: '5px' },
-    alerta: { padding: '10px', borderRadius: '6px', fontSize: '14px', marginBottom: '15px' },
-    footer: { marginTop: '20px', fontSize: '14px' },
-    toggleText: { color: '#666', marginBottom: '15px' },
-    toggleLink: { color: '#e53935', fontWeight: 'bold', cursor: 'pointer' },
-    backLink: { color: '#999', textDecoration: 'none', display: 'block', marginTop: '10px' }
-};

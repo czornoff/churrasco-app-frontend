@@ -36,7 +36,7 @@ export default function Calculadora({ opcoes }) {
             return alert("Informe o número de pessoas");
         }
         
-        const res = await fetch(`${API_URL}/calcular`, {
+        const res = await fetch(`${API_URL}/api/calcular`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ...pessoas, selecionados })

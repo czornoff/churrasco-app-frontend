@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Calculadora from './pages/Calculadora';
-import AdminPanel from './pages/Admin';
-import AdminConteudo from './pages/AdminConteudo';
-import AdminUsuario from './pages/AdminUsuario';
 import Login from './components/Login';
 import Header from './components/Header';
 import Footer from './components/Footer';
 
-// Importe as novas páginas (Certifique-se de criar estes arquivos na pasta pages)
+import AdminPanel from './pages/Admin';
+import AdminConteudo from './pages/AdminConteudo';
+import AdminUsuario from './pages/AdminUsuario';
+import Calculadora from './pages/Calculadora';
 import Dicas from './pages/Dicas';
 import Produtos from './pages/Produtos';
 import Receitas from './pages/Receitas';
-import Utensilios from './pages/Utensilios';
 import Sobre from './pages/Sobre';
+import Utensilios from './pages/Utensilios';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -25,7 +24,7 @@ export default function App() {
     const [atualizador, setAtualizador] = useState(0);
     useEffect(() => {
         // 1. Carrega as opções da calculadora
-            fetch(`${API_URL}/opcoes`)
+            fetch(`${API_URL}/api/opcao`)
                 .then(res => res.json())
                 .then(data => setOpcoes(data))
                 .catch(err => console.error("Erro ao carregar opções:", err));
@@ -42,7 +41,7 @@ export default function App() {
                 .finally(() => setCarregando(false));
 
             // Carrega o conteúdo das páginas
-            fetch(`${API_URL}/conteudo?v=${new Date().getTime()}`, {
+            fetch(`${API_URL}/api/conteudo?v=${new Date().getTime()}`, {
                 cache: 'no-store'
             })
                 .then(res => res.json())
