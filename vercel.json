@@ -1,6 +1,10 @@
 {
   "routes": [
     {
+      "src": "/admin/(.*)",
+      "dest": "/admin$1"
+    },
+    {
       "src": "churrasco.zornoff.com.br/(.*)",
       "dest": "https://churrasco.zornoff.com.br$1"
     },
