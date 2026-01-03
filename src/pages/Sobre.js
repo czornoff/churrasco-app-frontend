@@ -13,7 +13,7 @@ export default function Sobre({ dados }) {
                 <h1 style={styles.title}>{dados.sobreTitulo || 'Nossa História'}</h1>
             </header>
 
-            <div style={contentWrapper}>
+            <div style={styles.contentWrapper}>
                 {/* Renderiza o HTML do TinyMCE que veio do banco */}
                 <div 
                     className="html-content"
@@ -23,15 +23,3 @@ export default function Sobre({ dados }) {
         </div>
     );
 }
-
-// Estilos para deixar o texto bonito
-const contentWrapper = {
-    backgroundColor: '#fff',
-    padding: '30px',
-    borderRadius: '12px',
-    marginTop: '20px',
-    lineHeight: '1.8', // Espaçamento entre linhas para leitura fácil
-    fontSize: '16px',
-    color: '#333',
-    boxShadow: '0 4px 10px rgba(0,0,0,0.05)'
-};

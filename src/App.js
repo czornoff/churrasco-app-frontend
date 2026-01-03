@@ -4,9 +4,11 @@ import Login from './components/Login';
 import Header from './components/Header';
 import Footer from './components/Footer';
 
-import AdminPanel from './pages/Admin';
-import AdminConteudo from './pages/AdminConteudo';
-import AdminUsuario from './pages/AdminUsuario';
+import Admin from './pages/admin/Admin';
+import AdminConteudo from './pages/admin/AdminConteudo';
+import AdminItem from './pages/admin/AdminItem';
+import AdminRelatorio from './pages/admin/AdminRelatorio';
+import AdminUsuario from './pages/admin/AdminUsuario';
 import Calculadora from './pages/Calculadora';
 import Dicas from './pages/Dicas';
 import Produtos from './pages/Produtos';
@@ -18,10 +20,12 @@ const API_URL = process.env.REACT_APP_API_URL;
 
 export default function App() {
     const [opcoes, setOpcoes] = useState(null);
+    const [relatorios, setRelatorios] = useState(null);
     const [usuario, setUsuario] = useState(null); // Agora guardamos o objeto do usuário
     const [carregando, setCarregando] = useState(true);
     const [conteudo, setConteudo] = useState(null);
     const [atualizador, setAtualizador] = useState(0);
+    
     useEffect(() => {
         // 1. Carrega as opções da calculadora
             fetch(`${API_URL}/api/opcao`)
@@ -72,7 +76,16 @@ export default function App() {
                         <Route path="/admin" 
                             element={
                                 usuario?.role === 'admin' ? (
-                                    <AdminPanel opcoes={opcoes} setOpcoes={setOpcoes} />
+                                    <Admin opcoes={opcoes} setOpcoes={setOpcoes} />
+                                ) : (
+                                    <Navigate to="/login" />
+                                )
+                            } 
+                        />
+                        <Route path="/admin/item" 
+                            element={
+                                usuario?.role === 'admin' ? (
+                                    <AdminItem opcoes={opcoes} setOpcoes={setOpcoes} />
                                 ) : (
                                     <Navigate to="/login" />
                                 )
@@ -86,6 +99,15 @@ export default function App() {
                                         setConteudo={setConteudo} 
                                         atualizarApp={() => setAtualizador(prev => prev + 1)} // Passe isso
                                     />
+                                ) : (
+                                    <Navigate to="/login" />
+                                )
+                            } 
+                        />
+                        <Route path="/admin/relatorio" 
+                            element={
+                                usuario?.role === 'admin' ? (
+                                    <AdminRelatorio />
                                 ) : (
                                     <Navigate to="/login" />
                                 )

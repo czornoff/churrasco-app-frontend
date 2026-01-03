@@ -39,6 +39,7 @@ export default function Calculadora({ opcoes }) {
         const res = await fetch(`${API_URL}/api/calcular`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ ...pessoas, selecionados })
         });
         const data = await res.json();

@@ -62,10 +62,16 @@ export default function Header({ usuario }) {
                                     {dropdownAberto && (
                                         <div style={styles.dropdownMenu}>
                                             <Link to="/admin" style={styles.dropdownItem} onClick={() => setDropdownAberto(false)}>
-                                                ⚙️ Itens
+                                                📱 Painel
                                             </Link>
                                             <Link to="/admin/conteudo" style={styles.dropdownItem} onClick={() => setDropdownAberto(false)}>
                                                 📝 Conteúdo
+                                            </Link>
+                                            <Link to="/admin/item" style={styles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                                ⚙️ Itens
+                                            </Link>
+                                            <Link to="/admin/relatorio" style={styles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                                📊 Relatórios
                                             </Link>
                                             <Link to="/admin/usuarios" style={styles.dropdownItem} onClick={() => setDropdownAberto(false)}>
                                                 👥 Usuários
@@ -104,16 +110,24 @@ export default function Header({ usuario }) {
                     <Link to="/receitas" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>Receitas</Link>
                     <Link to="/utensilios" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>Utensílios</Link>
                     <Link to="/sobre" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>Sobre</Link>
-                    <hr style={styles.divider} />
-                    <span style={{color: '#FFC107'}}>Administração:</span>
                         {usuario?.role === 'admin' && (
                             <>
-                                <Link to="/admin" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>⚙️ Itens</Link>
+                            <hr style={styles.divider} />
+                            <span style={{color: '#FFC107'}}>Administração:</span>
+                                <Link to="/admin" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>📱 Painel</Link>
                                 <Link to="/admin/conteudo" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>📝 Conteúdo</Link>
+                                <Link to="/admin/item" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>⚙️ Itens</Link>
+                                <Link to="/admin/relatorio" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>📊 Relatórios</Link>
                                 <Link to="/admin/usuarios" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>👥 Usuários</Link>
+                            <button onClick={handleLogout} style={styles.mobileMenuBtn}>Sair da Conta</button>
                             </>
                         )}
-                    <button onClick={handleLogout} style={styles.mobileLogoutBtn}>Sair da Conta</button>
+                        {usuario?.role !== 'admin' && (
+                            <>
+                            <hr style={styles.divider} />
+                            <Link to="/login" style={styles.mobileMenuBtn} onClick={() => setMenuAberto(false)}>Entrar</Link>
+                            </>
+                        )}
                 </div>
             )}
         </header>
