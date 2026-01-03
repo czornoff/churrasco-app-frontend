@@ -14,7 +14,7 @@
     },
     {
       "src": "/*",
-      "dest": "https://churrasco.zornoff.com.br{request.url}"
+      "dest": "/"
     }
   ]
 }
