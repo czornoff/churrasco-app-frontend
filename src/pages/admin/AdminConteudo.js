@@ -1,12 +1,21 @@
-import React, { useState } from 'react';
-import { commonStyles as styles, adminStyles } from '../../components/Styles';
+import React, { useState, useEffect } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-export default function AdminConteudo({ conteudo, setConteudo, atualizarApp }) {
+export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, styles, adminStyles }) {
     const [abaAtiva, setAbaAtiva] = useState('site');
     const [mensagem, setMensagem] = useState('');
+    const [ultimasLogos, setUltimasLogos] = useState([]);
+
+    useEffect(() => {
+        if (abaAtiva === 'site') {
+            fetch(`${API_URL}/admin/listar-logos`, { credentials: 'include' })
+                .then(res => res.json())
+                .then(data => setUltimasLogos(data))
+                .catch(err => console.error("Erro ao carregar histórico de logos", err));
+        }
+    }, [abaAtiva, conteudo.logoUrl]);
 
     if (!conteudo) return <div style={adminStyles.loading}>Carregando configurações...</div>;
 
@@ -81,6 +90,33 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp }) {
         });
     };
 
+    const fazerUploadLogo = async (arquivo) => {
+        if (!arquivo) return;
+
+        const formData = new FormData();
+        formData.append('logo', arquivo);
+
+        try {
+            setMensagem('⏳ Enviando imagem...');
+            const res = await fetch(`${API_URL}/admin/upload-logo`, {
+                method: 'POST',
+                body: formData,
+                credentials: 'include',
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                handleConfigChange('site', 'logoUrl', data.url);
+                setMensagem('✅ Logo enviada! Não esqueça de Salvar Alterações.');
+            } else {
+                alert('Erro no upload');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Erro ao conectar com servidor de imagens');
+        }
+    };
+
     return (
         <div style={styles.container}>
             {mensagem && <div style={adminStyles.msgStyle}>{mensagem}</div>}
@@ -98,7 +134,7 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp }) {
                         onClick={() => setAbaAtiva(tab)}
                         style={{
                             ...adminStyles.tabBtn, 
-                            backgroundColor: abaAtiva === tab ? '#ff5252' : '#333333'
+                            ...(abaAtiva === tab ? adminStyles.statusAtivo : adminStyles.statusInativo)
                         }}
                     >
                         {tab.toUpperCase()}
@@ -110,15 +146,86 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp }) {
                 {/* ABA CONFIGURAÇÕES DO SITE */}
                 {abaAtiva === 'site' && (
                     <div style={styles.column}>
-                        <h3 style={styles.cardTitle}>Geral do Site</h3>
+                        <h3 style={styles.cardTitle}>Identidade Visual</h3>
+                        
+                        <div style={styles.logoWrapper}>
+                            <label style={adminStyles.label}>Logotipo Atual:</label>
+                            <img 
+                                src={conteudo.logoUrl ? `${API_URL}${conteudo.logoUrl}` : '/logos/logo.png'} 
+                                alt="Logotipo Atual" 
+                                style={styles.logoPreview} 
+                            />
+                            
+                            <input 
+                                type="file" 
+                                accept="image/*"
+                                onChange={(e) => fazerUploadLogo(e.target.files[0])} 
+                                style={adminStyles.input}
+                            />
+
+                            {/* SELEÇÃO DE LOGOS ANTIGAS */}
+                            {ultimasLogos.length > 0 && (
+                                <div style={{ marginTop: '15px' }}>
+                                    <label style={{ ...adminStyles.label, fontSize: '0.8rem' }}>Usar uma das últimas 10 enviadas:</label>
+                                    <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
+                                        {ultimasLogos.map((logo, idx) => (
+                                            <img 
+                                                alt="Logotipo Antigo" 
+                                                key={idx}
+                                                src={`${API_URL}${logo.url}`}
+                                                onClick={() => handleConfigChange('site', 'logoUrl', logo.url)}
+                                                title="Clique para selecionar esta imagem"
+                                                style={{
+                                                    width: '60px',
+                                                    height: '60px',
+                                                    objectFit: 'contain',
+                                                    border: conteudo.logoUrl === logo.url ? '2px solid #e53935' : '1px solid #ddd',
+                                                    borderRadius: '5px',
+                                                    cursor: 'pointer',
+                                                    padding: '2px',
+                                                    backgroundColor: '#f9f9f9'
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            <small style={styles.helperText}>O arquivo será salvo no diretório public do servidor.</small>
+                        </div>
+
+                        {/* SEÇÃO DE CORES GLOBAIS */}
+                        <h3 style={styles.cardHeaderTitle}>Paleta de Cores</h3>
+                        <div style={styles.colorGrid}>
+                            {[
+                                { label: 'Primária (Ações)', key: 'primary', default: '#2299ff' },
+                                { label: 'Secundária (Menu)', key: 'secondary', default: '#555555' },
+                                { label: 'Sucesso (Botões)', key: 'success', default: '#44aa55' },
+                                { label: 'Perigo (Excluir)', key: 'danger', default: '#ff5555' },
+                                { label: 'Aviso (Alertas)', key: 'warning', default: '#ffcc00' },
+                                { label: 'Info (Dicas)', key: 'info', default: '#31D2F2' }
+                            ].map((cor) => (
+                                <div key={cor.key} style={styles.colorItem}>
+                                    <label style={adminStyles.label}>{cor.label}:</label>
+                                    <div style={styles.colorInputGroup}>
+                                        <input 
+                                            type="color" 
+                                            value={conteudo[cor.key] || cor.default} 
+                                            onChange={e => handleConfigChange('site', cor.key, e.target.value)}
+                                            style={styles.colorPicker}
+                                        />
+                                        <input 
+                                            style={{...adminStyles.input, ...styles.colorHexInput}} 
+                                            value={conteudo[cor.key] || ''} 
+                                            placeholder={cor.default}
+                                            onChange={e => handleConfigChange('site', cor.key, e.target.value)} 
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
                         <label style={adminStyles.label}>Nome do App:</label>
                         <input style={adminStyles.input} value={conteudo.nomeApp || ''} onChange={e => handleConfigChange('site', 'nomeApp', e.target.value)} />
-                        
-                        <label style={adminStyles.label}>Slogan:</label>
-                        <input style={adminStyles.input} value={conteudo.slogan || ''} onChange={e => handleConfigChange('site', 'slogan', e.target.value)} />
-                        
-                        <label style={adminStyles.label}>E-mail de Contato:</label>
-                        <input style={adminStyles.input} value={conteudo.email || ''} onChange={e => handleConfigChange('site', 'email', e.target.value)} />
                     </div>
                 )}
 
@@ -147,13 +254,13 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp }) {
                 {/* GESTÃO DE CARDS DINÂMICOS */}
                 {['dicas', 'produtos', 'receitas', 'utensilios'].includes(abaAtiva) && (
                     <div>
-                        <div style={{ marginBottom: '20px' }}>
+                        <div style={styles.tabContainer}>
                             <h3 style={styles.cardTitle}>Cabeçalho da Página</h3>
                             <input style={adminStyles.input} placeholder="Título da Página" value={conteudo[abaAtiva]?.titulo || ''} onChange={e => handleConfigChange(abaAtiva, 'titulo', e.target.value)} />
                             <input style={adminStyles.input} placeholder="Subtítulo" value={conteudo[abaAtiva]?.subtitulo || ''} onChange={e => handleConfigChange(abaAtiva, 'subtitulo', e.target.value)} />
                         </div>
                         
-                        <hr style={{ border: '0.5px solid #eee', margin: '20px 0' }} />
+                        <hr style={styles.sectionDivider} />
                         
                         <div style={adminStyles.flexRowSpace}>
                             <h3 style={styles.cardTitle}>Cards de {abaAtiva}</h3>
@@ -165,8 +272,8 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp }) {
                                 {abaAtiva === 'receitas' ? (
                                     <>
                                         <div style={adminStyles.flexRowGap}>
-                                            <input style={{...adminStyles.input, flex: 1, marginBottom: 0}} value={item.titulo || ''} onChange={e => handleListChange(abaAtiva, index, 'titulo', e.target.value)} />
-                                            <input style={{...adminStyles.input, width: '80px', marginBottom: 0}} value={item.icone || ''} onChange={e => handleListChange(abaAtiva, index, 'icone', e.target.value)} />
+                                            <input style={{...adminStyles.input, ...styles.inputFlex}} value={item.titulo || ''} onChange={e => handleListChange(abaAtiva, index, 'titulo', e.target.value)} />
+                                            <input style={{...adminStyles.input, ...styles.inputIcon}} value={item.icone || ''} onChange={e => handleListChange(abaAtiva, index, 'icone', e.target.value)} />
                                         </div>
                                         <div style={adminStyles.recipeGrid}>
                                             <input style={adminStyles.input} placeholder="Tempo" value={item.tempo || ''} onChange={e => handleListChange(abaAtiva, index, 'tempo', e.target.value)} />
@@ -182,8 +289,8 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp }) {
                                 ) : (
                                     <>
                                         <div style={adminStyles.flexRowGap}>
-                                            <input style={{...adminStyles.input, flex: 1, marginBottom: 0}} value={item.titulo || ''} onChange={e => handleListChange(abaAtiva, index, 'titulo', e.target.value)} />
-                                            <input style={{...adminStyles.input, width: '80px', marginBottom: 0}} value={item.icone || ''} onChange={e => handleListChange(abaAtiva, index, 'icone', e.target.value)} />
+                                            <input style={{...adminStyles.input, ...styles.inputFlex}} value={item.titulo || ''} onChange={e => handleListChange(abaAtiva, index, 'titulo', e.target.value)} />
+                                            <input style={{...adminStyles.input, ...styles.inputIcon}} value={item.icone || ''} onChange={e => handleListChange(abaAtiva, index, 'icone', e.target.value)} />
                                         </div>
                                         <textarea style={adminStyles.textarea} value={item.texto || ''} onChange={e => handleListChange(abaAtiva, index, 'texto', e.target.value)} />
                                     </>

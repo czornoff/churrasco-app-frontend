@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { commonStyles as styles, adminStyles } from '../../components/Styles';
 
-export default function Admin() {
+export default function Admin({styles, adminStyles}) {
     return (
         <div style={styles.container}>
             <header style={adminStyles.headerRow}>
@@ -16,19 +15,19 @@ export default function Admin() {
                 </p>
 
                 <div style={adminStyles.shortcutsGrid}>
-                    <Link to="/admin/item" style={adminStyles.shortcutCard}>
-                        <span style={adminStyles.icon}>⚙️</span>
-                        <div style={adminStyles.shortcutInfo}>
-                            <strong style={adminStyles.shortcutTitle}>Item</strong>
-                            <p style={adminStyles.shortcutDesc}>Suas configurações e items</p>
-                        </div>
-                    </Link>
-
                     <Link to="/admin/conteudo" style={adminStyles.shortcutCard}>
                         <span style={adminStyles.icon}>📝</span>
                         <div style={adminStyles.shortcutInfo}>
                             <strong style={adminStyles.shortcutTitle}>Conteúdo</strong>
                             <p style={adminStyles.shortcutDesc}>Textos, Dicas e Receitas</p>
+                        </div>
+                    </Link>
+
+                    <Link to="/admin/item" style={adminStyles.shortcutCard}>
+                        <span style={adminStyles.icon}>⚙️</span>
+                        <div style={adminStyles.shortcutInfo}>
+                            <strong style={adminStyles.shortcutTitle}>Item</strong>
+                            <p style={adminStyles.shortcutDesc}>Suas configurações e items</p>
                         </div>
                     </Link>
 
@@ -42,7 +41,7 @@ export default function Admin() {
 
                     {/* Exemplo de card de métrica futura */}
                     <Link to="/admin/relatorio" style={adminStyles.shortcutCard}>
-                        <span style={adminStyles.icon}>📈</span>
+                        <span style={adminStyles.icon}>📊</span>
                         <div style={adminStyles.shortcutInfo}>
                             <strong style={adminStyles.shortcutTitle}>Relatórios</strong>
                             <p style={adminStyles.shortcutDesc}>Estatísticas de uso</p>

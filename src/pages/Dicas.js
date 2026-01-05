@@ -1,7 +1,6 @@
 import React from 'react';
-import { commonStyles as styles } from '../components/Styles'; // Importando aqui
 
-export default function Dicas({ dados }) {
+export default function Dicas({ dados, styles }) {
     // Caso o conteúdo ainda não tenha sido populado no banco
     if (!dados || !dados.itens) {
         return <div style={styles.container}>Nenhuma dica cadastrada ainda. 🔥</div>;

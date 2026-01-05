@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { loginStyles as styles } from '../components/Styles';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-export default function Login() {
+export default function Login({loginStyles}) {
     const [isRegistro, setIsRegistro] = useState(false);
     const [formData, setFormData] = useState({ nome: '', email: '', password: '' });
     const [mensagem, setMensagem] = useState({ texto: '', tipo: '' });
@@ -51,11 +50,11 @@ export default function Login() {
     };
 
     return (
-        <div style={styles.container}>
-            <div style={styles.card}>
-                <h2 style={styles.titulo}>{isRegistro ? 'Criar Conta' : 'Acesso Restrito'}</h2>
+        <div style={loginStyles.container}>
+            <div style={loginStyles.card}>
+                <h2 style={loginStyles.titulo}>{isRegistro ? 'Criar Conta' : 'Acesso Restrito'}</h2>
                 
-                <button onClick={handleGoogleLogin} style={styles.googleBtn}>
+                <button onClick={handleGoogleLogin} style={loginStyles.googleBtn}>
                     <img 
                         src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" 
                         alt="Google" style={{ width: '18px' }} 
@@ -63,28 +62,27 @@ export default function Login() {
                     {isRegistro ? 'Cadastrar com Google' : 'Entrar com Google'}
                 </button>
 
-                <div style={styles.divisor}>
-                    <span style={styles.divisorTexto}>ou use seu e-mail</span>
+                <div style={loginStyles.divisor}>
+                    <span style={loginStyles.divisorTexto}>ou use seu e-mail</span>
                 </div>
 
                 {mensagem.texto && (
                     <div style={{ 
-                        ...styles.alerta, 
-                        backgroundColor: mensagem.tipo === 'erro' ? '#ffebee' : '#e8f5e9', 
-                        color: mensagem.tipo === 'erro' ? '#c62828' : '#2e7d32' 
+                        ...loginStyles.alerta, 
+                        ...(mensagem.tipo === 'erro' ? loginStyles.erro : loginStyles.sucesso) 
                     }}>
                         {mensagem.texto}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} style={styles.form}>
+                <form onSubmit={handleSubmit} style={loginStyles.form}>
                     {isRegistro && (
                         <input 
                             name="nome"
                             type="text" 
                             placeholder="Nome completo" 
                             required 
-                            style={styles.input} 
+                            style={loginStyles.input} 
                             onChange={handleChange}
                         />
                     )}
@@ -93,7 +91,7 @@ export default function Login() {
                         type="email" 
                         placeholder="E-mail" 
                         required 
-                        style={styles.input} 
+                        style={loginStyles.input} 
                         onChange={handleChange}
                     />
                     <input 
@@ -101,25 +99,25 @@ export default function Login() {
                         type="password" 
                         placeholder="Senha" 
                         required 
-                        style={styles.input} 
+                        style={loginStyles.input} 
                         onChange={handleChange}
                     />
-                    <button type="submit" style={styles.submitBtn}>
+                    <button type="submit" style={loginStyles.submitBtn}>
                         {isRegistro ? 'Finalizar Cadastro' : 'Entrar'}
                     </button>
                 </form>
 
-                <div style={styles.footer}>
-                    <p style={styles.toggleText}>
+                <div style={loginStyles.footer}>
+                    <p style={loginStyles.toggleText}>
                         {isRegistro ? 'Já tem uma conta?' : 'Ainda não tem conta?'}
                         <span 
                             onClick={() => setIsRegistro(!isRegistro)} 
-                            style={styles.toggleLink}
+                            style={loginStyles.toggleLink}
                         >
                             {isRegistro ? ' Faça Login' : ' Cadastre-se'}
                         </span>
                     </p>
-                    <a href="/" style={styles.backLink}>← Voltar para a Calculadora</a>
+                    <a href="/" style={loginStyles.backLink}>← Voltar para a Calculadora</a>
                 </div>
             </div>
         </div>

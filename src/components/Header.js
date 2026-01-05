@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { headerStyles as styles } from '../components/Styles';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-
-export default function Header({ usuario }) {
+export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
     const [menuAberto, setMenuAberto] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const [dropdownAberto, setDropdownAberto] = useState(false);
@@ -15,6 +13,7 @@ export default function Header({ usuario }) {
             setIsMobile(window.innerWidth < 768);
             if (window.innerWidth >= 768) setMenuAberto(false);
         };
+
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
@@ -24,56 +23,58 @@ export default function Header({ usuario }) {
     };
 
     return (
-        <header style={styles.header}>
-            <div style={styles.container}>
-                <div style={styles.leftSection}>
-                    <Link to="/" style={styles.logoLink} onClick={() => setMenuAberto(false)}>
+        <header style={headerStyles.header}>
+            <div style={headerStyles.container}>
+                <div style={headerStyles.leftSection}>
+                    <Link to="/" style={headerStyles.logoLink} onClick={() => setMenuAberto(false)}>
                         <img 
-                            src="/logo.png" 
-                            alt="Calculadora de Churrasco" 
-                            style={styles.logoImg} 
-                        /><span style={styles.logoText}>Calculadora</span>
+                            src={dados.logoUrl ? `${API_URL}${dados.logoUrl}` : '/logos/logo.png'}
+                            alt={dados.nomeApp} 
+                            style={headerStyles.logoImg} 
+                        />
                     </Link>
 
                     {!isMobile && (
-                        <nav style={styles.mainNav}>
-                            <Link to="/dicas" style={styles.navLink}>Dicas</Link>
-                            <Link to="/produtos" style={styles.navLink}>Produtos</Link>
-                            <Link to="/receitas" style={styles.navLink}>Receitas</Link>
-                            <Link to="/utensilios" style={styles.navLink}>Utensílios</Link>
-                            <Link to="/sobre" style={styles.navLink}>Sobre</Link>
+                        <nav style={headerStyles.mainNav}>
+                            <Link to="/" style={headerStyles.navLink}>Início</Link>
+                            <Link to="/calculadora" style={headerStyles.navLink}>Calculadora</Link>
+                            <Link to="/dicas" style={headerStyles.navLink}>Dicas</Link>
+                            <Link to="/produtos" style={headerStyles.navLink}>Produtos</Link>
+                            <Link to="/receitas" style={headerStyles.navLink}>Receitas</Link>
+                            <Link to="/utensilios" style={headerStyles.navLink}>Utensílios</Link>
+                            <Link to="/sobre" style={headerStyles.navLink}>Sobre</Link>
                         </nav>
                     )}
                 </div>
 
-                <div style={styles.rightSection}>
+                <div style={headerStyles.rightSection}>
                     {usuario ? (
-                        <div style={styles.userSection}>
+                        <div style={headerStyles.userSection}>
                             {usuario?.role === 'admin' && !isMobile && (
                                 <div 
-                                    style={styles.dropdownContainer}
+                                    style={headerStyles.dropdownContainer}
                                     onMouseEnter={() => setDropdownAberto(true)}
                                     onMouseLeave={() => setDropdownAberto(false)}
                                 >
-                                    <button style={styles.adminDropdownBtn}>
+                                    <button style={headerStyles.adminDropdownBtn}>
                                         🛠️ Admin ▼
                                     </button>
 
                                     {dropdownAberto && (
-                                        <div style={styles.dropdownMenu}>
-                                            <Link to="/admin" style={styles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                        <div style={headerStyles.dropdownMenu}>
+                                            <Link to="/admin" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
                                                 📱 Painel
                                             </Link>
-                                            <Link to="/admin/conteudo" style={styles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                            <Link to="/admin/conteudo" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
                                                 📝 Conteúdo
                                             </Link>
-                                            <Link to="/admin/item" style={styles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                            <Link to="/admin/item" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
                                                 ⚙️ Itens
                                             </Link>
-                                            <Link to="/admin/relatorio" style={styles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                            <Link to="/admin/relatorio" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
                                                 📊 Relatórios
                                             </Link>
-                                            <Link to="/admin/usuarios" style={styles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                            <Link to="/admin/usuarios" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
                                                 👥 Usuários
                                             </Link>
                                         </div>
@@ -81,21 +82,21 @@ export default function Header({ usuario }) {
                                 </div>
                             )}
                             
-                            <div style={styles.profile}>
-                                <img src={usuario.avatar} alt="Avatar" style={styles.avatar} />
-                                {!isMobile && <span style={styles.userName}>{usuario.nome.split(' ')[0]}</span>}
+                            <div style={headerStyles.profile} onClick={abrirPerfil}>
+                                <img src={usuario.avatar} alt="Avatar" style={headerStyles.avatar} />
+                                {!isMobile && <span style={headerStyles.userName}>{usuario.nome.split(' ')[0]} (perfil)</span>}
                             </div>
 
                             {!isMobile && (
-                                <button onClick={handleLogout} style={styles.logoutBtn}>Sair</button>
+                                <button onClick={handleLogout} style={headerStyles.logoutBtn}>Sair</button>
                             )}
                         </div>
                     ) : (
-                        !isMobile && <Link to="/login" style={styles.loginBtn}>Entrar</Link>
+                        !isMobile && <Link to="/login" style={headerStyles.loginBtn}>Entrar</Link>
                     )}
 
                     {isMobile && (
-                        <button onClick={() => setMenuAberto(!menuAberto)} style={styles.hamburger}>
+                        <button onClick={() => setMenuAberto(!menuAberto)} style={headerStyles.hamburger}>
                             {menuAberto ? '✕' : '☰'}
                         </button>
                     )}
@@ -104,28 +105,32 @@ export default function Header({ usuario }) {
 
             {/* MENU MOBILE */}
             {isMobile && menuAberto && (
-                <div style={styles.mobileMenu}>
-                    <Link to="/dicas" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>Dicas</Link>
-                    <Link to="/produtos" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>Produtos</Link>
-                    <Link to="/receitas" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>Receitas</Link>
-                    <Link to="/utensilios" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>Utensílios</Link>
-                    <Link to="/sobre" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>Sobre</Link>
+                <div style={headerStyles.mobileMenu}>
+                    <Link to="/" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Início</Link>
+                    <Link to="/calculadora" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Calculadora</Link>
+                    <Link to="/dicas" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Dicas</Link>
+                    <Link to="/produtos" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Produtos</Link>
+                    <Link to="/receitas" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Receitas</Link>
+                    <Link to="/utensilios" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Utensílios</Link>
+                    <Link to="/sobre" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Sobre</Link>
+                    <hr style={headerStyles.divider} />
+                    <Link to="/sobre" style={headerStyles.mobileNavLink} onClick={() => {abrirPerfil(); setMenuAberto(false)}}>Perfil</Link>
                         {usuario?.role === 'admin' && (
                             <>
-                            <hr style={styles.divider} />
-                            <span style={{color: '#FFC107'}}>Administração:</span>
-                                <Link to="/admin" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>📱 Painel</Link>
-                                <Link to="/admin/conteudo" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>📝 Conteúdo</Link>
-                                <Link to="/admin/item" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>⚙️ Itens</Link>
-                                <Link to="/admin/relatorio" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>📊 Relatórios</Link>
-                                <Link to="/admin/usuarios" style={styles.mobileNavLink} onClick={() => setMenuAberto(false)}>👥 Usuários</Link>
-                            <button onClick={handleLogout} style={styles.mobileMenuBtn}>Sair da Conta</button>
+                            <hr style={headerStyles.divider} />
+                            <span style={headerStyles.mobileTitle}>Administração:</span>
+                                <Link to="/admin" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>📱 Painel</Link>
+                                <Link to="/admin/conteudo" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>📝 Conteúdo</Link>
+                                <Link to="/admin/item" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>⚙️ Itens</Link>
+                                <Link to="/admin/relatorio" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>📊 Relatórios</Link>
+                                <Link to="/admin/usuarios" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>👥 Usuários</Link>
+                            <button onClick={handleLogout} style={headerStyles.mobileMenuBtn}>Sair da Conta</button>
                             </>
                         )}
                         {usuario?.role !== 'admin' && (
                             <>
-                            <hr style={styles.divider} />
-                            <Link to="/login" style={styles.mobileMenuBtn} onClick={() => setMenuAberto(false)}>Entrar</Link>
+                            <hr style={headerStyles.divider} />
+                            <Link to="/login" style={headerStyles.mobileMenuBtn} onClick={() => setMenuAberto(false)}>Entrar</Link>
                             </>
                         )}
                 </div>

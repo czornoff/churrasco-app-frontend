@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { commonStyles as styles, modalStyles, adminStyles } from '../../components/Styles';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-export default function Usuarios() {
+export default function Usuarios({styles, adminStyles, modalStyles}) {
+
     const [listaUsuarios, setListaUsuarios] = useState([]);
     const [loading, setLoading] = useState(true);
     const [usuarioEditando, setUsuarioEditando] = useState(null);
     const [mostrarModalAdicao, setMostrarModalAdicao] = useState(false);
     const [novoUsuario, setNovoUsuario] = useState({ nome: '', email: '', senha: '', role: 'user' });
     const [adminLogadoId, setAdminLogadoId] = useState(null);
+    const formatarDataBR = (dataISO) => {
+        if (!dataISO) return "";
+        return new Date(dataISO).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+    };
 
     useEffect(() => {
         fetch(`${API_URL}/auth/usuario`, { credentials: 'include' })
@@ -106,7 +110,7 @@ export default function Usuarios() {
                             </h5>
                             <p style={adminStyles.userEmail}>{user.email}</p>
                             <div style={adminStyles.badgeRow}>
-                                <span style={{ ...adminStyles.roleBadge, backgroundColor: user.role === 'admin' ? '#ff5252' : '#2196F3' }}>
+                                <span style={{ ...adminStyles.roleBadge, backgroundColor: adminStyles.roleColors[user.role] || adminStyles.roleColors.user }}>
                                     {user.role?.toUpperCase()}
                                 </span>
                                 <span style={adminStyles.statusText}>● {user.status}</span>
@@ -130,6 +134,11 @@ export default function Usuarios() {
                         <button style={modalStyles.closeBtn} onClick={() => setUsuarioEditando(null)}>×</button>
                         <h3 style={modalStyles.sectionTitle}>Editar Usuário</h3>
                         <p style={adminStyles.modalInfo}><strong>Nome:</strong> {usuarioEditando.nome}</p>
+                        <p style={adminStyles.modalInfo}><strong>email:</strong> {usuarioEditando.email}</p>
+                        <p style={adminStyles.modalInfo}><strong>aniversário:</strong> {formatarDataBR(usuarioEditando.birthday)}</p>
+                        <p style={adminStyles.modalInfo}><strong>local:</strong> {usuarioEditando.Cidade}/{usuarioEditando.UF}</p>
+                        <p style={adminStyles.modalInfo}><strong>gênero:</strong> {usuarioEditando.genero}</p>
+                        <p style={adminStyles.modalInfo}><strong>whatsApp:</strong> {usuarioEditando.whatsApp}</p>
                         
                         <form onSubmit={handleAtualizar} style={adminStyles.modalForm}>
                             <label style={adminStyles.label}>Permissão (Role):</label>

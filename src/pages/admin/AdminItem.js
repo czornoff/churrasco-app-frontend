@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { commonStyles as styles, adminStyles } from '../../components/Styles';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-export default function AdminItem({ opcoes, setOpcoes }) {
+export default function AdminItem({ opcoes, setOpcoes, styles, adminStyles }) {
     const [novoItem, setNovoItem] = useState({ 
         nome: '', 
         subcategoria: 'Bovina', 
@@ -84,7 +83,7 @@ export default function AdminItem({ opcoes, setOpcoes }) {
 
             {/* SEÇÃO DE COTAS GERAIS */}
             <div style={adminStyles.cotaGrid}>
-                <div style={{ ...adminStyles.cotaCard, background: '#fff3e0', borderColor: '#ffe0b2' }}>
+                <div style={{ ...adminStyles.cotaCard, ...adminStyles.cotaCarne }}>
                     <h4 style={adminStyles.cotaTitle}>🥩 Carne (Homem)</h4>
                     <div style={adminStyles.inputGroup}>
                         <input type="number" style={adminStyles.inlineInput} value={opcoes.configuracoes?.gramasCarneAdulto || 0} onChange={(e) => setOpcoes({...opcoes, configuracoes: {...opcoes.configuracoes, gramasCarneAdulto: parseInt(e.target.value) || 0}})} />
@@ -93,7 +92,7 @@ export default function AdminItem({ opcoes, setOpcoes }) {
                     <p style={adminStyles.cotaDesc}>* Mulher: 75% | Criança: 45%</p>
                 </div>
                 
-                <div style={{ ...adminStyles.cotaCard, background: '#e1f5fe', borderColor: '#b3e5fc' }}>
+                <div style={{ ...adminStyles.cotaCard, ...adminStyles.cotaAcomp }}>
                     <h4 style={adminStyles.cotaTitle}>🥗 Acompanhamentos</h4>
                     <div style={adminStyles.inputGroup}>
                         <input type="number" style={adminStyles.inlineInput} value={opcoes.configuracoes?.gramasOutrosAdulto || 0} onChange={(e) => setOpcoes({...opcoes, configuracoes: {...opcoes.configuracoes, gramasOutrosAdulto: parseInt(e.target.value) || 0}})} />
@@ -102,7 +101,7 @@ export default function AdminItem({ opcoes, setOpcoes }) {
                     <p style={adminStyles.cotaDesc}>* Distribuído entre os itens.</p>
                 </div>
 
-                <div style={{ ...adminStyles.cotaCard, background: '#e8f5e9', borderColor: '#c8e6c9' }}>
+                <div style={{ ...adminStyles.cotaCard, ...adminStyles.cotaBebida }}>
                     <h4 style={adminStyles.cotaTitle}>🥤 Bebida Total</h4>
                     <div style={adminStyles.inputGroup}>
                         <input type="number" style={adminStyles.inlineInput} value={opcoes.configuracoes?.mlBebidaAdulto || 0} onChange={(e) => setOpcoes({...opcoes, configuracoes: {...opcoes.configuracoes, mlBebidaAdulto: parseInt(e.target.value) || 0}})} />
@@ -114,7 +113,7 @@ export default function AdminItem({ opcoes, setOpcoes }) {
 
             {/* FORMULÁRIO DE ADIÇÃO */}
             <section style={styles.contentWrapper}>
-                <h3 style={{...styles.cardTitle, marginBottom: '15px'}}>➕ Adicionar Novo Item</h3>
+                <h3 style={adminStyles.addFormTitle}>➕ Adicionar Novo Item</h3>
                 <div style={adminStyles.addForm}>
                     <input placeholder="Nome do item (ex: Picanha)" value={novoItem.nome} onChange={e => setNovoItem({ ...novoItem, nome: e.target.value })} style={adminStyles.input} />
                     
@@ -146,12 +145,6 @@ export default function AdminItem({ opcoes, setOpcoes }) {
                     <button onClick={adicionarItem} style={adminStyles.addBtn}>ADICIONAR</button>
                 </div>
             </section>
-            <div style={adminStyles.divBtnSalvar}>
-                <div style={adminStyles.headerButtons}>
-                    <button onClick={() => salvarNoServidor(opcoes)} style={adminStyles.saveAllBtn}>SALVAR TUDO</button>
-                    <Link to="/admin"><button style={adminStyles.exitBtn}>VOLTAR</button></Link>
-                </div>
-            </div>
 
             {/* LISTAGEM DE ITENS POR CATEGORIA */}
             {Object.keys(opcoes).filter(k => Array.isArray(opcoes[k])).map(cat => (
@@ -212,44 +205,45 @@ export default function AdminItem({ opcoes, setOpcoes }) {
 
                                 <div style={adminStyles.itemActions}>
                                     <label style={adminStyles.switch}>
-                                    <input 
-                                        type="checkbox" 
-                                        checked={item.ativo || false} 
-                                        onChange={() => {
-                                            const novos = { ...opcoes };
-                                            const target = novos[cat].find(x => x.id === item.id);
-                                            target.ativo = !target.ativo;
-                                            setOpcoes(novos);
-                                        }} 
-                                        style={adminStyles.switchInput}
-                                    />
-                                    <span style={{
-                                        ...adminStyles.slider,
-                                        backgroundColor: item.ativo ? '#4CAF50' : '#ccc'
-                                    }}>
+                                        <input 
+                                            type="checkbox" 
+                                            checked={item.ativo || false} 
+                                            onChange={() => {
+                                                const novos = { ...opcoes };
+                                                const target = novos[cat].find(x => x.id === item.id);
+                                                target.ativo = !target.ativo;
+                                                setOpcoes(novos);
+                                            }} 
+                                            style={adminStyles.switchInput}
+                                        />
                                         <span style={{
-                                            ...adminStyles.sliderText,
-                                            left: item.ativo ? '20px' : '40px'
-                                        }}>{item.ativo ? 'ATIVADO' : 'DESATIVADO'}</span>
-                                        <span style={{
-                                            ...adminStyles.sliderBall,
-                                            transform: item.ativo ? 'translateX(91px)' : 'translateX(4px)'
-                                        }} />
-                                    </span>
-                                </label>
+                                            ...adminStyles.slider,
+                                            ...(item.ativo ? adminStyles.statusAtivo : adminStyles.statusInativo)
+                                        }}>
+                                            <span style={{
+                                                ...adminStyles.sliderText,
+                                                left: item.ativo ? '20px' : '40px'
+                                            }}>{item.ativo ? 'ATIVADO' : 'DESATIVADO'}</span>
+                                            <span style={{
+                                                ...adminStyles.sliderBall,
+                                                transform: item.ativo ? 'translateX(91px)' : 'translateX(4px)'
+                                            }} />
+                                        </span>
+                                    </label>
                                     <button onClick={() => {if(window.confirm('Excluir item?')){ const n = {...opcoes}; n[cat] = n[cat].filter(x => x.id !== item.id); salvarNoServidor(n); }}} style={adminStyles.deleteBtn}>🗑️</button>
                                 </div>
                             </div>
                         ))}
                     </div>
-                    <div style={adminStyles.divBtnSalvar}>
-                        <div style={adminStyles.headerButtons}>
-                            <button onClick={() => salvarNoServidor(opcoes)} style={adminStyles.saveAllBtn}>SALVAR TUDO</button>
-                            <Link to="/admin"><button style={adminStyles.exitBtn}>VOLTAR</button></Link>
-                        </div>
-                    </div>
                 </div>
             ))}
+
+            <div style={adminStyles.divBtnSalvar}>
+                <div style={adminStyles.headerButtons}>
+                    <button onClick={() => salvarNoServidor(opcoes)} style={adminStyles.saveAllBtn}>SALVAR TUDO</button>
+                    <Link to="/admin"><button style={adminStyles.exitBtn}>VOLTAR</button></Link>
+                </div>
+            </div>
         </div>
     );
 }

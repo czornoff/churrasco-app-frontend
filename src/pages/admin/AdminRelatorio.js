@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { commonStyles as styles, adminStyles } from '../../components/Styles';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-export default function AdminRelatorio() {
+export default function AdminRelatorio({ styles, adminStyles }) {
     const [dados, setDados] = useState({ logs: [], estatisticas: {} });
     const [loading, setLoading] = useState(true);
     const [logSelecionado, setLogSelecionado] = useState(null);
@@ -11,16 +10,15 @@ export default function AdminRelatorio() {
     const [filtroDataInicio, setFiltroDataInicio] = useState('');
     const [filtroDataFim, setFiltroDataFim] = useState('');
     const [logsFiltrados, setLogsFiltrados] = useState([]);
+
     const temFiltroAtivo = filtroUsuario !== '' || filtroDataInicio !== '' || filtroDataFim !== '';
     const listaUsuariosUnicos = [...new Set(dados.logs.map(log => log.usuarioId?.nome || 'Anônimo'))].sort();
 
     const totalCalculosFiltrados = logsFiltrados.length;
-
     const totalPessoasFiltradas = logsFiltrados.reduce((acc, log) => {
-        // Soma todos os participantes de cada log filtrado
         const somaLog = (log.participantes.homens || 0) + 
-                    (log.participantes.mulheres || 0) + 
-                    (log.participantes.criancas || 0);
+                        (log.participantes.mulheres || 0) + 
+                        (log.participantes.criancas || 0);
         return acc + somaLog;
     }, 0);
 
@@ -37,14 +35,12 @@ export default function AdminRelatorio() {
     useEffect(() => {
         let resultado = dados.logs;
 
-        // Filtro por Nome de Usuário
         if (filtroUsuario) {
             resultado = resultado.filter(log => 
                 (log.usuarioId?.nome || 'Anônimo').toLowerCase().includes(filtroUsuario.toLowerCase())
             );
         }
 
-        // Filtro por Período
         if (filtroDataInicio) {
             resultado = resultado.filter(log => new Date(log.dataConsulta) >= new Date(filtroDataInicio + "T00:00:00"));
         }
@@ -65,34 +61,32 @@ export default function AdminRelatorio() {
 
             {/* CARDS DE RESUMO */}
             <div style={adminStyles.cotaGrid}>
-                <div style={{ ...adminStyles.cotaCard, background: '#e1f5fe', borderColor: '#b3e5fc' }}>
-                    <h1 style={{margin: '0px'}}>
-                        <span style={{fontSize: '12px'}}>Total de Cálculos</span><br/>
-                        {/* Antes: dados?.estatisticas.totalCalculos */}
+                <div style={{ ...adminStyles.cotaCard, ...styles.cardBlue }}>
+                    <h1 style={styles.cardValue}>
+                        <span style={styles.cardLabel}>Total de Cálculos</span><br/>
                         {totalCalculosFiltrados}
                     </h1>
-                    {temFiltroAtivo && <small style={{fontSize: '10px', color: '#0288d1'}}> (filtrado)</small>}
+                    {temFiltroAtivo && <small style={styles.filteredBadge}> (filtrado)</small>}
                 </div>
-                <div style={{ ...adminStyles.cotaCard, background: '#e8f5e9', borderColor: '#c8e6c9' }}>
-                    <h1 style={{margin: '0px'}}>
-                        <span style={{fontSize: '12px'}}>Pessoas Impactadas</span><br/>
-                        {/* Antes: dados?.estatisticas.totalPessoasAtendidas[0]?.total */}
+                <div style={{ ...adminStyles.cotaCard, ...styles.cardGreen }}>
+                    <h1 style={styles.cardValue}>
+                        <span style={styles.cardLabel}>Pessoas Impactadas</span><br/>
                         {totalPessoasFiltradas}
                     </h1>
-                    {temFiltroAtivo && <small style={{fontSize: '10px', color: '#0288d1'}}> (filtrado)</small>}
+                    {temFiltroAtivo && <small style={styles.filteredBadge}> (filtrado)</small>}
                 </div>
             </div>
 
-            <section style={localStyles.filterSection}>
-                <div style={localStyles.filterGroup}>
+            <section style={styles.filterSection}>
+                <div style={styles.filterGroup}>
                     <label>Buscar Usuário:</label>
                     <input 
                         type="text" 
-                        list="usuarios-list" // Conecta com o id do datalist abaixo
+                        list="usuarios-list"
                         placeholder="Digite ou selecione..." 
                         value={filtroUsuario}
                         onChange={(e) => setFiltroUsuario(e.target.value)}
-                        style={localStyles.input}
+                        style={styles.input}
                     />
                     <datalist id="usuarios-list">
                         {listaUsuariosUnicos.map((nome, index) => (
@@ -100,36 +94,35 @@ export default function AdminRelatorio() {
                         ))}
                     </datalist>
                 </div>
-                <div style={localStyles.filterGroup}>
+                <div style={styles.filterGroup}>
                     <label>De:</label>
                     <input 
                         type="date" 
                         value={filtroDataInicio}
                         onChange={(e) => setFiltroDataInicio(e.target.value)}
-                        style={localStyles.input}
+                        style={styles.input}
                     />
                 </div>
-                <div style={localStyles.filterGroup}>
+                <div style={styles.filterGroup}>
                     <label>Até:</label>
                     <input 
                         type="date" 
                         value={filtroDataFim}
                         onChange={(e) => setFiltroDataFim(e.target.value)}
-                        style={localStyles.input}
+                        style={styles.input}
                     />
                 </div>
                 <button 
                     onClick={() => { setFiltroUsuario(''); setFiltroDataInicio(''); setFiltroDataFim(''); }}
-                    style={localStyles.btnClear}
+                    style={styles.btnClear}
                 >
                     Limpar
                 </button>
             </section>
 
-            {/* LISTA DE LOGS (USA logsFiltrados AGORA) */}
             <section style={styles.contentWrapper}>
                 <h3 style={styles.cardTitle}>Resultados ({logsFiltrados.length})</h3>
-                <div style={{ overflowX: 'auto' }}>
+                <div style={styles.tableScroll}>
                     <table style={adminStyles.table}>
                         <thead>
                             <tr style={adminStyles.thr}>
@@ -154,7 +147,7 @@ export default function AdminRelatorio() {
                                     <td>
                                         <button 
                                             onClick={() => setLogSelecionado(log)}
-                                            style={localStyles.btnView}
+                                            style={styles.btnView}
                                         >
                                             👁️ Ver Lista
                                         </button>
@@ -168,114 +161,32 @@ export default function AdminRelatorio() {
 
             {/* MODAL DE DETALHES */}
             {logSelecionado && (
-                <div style={localStyles.modalOverlay}>
-                    <div style={localStyles.modalContent}>
-                        <div style={localStyles.modalHeader}>
-                            <h3>Lista Gerada - {logSelecionado.usuarioId?.nome || 'Anônimo'}</h3>
-                            <button onClick={() => setLogSelecionado(null)} style={localStyles.btnClose}>&times;</button>
+                <div style={styles.modalOverlay} onClick={() => setLogSelecionado(null)}>
+                    <div style={styles.modalContent} onClick={e => e.stopPropagation()}>
+                        <div style={styles.modalHeader}>
+                            <h3 style={styles.modalTitle}>Lista Gerada - {logSelecionado.usuarioId?.nome || 'Anônimo'}</h3>
                         </div>
-                        <div style={localStyles.modalBody}>
-                            <p><strong>Data:</strong> {new Date(logSelecionado.dataConsulta).toLocaleString('pt-BR')}</p>
-                            <hr />
-                            {logSelecionado.resultadoFinal.map((item, idx) => (
-                                <div key={idx} style={localStyles.itemRow}>
-                                    <span style={{ color: item.subtipo === 'observacao' ? '#888' : '#333' }}>
-                                        {item.nome}
-                                    </span>
-                                    <strong style={{ color: item.subtipo === 'observacao' ? '#888' : '#e53935' }}>
-                                        {item.quantidade}
-                                    </strong>
-                                </div>
-                            ))}
+                        <div style={styles.modalBody}>
+                            <p style={styles.modalDate}><strong>Data:</strong> {new Date(logSelecionado.dataConsulta).toLocaleString('pt-BR')}</p>
+                            <hr style={styles.divider} />
+                            {logSelecionado.resultadoFinal.map((item, idx) => {
+                                const isObs = item.subtipo === 'observacao';
+                                return (
+                                    <div key={idx} style={styles.itemRow}>
+                                        <span style={isObs ? styles.textObs : styles.textMain}>
+                                            {item.nome}
+                                        </span>
+                                        <strong style={isObs ? styles.textObs : styles.textQty}>
+                                            {item.quantidade}
+                                        </strong>
+                                    </div>
+                                );
+                            })}
                         </div>
+                    <button  onClick={() => setLogSelecionado(null)} style={styles.btnCloseGray}>FECHAR</button>
                     </div>
                 </div>
             )}
         </div>
     );
 }
-
-const localStyles = {
-    modalOverlay: {
-        position: 'fixed',
-        top: 0, left: 0, width: '100%', height: '100%',
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        display: 'flex', justifyContent: 'center', alignItems: 'center',
-        zIndex: 3000
-    },
-    modalContent: {
-        background: 'white',
-        width: '90%',
-        maxWidth: '450px',
-        borderRadius: '8px',
-        maxHeight: '80vh',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column'
-    },
-    modalHeader: {
-        padding: '15px',
-        borderBottom: '1px solid #eee',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        background: '#f8f8f8'
-    },
-    modalBody: {
-        padding: '15px',
-        overflowY: 'auto'
-    },
-    btnClose: {
-        background: 'none',
-        border: 'none',
-        fontSize: '24px',
-        cursor: 'pointer',
-        color: '#999'
-    },
-    itemRow: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        padding: '8px 0',
-        borderBottom: '1px solid #f9f9f9',
-        fontSize: '14px'
-    },
-    filterSection: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '15px',
-        background: '#fff',
-        padding: '15px',
-        borderRadius: '8px',
-        marginBottom: '20px',
-        border: '1px solid #eee',
-        alignItems: 'flex-end'
-    },
-    filterGroup: {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '5px',
-        fontSize: '12px',
-        fontWeight: 'bold'
-    },
-    input: {
-        padding: '8px',
-        borderRadius: '4px',
-        border: '1px solid #ccc'
-    },
-    btnClear: {
-        padding: '8px 15px',
-        background: '#666',
-        color: 'white',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer'
-    },
-    btnView: {
-        padding: '5px 10px',
-        backgroundColor: '#f0f0f0',
-        border: '1px solid #ddd',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        fontSize: '12px'
-    },
-};
