@@ -50,42 +50,52 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
                 <div style={headerStyles.rightSection}>
                     {usuario ? (
                         <div style={headerStyles.userSection}>
-                            {usuario?.role === 'admin' && !isMobile && (
+                            {!isMobile && (
                                 <div 
                                     style={headerStyles.dropdownContainer}
                                     onMouseEnter={() => setDropdownAberto(true)}
                                     onMouseLeave={() => setDropdownAberto(false)}
                                 >
                                     <button style={headerStyles.adminDropdownBtn}>
-                                        🛠️ Admin ▼
+                                        <div style={headerStyles.profile}>
+                                            <img src={usuario.avatar} alt="Avatar" style={headerStyles.avatar} />
+                                            {!isMobile && <span style={headerStyles.userName}>{usuario.nome.split(' ')[0]} {usuario?.role === 'admin' ? '🛠️' : ''} ▼</span>}
+                                        </div>
                                     </button>
 
                                     {dropdownAberto && (
                                         <div style={headerStyles.dropdownMenu}>
-                                            <Link to="/admin" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
-                                                📱 Painel
+                                            <Link style={headerStyles.dropdownItem} onClick={ (e) => {e.stopPropagation(); abrirPerfil(); setDropdownAberto(false)}}>
+                                                👤 Perfil
                                             </Link>
-                                            <Link to="/admin/conteudo" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
-                                                📝 Conteúdo
-                                            </Link>
-                                            <Link to="/admin/item" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
-                                                ⚙️ Itens
-                                            </Link>
-                                            <Link to="/admin/relatorio" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
-                                                📊 Relatórios
-                                            </Link>
-                                            <Link to="/admin/usuarios" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
-                                                👥 Usuários
-                                            </Link>
+                                            {usuario?.role !== 'admin' && dropdownAberto && (
+                                                <Link to={`/relatorio/${usuario._id}`} style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                                    📊 Relatório
+                                                </Link>
+                                            )}
+                                            {usuario?.role === 'admin' && dropdownAberto && (
+                                                <>
+                                                <Link to="/admin" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                                    📱 Painel
+                                                </Link>
+                                                <Link to="/admin/conteudo" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                                    📝 Conteúdo
+                                                </Link>
+                                                <Link to="/admin/item" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                                    ⚙️ Itens
+                                                </Link>
+                                                <Link to="/admin/relatorio" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                                    📊 Relatórios
+                                                </Link>
+                                                <Link to="/admin/usuarios" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                                    👥 Usuários
+                                                </Link>
+                                                </>
+                                            )}
                                         </div>
                                     )}
                                 </div>
                             )}
-                            
-                            <div style={headerStyles.profile} onClick={abrirPerfil}>
-                                <img src={usuario.avatar} alt="Avatar" style={headerStyles.avatar} />
-                                {!isMobile && <span style={headerStyles.userName}>{usuario.nome.split(' ')[0]} (perfil)</span>}
-                            </div>
 
                             {!isMobile && (
                                 <button onClick={handleLogout} style={headerStyles.logoutBtn}>Sair</button>
@@ -113,11 +123,12 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
                     <Link to="/receitas" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Receitas</Link>
                     <Link to="/utensilios" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Utensílios</Link>
                     <Link to="/sobre" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Sobre</Link>
-                    <hr style={headerStyles.divider} />
-                    <Link to="/sobre" style={headerStyles.mobileNavLink} onClick={() => {abrirPerfil(); setMenuAberto(false)}}>Perfil</Link>
+                    {usuario ? (
+                        <>
+                        <hr style={headerStyles.divider} />
+                        <Link to="/sobre" style={headerStyles.mobileNavLink} onClick={() => {abrirPerfil(); setMenuAberto(false)}}>👤 Perfil</Link>
                         {usuario?.role === 'admin' && (
                             <>
-                            <hr style={headerStyles.divider} />
                             <span style={headerStyles.mobileTitle}>Administração:</span>
                                 <Link to="/admin" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>📱 Painel</Link>
                                 <Link to="/admin/conteudo" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>📝 Conteúdo</Link>
@@ -127,12 +138,20 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
                             <button onClick={handleLogout} style={headerStyles.mobileMenuBtn}>Sair da Conta</button>
                             </>
                         )}
-                        {usuario?.role !== 'admin' && (
+                        {usuario?.role === 'user' && (
                             <>
-                            <hr style={headerStyles.divider} />
-                            <Link to="/login" style={headerStyles.mobileMenuBtn} onClick={() => setMenuAberto(false)}>Entrar</Link>
+                            <Link to={`/relatorio/${usuario._id}`} style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>
+                                📊 Relatório
+                            </Link>
                             </>
                         )}
+                        </>
+                    ) : (
+                        <>
+                        <hr style={headerStyles.divider} />
+                        <Link to="/login" style={headerStyles.mobileMenuBtn} onClick={() => setMenuAberto(false)}>Entrar</Link>
+                        </>
+                    )}
                 </div>
             )}
         </header>

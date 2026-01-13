@@ -10,9 +10,9 @@ export default function Admin({styles, adminStyles}) {
 
             <div style={styles.contentWrapper}>
                 <h3 style={styles.cardTitle}>Bem-vindo ao Gerenciamento</h3>
-                <p style={styles.cardText}>
-                    Selecione uma das opções abaixo para gerenciar os dados da sua aplicação.
-                </p>
+                <div style={styles.cardText}>
+                    <p>Selecione uma das opções abaixo para gerenciar os dados da sua aplicação.</p>
+                </div>
 
                 <div style={adminStyles.shortcutsGrid}>
                     <Link to="/admin/conteudo" style={adminStyles.shortcutCard}>

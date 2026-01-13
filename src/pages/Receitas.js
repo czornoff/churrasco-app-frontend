@@ -50,9 +50,11 @@ const Receitas = ({ dados, styles, modalStyles }) => {
                         </p>
 
                         <h4 style={modalStyles.sectionTitle}>👨‍🍳 Modo de Preparo:</h4>
-                        <p style={styles.preLineText}>
-                            {receitaAtiva.preparo}
-                        </p>
+                        <div 
+                            className="html-content"
+                            style={styles.cardText}
+                            dangerouslySetInnerHTML={{ __html: receitaAtiva.preparo || '<p>História em breve...</p>' }} 
+                        />
                     </div>
                 </div>
             )}

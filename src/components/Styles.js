@@ -24,7 +24,7 @@ const DEFAULT_COLORS = {
 const FONT_FAMILY = "'Segoe UI', Roboto, sans-serif";
 
 export const obterEstilos = (dbConfig = {}) => {
-
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
     const COLORS = { ...DEFAULT_COLORS, ...dbConfig };
     const styles = {
             container: {
@@ -37,9 +37,21 @@ export const obterEstilos = (dbConfig = {}) => {
                 flex: "1",
                 minWidth: "250px",
             },
-            header: { textAlign: "center", marginBottom: "40px" },
-            title: { fontSize: "32px", color: COLORS.textMain, marginBottom: "10px" },
-            subtitle: { fontSize: "18px", color: COLORS.textMuted },
+            header: { 
+                textAlign: "left", 
+                marginTop: "50px",
+                marginBottom: "20px"
+            },
+            title: { 
+                fontSize: "22px", 
+                color: COLORS.textMain, 
+                marginBottom: "0px" 
+            },
+            subtitle: { 
+                marginTop: "0px",
+                fontSize: "18px", 
+                color: COLORS.textMuted 
+            },
             grid: {
                 display: "flex",
                 flexWrap: "wrap",
@@ -61,12 +73,15 @@ export const obterEstilos = (dbConfig = {}) => {
             cardTitle: { 
                 margin: 0, color: 
                 COLORS.dark, 
-                fontSize: "18px" },
+                fontSize: "18px",
+                marginBottom: "-15px",
+            },
             cardText: {
                 margin: 0,
                 color: COLORS.grey75,
                 lineHeight: "1.5",
                 fontSize: "14px",
+                marginTop: "0px",
             },
             viewBtn: {
                 marginTop: "10px",
@@ -173,6 +188,7 @@ export const obterEstilos = (dbConfig = {}) => {
                 display: "grid",
                 gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))",
                 gap: "20px",
+                marginTop: "50px",
                 marginBottom: "20px",
                 background: COLORS.grey10,
                 padding: "25px",
@@ -363,7 +379,10 @@ export const obterEstilos = (dbConfig = {}) => {
                 cursor: 'pointer',
                 fontSize: '14px'
             },
-            tableScroll: { overflowX: 'auto' },
+            tableScroll: { 
+                marginTop: '20px', 
+                overflowX: 'auto' 
+            },
             btnView: {
                 padding: '5px 10px',
                 color: COLORS.white, 
@@ -404,7 +423,11 @@ export const obterEstilos = (dbConfig = {}) => {
             tabContainer: {
                 marginBottom: '20px'
             },
+            adminWrapper: {
+                marginTop: '20px', 
+            },
             logoWrapper: {
+                marginTop: '20px', 
                 marginBottom: '20px',
                 padding: '15px',
                 border: `1px solid ${COLORS.grey25}`, 
@@ -529,12 +552,21 @@ export const obterEstilos = (dbConfig = {}) => {
                 zIndex: 4000,
                 fontWeight: "bold",
             },
+            gridContainer: {
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr', 
+                gap: '20px', 
+                width: '100%',
+            },
             cardBox: {
-                background: COLORS.grey10,
-                padding: "15px",
-                borderRadius: "8px",
-                marginBottom: "15px",
+                backgroundColor: COLORS.grey10,
+                padding: '15px',
+                borderRadius: '8px',
                 border: `1px solid ${COLORS.grey25}`,
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%', 
+                boxSizing: 'border-box'
             },
             deleteBtn: {
                 color: COLORS.danger,
@@ -543,6 +575,7 @@ export const obterEstilos = (dbConfig = {}) => {
                 cursor: "pointer",
                 fontSize: "12px",
                 marginTop: "5px",
+                fontWeight: "bold",
             },
             flexRowSpace: {
                 display: "flex",
@@ -682,10 +715,9 @@ export const obterEstilos = (dbConfig = {}) => {
             divBtnSalvar: { padding: "20px 0" },
             headerRow: {
                 ...styles.header,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "30px",
+                justifyContent: "left",
+                marginTop: "50px",
+                marginBottom: "10px",
             },
             shortcutsGrid: {
                 display: "grid",
@@ -906,20 +938,65 @@ export const obterEstilos = (dbConfig = {}) => {
             table: { 
                 width: "100%", 
                 borderCollapse: "collapse", 
-                marginTop: "10px" 
+                marginTop: "20px", 
+                display: isMobile ? "block" : "table", 
             },
-            thr: {
-                textAlign: "left",
-                borderBottom: `1px solid ${COLORS.grey25}`,
-                color: COLORS.textMuted,
-                fontSize: "14px",
+            thead: {
+                display: isMobile ? "none" : "table-header-group", 
+            },
+            tbody: {
+                display: isMobile ? "grid" : "table-row-group",
+                gridTemplateColumns: isMobile ? "1fr 1fr" : "none", 
+                gridAutoRows: isMobile ? "1fr" : "auto",
+                gap: isMobile ? "10px" : "0",
+                padding: isMobile ? "5px 0" : "0",
             },
             tr: { 
-                    borderBottom: `1px solid ${COLORS.grey25}`,
-                    fontSize: "13px" 
-                },
-            td: { 
-                padding: "12px 8px" 
+                display: isMobile ? "flex" : "table-row",
+                flexDirection: isMobile ? "column" : "row",
+                borderBottom: `1px solid ${COLORS.grey25}`,
+                borderTop: isMobile ? "none" : `1px solid ${COLORS.grey25}`,
+                textAlign: "left",
+                fontSize: "13px",
+                marginBottom: isMobile ? "0px" : "0",
+                padding: isMobile ? "10px" : "0",
+                backgroundColor: isMobile ? COLORS.white : "transparent",
+                borderRadius: isMobile ? "8px" : "0",
+                boxShadow: isMobile ? `0 4px 8px ${COLORS.shadow}` : "none",
+                // Removido height 100% para não bugar o desktop
+            },
+            td: {
+                padding: isMobile ? "1px" : "12px 10px", // Aumentei um pouco o padding lateral no desktop
+                textAlign: "left",
+                display: isMobile ? "flex" : "table-cell",
+                gap: "4px", 
+                borderBottom: isMobile ? "none" : `1px solid ${COLORS.grey10}`,
+                // AJUSTE AQUI: width auto no desktop permite que o navegador distribua as colunas
+                width: isMobile ? "100%" : "auto", 
+                boxSizing: "border-box",
+                verticalAlign: "middle",
+                // Impede que o texto quebre em várias linhas no desktop
+                whiteSpace: isMobile ? "normal" : "nowrap", 
+            },
+            tdAcoes: {
+                display: isMobile ? "flex" : "table-cell",
+                paddingTop: isMobile ? "15px" : "10px",
+                paddingBottom: isMobile ? "0" : "10px",
+                marginTop: isMobile ? "auto" : "0", 
+                // Ajuste de largura para a coluna de ação não ocupar espaço demais no desktop
+                width: isMobile ? "100%" : "80px", 
+                textAlign: isMobile ? "left" : "center",
+                verticalAlign: "middle",
+            },
+            // Estilo para o rótulo que aparece apenas no mobile (ex: "Usuário:", "Data:")
+            mobileLabel: {
+                display: isMobile ? "inline-block" : "none",
+                fontWeight: "bold",
+                color: COLORS.primary,
+                fontSize: "11px",
+                marginRight: "10px",
+                width: "50px",
+                flexShrink: 0,
             },
             roleColors: {
                 admin: COLORS.red,
@@ -1195,9 +1272,11 @@ export const obterEstilos = (dbConfig = {}) => {
                 justifyContent: "space-between",
                 alignItems: "center",
                 padding: "0 20px",
-                height: "70px",
+                height: "60px",
             },
-            leftSection: { display: "flex", alignItems: "center", gap: "30px" },
+            leftSection: { 
+                display: "flex", alignItems: "center", gap: "30px"
+            },
             logoLink: {
                 textDecoration: "none",
                 display: "flex",
@@ -1208,7 +1287,7 @@ export const obterEstilos = (dbConfig = {}) => {
                 height: "100px",
                 width: "auto",
                 display: "block",
-                marginTop: "30px",
+                marginTop: "50px",
             },
             logoText: { fontSize: "22px", fontWeight: "bold", color: COLORS.primary },
             mainNav: { display: "flex", gap: "20px" },
@@ -1220,7 +1299,12 @@ export const obterEstilos = (dbConfig = {}) => {
                 textTransform: "uppercase",
                 letterSpacing: "0.5px",
             },
-            rightSection: { display: "flex", alignItems: "center", gap: "20px" },
+            rightSection: { 
+                display: "flex",
+                alignItems: "center",
+                gap: "20px",
+                padding: "30px",
+            },
             userSection: {
                 display: "flex",
                 flexDirection: "row",
@@ -1236,7 +1320,9 @@ export const obterEstilos = (dbConfig = {}) => {
                 objectFit: "cover",
                 cursor: "pointer",
             },
-            userName: { fontSize: "14px", fontWeight: "600", color: COLORS.white, cursor: "pointer", },
+            userName: {
+                fontSize: "14px", fontWeight: "600", color: COLORS.white, cursor: "pointer",
+            },
             adminLink: {
                 color: COLORS.yellow,
                 textDecoration: "none",
@@ -1309,13 +1395,14 @@ export const obterEstilos = (dbConfig = {}) => {
                 borderRadius: "4px",
                 fontWeight: "bold",
             },
-            dropdownContainer: { position: "relative", display: "inline-block" },
+            dropdownContainer: {
+                position: "relative", display: "inline-block"
+            },
             adminDropdownBtn: {
                 backgroundColor: COLORS.grey75,
                 color: COLORS.yellow,
-                border: `1px solid ${COLORS.yellow}`,
+                border: "0px",
                 padding: "8px 15px",
-                borderRadius: "4px",
                 cursor: "pointer",
                 fontWeight: "bold",
                 fontSize: "13px",

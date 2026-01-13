@@ -15,23 +15,32 @@ import Calculadora from './pages/Calculadora';
 import Dicas from './pages/Dicas';
 import Produtos from './pages/Produtos';
 import Receitas from './pages/Receitas';
+import Relatorio from './pages/Relatorio';
 import Sobre from './pages/Sobre';
 import Utensilios from './pages/Utensilios';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
 export default function App() {
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const [opcoes, setOpcoes] = useState(null);
     const [usuario, setUsuario] = useState(null);
     const [carregando, setCarregando] = useState(true);
     const [conteudo, setConteudo] = useState(null);
     const [atualizador, setAtualizador] = useState(0);
-    
     const [showModalComplemento, setShowModalComplemento] = useState(false);
     const [complementoData, setComplementoData] = useState({
         nome: '', email: '', UF: '', Cidade: '', birthday: '', whatsApp: '', genero: ''
     });
-
+    const [ufs, setUfs] = useState([]);
+    const [cidades, setCidades] = useState([]);
     const { styles, adminStyles, headerStyles, footerStyles, modalStyles, loginStyles } = obterEstilos(conteudo);
 
     const perfilIncompleto = (u) => {
@@ -60,8 +69,11 @@ export default function App() {
     }
     }, [usuario]);
 
-    const [ufs, setUfs] = useState([]);
-    const [cidades, setCidades] = useState([]);
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome')
@@ -148,6 +160,7 @@ export default function App() {
                     <Route path="/dicas" element={<Dicas dados={conteudo?.dicas} styles={styles} />} />
                     <Route path="/produtos" element={<Produtos dados={conteudo?.produtos} styles={styles}  />} />
                     <Route path="/receitas" element={<Receitas dados={conteudo?.receitas} styles={styles} modalStyles={modalStyles}  />} />
+                    <Route path="/relatorio/:id" element={<Relatorio styles={styles} adminStyles={adminStyles}  />} />
                     <Route path="/utensilios" element={<Utensilios dados={conteudo?.utensilios} styles={styles}  />} />
                     <Route path="/sobre" element={<Sobre dados={conteudo} styles={styles}  />} />
 

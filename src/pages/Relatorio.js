@@ -1,8 +1,10 @@
+import { useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-export default function AdminRelatorio({ styles, adminStyles }) {
+export default function Relatorio({ styles, adminStyles }) {
+    const { id } = useParams(); // Pega o ID da URL (:id)
     const [dados, setDados] = useState({ logs: [], estatisticas: {} });
     const [loading, setLoading] = useState(true);
     const [logSelecionado, setLogSelecionado] = useState(null);
@@ -12,7 +14,6 @@ export default function AdminRelatorio({ styles, adminStyles }) {
     const [logsFiltrados, setLogsFiltrados] = useState([]);
 
     const temFiltroAtivo = filtroUsuario !== '' || filtroDataInicio !== '' || filtroDataFim !== '';
-    const listaUsuariosUnicos = [...new Set(dados.logs.map(log => log.usuarioId?.nome || 'Anônimo'))].sort();
 
     const totalCalculosFiltrados = logsFiltrados.length;
     const totalPessoasFiltradas = logsFiltrados.reduce((acc, log) => {
@@ -23,14 +24,14 @@ export default function AdminRelatorio({ styles, adminStyles }) {
     }, 0);
 
     useEffect(() => {
-        fetch(`${API_URL}/admin/relatorio`, { credentials: 'include' })
+        fetch(`${API_URL}/api/relatorio/${id}`, { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
                 setDados(data);
                 setLoading(false);
             })
             .catch(err => console.error(err));
-    }, []);
+    }, [id]);
 
     useEffect(() => {
         let resultado = dados.logs;
@@ -78,22 +79,6 @@ export default function AdminRelatorio({ styles, adminStyles }) {
             </div>
 
             <section style={styles.filterSection}>
-                <div style={styles.filterGroup}>
-                    <label>Buscar Usuário:</label>
-                    <input 
-                        type="text" 
-                        list="usuarios-list"
-                        placeholder="Digite ou selecione..." 
-                        value={filtroUsuario}
-                        onChange={(e) => setFiltroUsuario(e.target.value)}
-                        style={styles.input}
-                    />
-                    <datalist id="usuarios-list">
-                        {listaUsuariosUnicos.map((nome, index) => (
-                            <option key={index} value={nome} />
-                        ))}
-                    </datalist>
-                </div>
                 <div style={styles.filterGroup}>
                     <label>De:</label>
                     <input 

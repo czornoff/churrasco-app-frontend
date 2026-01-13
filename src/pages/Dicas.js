@@ -17,7 +17,11 @@ export default function Dicas({ dados, styles }) {
                 {dados.itens.map((item, index) => (
                     <div key={index} style={styles.card}>
                         <h3 style={styles.cardTitle}>{item.icone || '💡'} {item.titulo}</h3>
-                        <p style={styles.cardText}>{item.texto}</p>
+                        <div 
+                            className="html-content"
+                            style={styles.cardText}
+                            dangerouslySetInnerHTML={{ __html: item.texto || '<p>História em breve...</p>' }} 
+                        />
                     </div>
                 ))}
             </div>
