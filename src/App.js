@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './components/Login';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import AdBanner from './components/AdBanner';
 import { obterEstilos } from './components/Styles';
 
 import Admin from './pages/admin/Admin';
@@ -152,6 +153,8 @@ export default function App() {
     return (
         <Router>
             <Header dados={conteudo} usuario={usuario} styles={styles} headerStyles={headerStyles} abrirPerfil = {() => abrirEdicao()}/> 
+
+            <AdBanner slot="2870360789" /> 
             
             <div style={{ minHeight: '80vh' }}>
                 <Routes>
@@ -245,6 +248,8 @@ export default function App() {
                     </div>
                 </div>
             )}
+
+            <AdBanner slot="6694055728" />
 
             <Footer dados={conteudo} footerStyles={footerStyles}/>
         </Router>
