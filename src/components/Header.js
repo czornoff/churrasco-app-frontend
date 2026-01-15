@@ -42,6 +42,7 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
                             <Link to="/produtos" style={headerStyles.navLink}>Produtos</Link>
                             <Link to="/receitas" style={headerStyles.navLink}>Receitas</Link>
                             <Link to="/utensilios" style={headerStyles.navLink}>Utensílios</Link>
+                            <Link to="/onde-comprar" style={headerStyles.navLink}>Onde Comprar</Link>
                             <Link to="/sobre" style={headerStyles.navLink}>Sobre</Link>
                         </nav>
                     )}
@@ -122,6 +123,7 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
                     <Link to="/produtos" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Produtos</Link>
                     <Link to="/receitas" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Receitas</Link>
                     <Link to="/utensilios" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Utensílios</Link>
+                    <Link to="/onde-comprar" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Onde Comprar</Link>
                     <Link to="/sobre" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Sobre</Link>
                     {usuario ? (
                         <>

@@ -4,6 +4,17 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+if (window.location.hostname === 'localhost') {
+  const originalError = console.error;
+  console.error = (...args) => {
+    // Se a mensagem contiver termos de scripts externos que sabemos que falham no localhost, ignoramos
+    if (args[0]?.includes?.('No checkout popup config') || args[0]?.includes?.('adsbygoogle')) {
+      return;
+    }
+    originalError.apply(console, args);
+  };
+}
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
@@ -11,7 +22,4 @@ root.render(
   </React.StrictMode>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();

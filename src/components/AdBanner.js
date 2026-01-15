@@ -2,30 +2,29 @@ import React, { useEffect } from 'react';
 
 const AdBanner = ({ slot }) => {
     useEffect(() => {
-        try {
-            if (window.adsbygoogle) {
+        if (window.location.hostname !== "localhost") {
+            try {
                 (window.adsbygoogle = window.adsbygoogle || []).push({});
+            } catch (e) {
+                console.error(e);
             }
-        } catch (e) {
-            console.error("Erro ao carregar bloco de anúncio:", e);
         }
     }, []);
 
     return (
         <div style={{ 
             textAlign: 'center', 
-            margin: '20px auto', 
+            margin: '10px 0', // Reduzi a margem
             overflow: 'hidden', 
-            minHeight: '90px',
-            width: '100%',
-            maxWidth: '1200px' 
+            maxHeight: '100px', // Limita a altura para não ser um "quadradão"
+            background: 'transparent'
         }}>
             <ins className="adsbygoogle"
-                style={{ display: 'block' }}
-                data-ad-client="ca-pub-2950297102005696" 
+                style={{ display: 'inline-block', width: '100%', height: '90px' }} // Altura fixa menor
+                data-ad-client="ca-pub-2950297102005696"
                 data-ad-slot={slot}
-                data-ad-format="auto"
-                data-full-width-responsive="true"></ins>
+                data-ad-format="horizontal" // Força o formato horizontal/fino
+                data-full-width-responsive="false"></ins> 
         </div>
     );
 };

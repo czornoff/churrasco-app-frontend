@@ -14,6 +14,7 @@ import AdminUsuario from './pages/admin/AdminUsuario';
 import Inicial from './pages/Inicial';
 import Calculadora from './pages/Calculadora';
 import Dicas from './pages/Dicas';
+import OndeComprar from './pages/OndeComprar';
 import Produtos from './pages/Produtos';
 import Receitas from './pages/Receitas';
 import Relatorio from './pages/Relatorio';
@@ -66,7 +67,6 @@ export default function App() {
             setShowModalComplemento(true);
         } else {
         // Log para debug caso você clique e não aconteça nada
-        console.log("Tentativa de abrir perfil sem usuário carregado");
     }
     }, [usuario]);
 
@@ -94,32 +94,35 @@ export default function App() {
 
     useEffect(() => {
         const carregarTudo = async () => {
-            try {
-                const [resOpcoes, resConteudo, resUser] = await Promise.all([
-                    fetch(`${API_URL}/api/opcao`),
-                    fetch(`${API_URL}/api/conteudo`, { cache: 'no-store' }),
-                    fetch(`${API_URL}/auth/usuario`, { credentials: 'include' })
-                ]);
+        try {
+            const [resOpcoes, resConteudo] = await Promise.all([
+                fetch(`${API_URL}/api/opcao`),
+                fetch(`${API_URL}/api/conteudo`, { cache: 'no-store' })
+            ]);
 
-                if (resOpcoes.ok) setOpcoes(await resOpcoes.json());
-                if (resConteudo.ok) setConteudo(await resConteudo.json());
-                
+            if (resOpcoes.ok) setOpcoes(await resOpcoes.json());
+            if (resConteudo.ok) setConteudo(await resConteudo.json());
+
+            const sessaoAtiva = document.cookie.includes('connect.sid') || localStorage.getItem('token');
+
+            if (sessaoAtiva) {
+                const resUser = await fetch(`${API_URL}/auth/usuario`, { credentials: 'include' });
                 if (resUser.ok) {
                     const dataUser = await resUser.json();
                     setUsuario(dataUser);
-                    if (perfilIncompleto(dataUser)) {
-                        abrirEdicao(dataUser);
-                    }
+                    if (perfilIncompleto(dataUser)) abrirEdicao(dataUser);
                 }
-            } catch (err) {
-                console.error("Erro na inicialização:", err);
-            } finally {
-                setCarregando(false);
+            } else {
+                setUsuario(null);
             }
-        };
-
+        } catch (err) {
+            // Erros de rede reais ainda aparecem aqui
+        } finally {
+            setCarregando(false);
+        }
+    };
         carregarTudo();
-    }, [atualizador]);
+    }, [atualizador, abrirEdicao]);
 
     const salvarDadosPerfil = async (e) => {
         e.preventDefault();
@@ -154,13 +157,14 @@ export default function App() {
         <Router>
             <Header dados={conteudo} usuario={usuario} styles={styles} headerStyles={headerStyles} abrirPerfil = {() => abrirEdicao()}/> 
 
-            <AdBanner slot="2870360789" /> 
+            {window.location.hostname !== 'localhost' && <AdBanner slot="2870360789" />}
             
             <div style={{ minHeight: '80vh' }}>
                 <Routes>
                     <Route path="/" element={<Inicial dados={conteudo} styles={styles} />} />
                     <Route path="/calculadora" element={<Calculadora dados={conteudo} opcoes={opcoes} styles={styles} modalStyles={modalStyles} />} />
                     <Route path="/dicas" element={<Dicas dados={conteudo?.dicas} styles={styles} />} />
+                    <Route path="/onde-comprar" element={<OndeComprar styles={styles} />} />
                     <Route path="/produtos" element={<Produtos dados={conteudo?.produtos} styles={styles}  />} />
                     <Route path="/receitas" element={<Receitas dados={conteudo?.receitas} styles={styles} modalStyles={modalStyles}  />} />
                     <Route path="/relatorio/:id" element={<Relatorio styles={styles} adminStyles={adminStyles}  />} />
@@ -249,7 +253,7 @@ export default function App() {
                 </div>
             )}
 
-            <AdBanner slot="6694055728" />
+            {window.location.hostname !== 'localhost' && <AdBanner slot="6694055728" />}
 
             <Footer dados={conteudo} footerStyles={footerStyles}/>
         </Router>
