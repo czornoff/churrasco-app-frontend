@@ -159,7 +159,25 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
                 {abaAtiva === 'layout' && (
                     <div style={styles.column}>
                         <label style={adminStyles.label}>Nome do App:</label>
-                        <input style={adminStyles.input} value={conteudo.nomeApp || ''} onChange={e => handleConfigChange('layout', 'nomeApp', e.target.value)} />
+                        <input 
+                            style={adminStyles.input} 
+                            value={conteudo.nomeApp || ''} 
+                            onChange={e => handleConfigChange('layout', 'nomeApp', e.target.value)} 
+                        />
+
+                        <label style={adminStyles.label}>e-mail:</label>
+                        <input 
+                            style={adminStyles.input} 
+                            value={conteudo.email || ''} // Garantindo que lê da raiz
+                            onChange={e => handleConfigChange('layout', 'email', e.target.value)} 
+                        />
+                        
+                        <label style={adminStyles.label}>Instagram:</label>
+                        <input 
+                            style={adminStyles.input} 
+                            value={conteudo.instagram || ''} // Garantindo que lê da raiz
+                            onChange={e => handleConfigChange('layout', 'instagram', e.target.value)} 
+                        />
 
                         {/* SEÇÃO DE CORES GLOBAIS */}
                         <h3 style={styles.cardHeaderTitle}>Paleta de Cores</h3>

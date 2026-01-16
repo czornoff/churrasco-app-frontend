@@ -34,17 +34,17 @@ export default function Footer({dados, footerStyles}) {
                 {/* Coluna 3: Contato/Social */}
                 <div style={footerStyles.column}>
                     <h4 style={footerStyles.heading}>Contato</h4>
-                    <p style={footerStyles.link}>contato@zornoff.com.br</p>
+                    <a href={`mailto:${dados.email}`} target="_blank" rel="noreferrer" style={footerStyles.socialIcon}>{dados.email}</a>
                     <div style={footerStyles.socialRow}>
                         {/* Você pode trocar os emojis por ícones de biblioteca se preferir */}
-                        <a href="https://instagram.com" target="_blank" rel="noreferrer" style={footerStyles.socialIcon}>📸 Instagram</a>
+                        <a href={dados.instagram} target="_blank" rel="noreferrer" style={footerStyles.socialIcon}>Instagram</a>
                     </div>
                 </div>
             </div>
 
             <div style={footerStyles.bottomBar}>
                 <p style={footerStyles.copyright}>
-                    © {new Date().getFullYear()} Calculadora de Churrasco - Desenvolvido por Zornoff.
+                    © {new Date().getFullYear()} Calculadora de Churrasco - Desenvolvido por <a href='https://www.zornoff.com.br' target="_blank" rel="noreferrer" style={footerStyles.socialIcon}>Zornoff</a>.
                 </p>
             </div>
         </footer>

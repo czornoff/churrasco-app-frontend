@@ -19,6 +19,7 @@ export default function OndeComprar({ styles }) {
 
     const filtros = {
         acougue: "açougue OR 'casa de carnes' OR 'boutique de carnes' OR carnes",
+        bebidas: "bebidas OR cerveja OR 'loja de bebidas' OR adega",
         mercado: "supermercado OR mercado OR empório",
         utensilio: "churrasqueira OR 'steak boutique' OR 'artigos para churrasco'",
         parceiro: "Swift"
@@ -28,6 +29,7 @@ export default function OndeComprar({ styles }) {
 
     const icons = {
         acougue: "https://bandalarga.com.br/img/churrasco/acougue.png",
+        bebidas: "https://bandalarga.com.br/img/churrasco/chopp.png",
         utensilio: "https://bandalarga.com.br/img/churrasco/utensilio.png",
         mercado: "https://bandalarga.com.br/img/churrasco/mercado.png",
         parceiro: "https://bandalarga.com.br/img/churrasco/patrocinio.png",
@@ -82,21 +84,23 @@ export default function OndeComprar({ styles }) {
 
     return (
         <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
-            <div style={{ ...styles.container, padding: '20px' }}>
-                <h1 style={styles.titulo}>🔥 Onde Comprar</h1>
-                
-                <MapaConteudo 
-                    centro={centro} 
-                    setCentro={setCentro}
-                    locais={locais}
-                    realizarBusca={realizarBusca}
-                    filtros={filtros}
-                    filtroAtivo={filtroAtivo}
-                    setFiltroAtivo={setFiltroAtivo}
-                    selecionado={selecionado}
-                    setSelecionado={setSelecionado}
-                    icons={icons}
-                />
+            <div style={styles.container}>
+                <header style={styles.header}>
+                    <h1 style={styles.title}>Onde Comprar</h1>
+                    <p style={styles.subtitle}>Encontre produtos para o seu churrasco</p>
+                </header>
+                    <MapaConteudo 
+                        centro={centro} 
+                        setCentro={setCentro}
+                        locais={locais}
+                        realizarBusca={realizarBusca}
+                        filtros={filtros}
+                        filtroAtivo={filtroAtivo}
+                        setFiltroAtivo={setFiltroAtivo}
+                        selecionado={selecionado}
+                        setSelecionado={setSelecionado}
+                        icons={icons}
+                    />
             </div>
         </APIProvider>
     );
@@ -153,6 +157,7 @@ function MapaConteudo({ centro, setCentro, locais, realizarBusca, filtros, filtr
 
     const getIconePorFiltro = () => {
         if (filtroAtivo === filtros.parceiro) return icons.parceiro;
+        if (filtroAtivo === filtros.bebidas) return icons.bebidas;
         if (filtroAtivo === filtros.utensilio) return icons.utensilio;
         if (filtroAtivo === filtros.mercado) return icons.mercado;
         return icons.acougue;
@@ -163,6 +168,9 @@ function MapaConteudo({ centro, setCentro, locais, realizarBusca, filtros, filtr
             <div style={{ marginBottom: '15px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 <button onClick={() => alterarFiltro(filtros.acougue)} style={{ ...btnStyle, backgroundColor: filtroAtivo === filtros.acougue ? '#FB6458' : '#555' }}>
                     <img src={icons.acougue} alt="" style={btnImgStyle} /> Açougues
+                </button>
+                <button onClick={() => alterarFiltro(filtros.bebidas)} style={{ ...btnStyle, backgroundColor: filtroAtivo === filtros.bebidas ? '#7eb9fc' : '#555' }}>
+                    <img src={icons.bebidas} alt="" style={btnImgStyle} /> Bebidas
                 </button>
                 <button onClick={() => alterarFiltro(filtros.mercado)} style={{ ...btnStyle, backgroundColor: filtroAtivo === filtros.mercado ? '#FC7E84' : '#555' }}>
                     <img src={icons.mercado} alt="" style={btnImgStyle} /> Mercados
