@@ -94,35 +94,32 @@ export default function App() {
 
     useEffect(() => {
         const carregarTudo = async () => {
-        try {
-            const [resOpcoes, resConteudo] = await Promise.all([
-                fetch(`${API_URL}/api/opcao`),
-                fetch(`${API_URL}/api/conteudo`, { cache: 'no-store' })
-            ]);
+            try {
+                const [resOpcoes, resConteudo, resUser] = await Promise.all([
+                    fetch(`${API_URL}/api/opcao`),
+                    fetch(`${API_URL}/api/conteudo`, { cache: 'no-store' }),
+                    fetch(`${API_URL}/auth/usuario`, { credentials: 'include' })
+                ]);
 
-            if (resOpcoes.ok) setOpcoes(await resOpcoes.json());
-            if (resConteudo.ok) setConteudo(await resConteudo.json());
-
-            const sessaoAtiva = document.cookie.includes('connect.sid') || localStorage.getItem('token');
-
-            if (sessaoAtiva) {
-                const resUser = await fetch(`${API_URL}/auth/usuario`, { credentials: 'include' });
+                if (resOpcoes.ok) setOpcoes(await resOpcoes.json());
+                if (resConteudo.ok) setConteudo(await resConteudo.json());
+                
                 if (resUser.ok) {
                     const dataUser = await resUser.json();
                     setUsuario(dataUser);
-                    if (perfilIncompleto(dataUser)) abrirEdicao(dataUser);
+                    if (perfilIncompleto(dataUser)) {
+                        abrirEdicao(dataUser);
+                    }
                 }
-            } else {
-                setUsuario(null);
+            } catch (err) {
+                console.error("Erro na inicialização:", err);
+            } finally {
+                setCarregando(false);
             }
-        } catch (err) {
-            // Erros de rede reais ainda aparecem aqui
-        } finally {
-            setCarregando(false);
-        }
-    };
+        };
+
         carregarTudo();
-    }, [atualizador, abrirEdicao]);
+    }, [atualizador]);
 
     const salvarDadosPerfil = async (e) => {
         e.preventDefault();
@@ -150,7 +147,50 @@ export default function App() {
     };
 
     if (carregando || !opcoes || !conteudo) {
-        return <div style={{ padding: '50px', textAlign: 'center' }}>Carregando Calculadora de Churrasco...</div>;
+        return (
+        <div style={{ 
+            height: '100vh', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            backgroundColor: '#f8f9fa',
+            fontFamily: 'sans-serif'
+        }}>
+            {/* Ícone ou Logo Animado */}
+            <div style={{
+                fontSize: '50px',
+                marginBottom: '20px',
+                animation: 'pulse 1.5s infinite ease-in-out'
+            }}>
+                🔥
+            </div>
+
+            {/* Texto de Carregamento */}
+            <h2 style={{ 
+                color: '#d9534f', 
+                marginBottom: '10px',
+                fontWeight: 'bold' 
+            }}>
+                Preparando a brasa...
+            </h2>
+            
+            <p style={{ color: '#666', fontSize: '14px' }}>
+                Carregando a Calculadora de Churrasco
+            </p>
+
+            {/* CSS inline para a animação de pulso */}
+            <style>
+                {`
+                    @keyframes pulse {
+                        0% { transform: scale(1); opacity: 1; }
+                        50% { transform: scale(1.2); opacity: 0.7; }
+                        100% { transform: scale(1); opacity: 1; }
+                    }
+                `}
+            </style>
+        </div>
+    );
     }
 
     return (
@@ -162,7 +202,7 @@ export default function App() {
             <div style={{ minHeight: '80vh' }}>
                 <Routes>
                     <Route path="/" element={<Inicial dados={conteudo} styles={styles} />} />
-                    <Route path="/calculadora" element={<Calculadora dados={conteudo} opcoes={opcoes} styles={styles} modalStyles={modalStyles} />} />
+                    <Route path="/calculadora" element={<Calculadora dados={conteudo} opcoes={opcoes} styles={styles} modalStyles={modalStyles} usuario={usuario} />} />
                     <Route path="/dicas" element={<Dicas dados={conteudo?.dicas} styles={styles} />} />
                     <Route path="/onde-comprar" element={<OndeComprar styles={styles} />} />
                     <Route path="/produtos" element={<Produtos dados={conteudo?.produtos} styles={styles}  />} />

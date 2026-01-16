@@ -189,8 +189,19 @@ function MapaConteudo({ centro, setCentro, locais, realizarBusca, filtros, filtr
             >
                 {/* Marcador do Usuário - Centralizado (ponto no meio) */}
                 <AdvancedMarker position={centro}>
-                    <img src={icons.usuario} width={45} height={45} alt="Você" 
-                        style={{ transform: 'translate(-50%, -50%)', filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))' }} />
+                    <img 
+                        src={icons.usuario} 
+                        width={45} 
+                        height={45} 
+                        alt="Você" 
+                        style={
+                            {
+                                transform: 'translate(calc(-50% + 20px), calc(-50% + 50px))', 
+                                filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))',
+                                pointerEvents: 'none' 
+                            }
+                        }
+                    />
                 </AdvancedMarker>
 
                 {/* Marcadores das Lojas - Ancorados na base (pé do ícone) */}

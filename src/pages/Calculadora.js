@@ -14,7 +14,8 @@ const EMOJIS = {
     'utensilios': '🍴'
 };
 
-export default function Calculadora({ dados, opcoes, styles, modalStyles }) {
+export default function Calculadora({ dados, opcoes, styles, usuario }) {
+
     const [selecionados, setSelecionados] = useState([]);
     const [pessoas, setPessoas] = useState({ 
         homens: 0, mulheres: 0, criancas: 0, adultosQueBebem: 0, horas: 4 
@@ -22,6 +23,32 @@ export default function Calculadora({ dados, opcoes, styles, modalStyles }) {
     const [resultado, setResultado] = useState(null);
     const [modalAberto, setModalAberto] = useState(false);
     const [ajudaAberta, setAjudaAberta] = useState(false);
+
+    const [estimativa, setEstimativa] = useState(null);
+    const [carregandoIA, setCarregandoIA] = useState(false);
+
+    const obterEstimativaIA = async () => {
+        if (!usuario) return alert("Você precisa estar logado!");
+        
+        setCarregandoIA(true);
+        setEstimativa(null); // Limpa estimativa anterior
+        
+        try {
+            const res = await fetch(`${API_URL}/api/estimativa-ia`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ itens: resultado }) // Enviamos o resultado do cálculo (nome e qtd)
+            });
+            
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
+            setEstimativa(data);
+        } catch (error) {
+            alert("Erro ao gerar estimativa: " + error.message);
+        } finally {
+            setCarregandoIA(false);
+        }
+    };
 
     const handleToggle = (id) => setSelecionados(prev => 
         prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
@@ -140,31 +167,110 @@ export default function Calculadora({ dados, opcoes, styles, modalStyles }) {
 
             {modalAberto && (
                 <ModalResultado 
-                    resultado={resultado} pessoas={pessoas} 
-                    enviarWhatsApp={enviarWhatsApp} fechar={() => setModalAberto(false)} 
+                    resultado={resultado} 
+                    pessoas={pessoas} 
+                    enviarWhatsApp={enviarWhatsApp} 
+                    fechar={() => { setModalAberto(false); setEstimativa(null); }} 
                     styles={styles}
-                    modalStyles={modalStyles}
+                    gerarEstimativaComIA={obterEstimativaIA} // Passa a função real
+                    usuario={usuario}
+                    estimativa={estimativa} // Passa o estado da estimativa
+                    carregandoIA={carregandoIA} // Passa o estado de loading
                 />
             )}
         </div>
     );
 }
 
-function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar, styles, modalStyles }) {
+function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar, styles, gerarEstimativaComIA, usuario, estimativa, carregandoIA }) {
     return (
         <div style={styles.modalFullOverlay}>
             <div style={styles.modalResultContent}>
                 <h2 style={styles.modalTitleRed}>📋 Lista Gerada</h2>
+                
                 <div style={styles.infoBox}>
                     🧔 {pessoas.homens} | 👩 {pessoas.mulheres} | 👶 {pessoas.criancas} | ⏱️ {pessoas.horas}h
                 </div>
-                <button onClick={() => enviarWhatsApp(pessoas, resultado)} style={styles.btnWhatsapp}>
-                    📱 Enviar para WhatsApp
-                </button>
+
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap' }}>
+                    <button onClick={() => enviarWhatsApp(pessoas, resultado)} style={
+                        {
+                            ...styles.btnWhatsapp, 
+                            flex: 1,
+                            backgroundColor: usuario ? '#339944' : '#ccc',
+                            cursor: (usuario) ? 'pointer' : 'not-allowed',
+                        }}>
+                        📱 Enviar Lista por WhatsApp
+                    </button>
+                    
+                    {/* Botão Gemini com trava de Login */}
+                    <button 
+                        onClick={gerarEstimativaComIA} 
+                        disabled={!usuario || carregandoIA}
+                        style={
+                            {
+                                ...styles.btnWhatsapp,
+                                flex: 1,
+                                backgroundColor: usuario ? '#007bff' : '#ccc',
+                                cursor: (usuario && !carregandoIA) ? 'pointer' : 'not-allowed',
+                            }
+                        }
+                    >
+                        {carregandoIA ? "⏳ Calculando..." : "💰 Estimativa de Custo por IA"}
+                    </button>
+                    { !usuario ? <div style={{ 
+                            width: '100%', 
+                            backgroundColor: '#fff3cd', // Amarelo alerta suave
+                            color: '#856404',           // Marrom texto de alerta
+                            padding: '10px', 
+                            borderRadius: '8px', 
+                            fontSize: '13px', 
+                            textAlign: 'center',
+                            border: '1px solid #ffeeba',
+                            marginTop: '5px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px'
+                        }}>
+                            <span>⚠️</span>
+                            <span>Faça <strong>login</strong> para liberar o envio e a estimativa de custos.</span>
+                        </div> : "" }
+                </div>
+
+                {/* Exibição da Estimativa do Gemini */}
+                {estimativa && (
+                    <div style={{ 
+                        backgroundColor: '#f8f9fa', 
+                        padding: '15px', 
+                        borderRadius: '8px', 
+                        marginBottom: '20px',
+                        borderLeft: '5px solid #28a745'
+                    }}>
+                        <h4 style={{ margin: '0 0 10px 0', color: '#28a745' }}>💰 Custos Estimados (IA)</h4>
+                        {estimativa.grupos.map((g, i) => (
+                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                                <span>{g.nome}:</span>
+                                <strong>R$ {g.valor.toFixed(2)}</strong>
+                            </div>
+                        ))}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', borderTop: '1px solid #ddd', paddingTop: '5px' }}>
+                            <strong>TOTAL ESTIMADO:</strong>
+                            <strong style={{ color: '#d9534f', fontSize: '18px' }}>R$ {estimativa.total.toFixed(2)}</strong>
+                        </div>
+                        {estimativa.observacao && (
+                            <p style={{ fontSize: '12px', color: '#666', marginTop: '10px', fontStyle: 'italic' }}>
+                                💡 {estimativa.observacao}
+                            </p>
+                        )}
+                    </div>
+                )}
+
                 <hr />
+                
                 {['comida', 'bebida', 'outros'].map(tipo => (
                     <div key={tipo} style={{ marginBottom: '20px' }}>
-                        <h4 style={styles.tipoTitle}>{tipo}</h4>
+                        <h4 style={styles.tipoTitle}>{tipo.toUpperCase()}</h4>
                         {resultado.filter(r => r.tipo === tipo).map((r, i) => (
                             <div key={i} style={styles.itemResultRow}>
                                 <span style={r.subtipo === 'observacao' ? styles.textObs : styles.textItem}>
@@ -177,6 +283,7 @@ function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar, styles, mo
                         ))}
                     </div>
                 ))}
+
                 <button onClick={fechar} style={styles.btnCloseGray}>FECHAR</button>
             </div>
         </div>

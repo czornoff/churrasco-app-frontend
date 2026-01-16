@@ -107,9 +107,37 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
                     )}
 
                     {isMobile && (
-                        <button onClick={() => setMenuAberto(!menuAberto)} style={headerStyles.hamburger}>
-                            {menuAberto ? '✕' : '☰'}
-                        </button>
+                        <>
+                            <Link to="/calculadora" onClick={handleLogout} style={
+                                {
+                                    ...headerStyles.loginBtn, 
+                                    backgroundColor: '#007bff', 
+                                    border: 'none', 
+                                    cursor: 'pointer',
+                                    fontSize: "12px",
+                                }
+                                }>Calculadora</Link>
+                            {usuario && (
+                                <button onClick={handleLogout} style={
+                                    {
+                                        ...headerStyles.logoutBtn,
+                                        fontSize: "12px",
+                                        padding: "8px 20px",
+                                    }
+                                }>Sair</button>
+                            )} 
+                            {!usuario && (
+                                <Link to="/login" style={
+                                    {
+                                        ...headerStyles.loginBtn,
+                                        fontSize: "12px",
+                                    }
+                                }>Entrar</Link>
+                            )}
+                            <button onClick={() => setMenuAberto(!menuAberto)} style={headerStyles.hamburger}>
+                                {menuAberto ? '✕' : '☰'}
+                            </button>
+                        </>
                     )}
                 </div>
             </div>
