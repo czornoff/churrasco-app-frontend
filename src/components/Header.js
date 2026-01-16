@@ -108,7 +108,7 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
 
                     {isMobile && (
                         <>
-                            <Link to="/calculadora" onClick={handleLogout} style={
+                            <Link to="/calculadora" style={
                                 {
                                     ...headerStyles.loginBtn, 
                                     backgroundColor: '#007bff', 
