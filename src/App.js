@@ -136,7 +136,7 @@ export default function App() {
             if (res.ok && data.success) {
                 setShowModalComplemento(false);
                 setUsuario(data.data); // Atualiza o usuário local com os dados do banco
-                window.location.href = '/'; // Redireciona para limpar o estado e fechar o modal
+                window.location.href = '/calculodechurrasco'; // Redireciona para limpar o estado e fechar o modal
             } else {
                 alert("Erro ao salvar: " + (data.message || "Verifique os campos."));
             }
@@ -194,7 +194,7 @@ export default function App() {
     }
 
     return (
-        <Router>
+        <Router basename="/calculodechurrasco">
             <Header dados={conteudo} usuario={usuario} styles={styles} headerStyles={headerStyles} abrirPerfil = {() => abrirEdicao()}/> 
 
             {window.location.hostname !== 'localhost' && <AdBanner slot="2870360789" />}

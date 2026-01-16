@@ -2,6 +2,7 @@
   "name": "churrasco-frontend",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/calculodechurrasco",
   "dependencies": {
     "@react-google-maps/api": "^2.20.8",
     "@testing-library/dom": "^10.4.1",

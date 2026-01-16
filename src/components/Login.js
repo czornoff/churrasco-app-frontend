@@ -39,7 +39,7 @@ export default function Login({loginStyles}) {
                 } else {
                     // Login manual bem sucedido: Redireciona para a home
                     // O App.js agora conseguirá ler o cookie pois usamos 'credentials'
-                    window.location.href = '/';
+                    window.location.href = '/calculodechurrasco';
                 }
             } else {
                 setMensagem({ texto: data.message || "Erro na autenticação", tipo: 'erro' });
