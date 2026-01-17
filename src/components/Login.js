@@ -117,7 +117,7 @@ export default function Login({loginStyles}) {
                             {isRegistro ? ' Faça Login' : ' Cadastre-se'}
                         </span>
                     </p>
-                    <a href="/" style={loginStyles.backLink}>← Voltar para a Calculadora</a>
+                    <a href="/calculodechurrasco" style={loginStyles.backLink}>← Voltar para a Calculadora</a>
                 </div>
             </div>
         </div>

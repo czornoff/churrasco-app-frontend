@@ -26,6 +26,8 @@ const API_URL = process.env.REACT_APP_API_URL;
 export default function App() {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
+    const avisoStyle = { width: '100%', backgroundColor: '#fff3cd', color: '#856404', padding: '10px', borderRadius: '8px', fontSize: '13px', textAlign: 'center', border: '1px solid #ffeeba', marginTop: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' };
+
     useEffect(() => {
         const handleResize = () => setWindowWidth(window.innerWidth);
         window.addEventListener('resize', handleResize);
@@ -138,7 +140,7 @@ export default function App() {
                 setUsuario(data.data); // Atualiza o usuário local com os dados do banco
                 window.location.href = '/calculodechurrasco'; // Redireciona para limpar o estado e fechar o modal
             } else {
-                alert("Erro ao salvar: " + (data.message || "Verifique os campos."));
+                alert("Erro ao salvar: " + (data.message || "Verifique todos os campos."));
             }
         } catch (err) {
             console.error("Erro ao salvar perfil:", err);
@@ -204,7 +206,7 @@ export default function App() {
                     <Route path="/" element={<Inicial dados={conteudo} styles={styles} />} />
                     <Route path="/calculadora" element={<Calculadora dados={conteudo} opcoes={opcoes} styles={styles} modalStyles={modalStyles} usuario={usuario} />} />
                     <Route path="/dicas" element={<Dicas dados={conteudo?.dicas} styles={styles} />} />
-                    <Route path="/onde-comprar" element={<OndeComprar styles={styles} />} />
+                    <Route path="/onde-comprar" element={<OndeComprar conteudo={conteudo} styles={styles} />} />
                     <Route path="/produtos" element={<Produtos dados={conteudo?.produtos} styles={styles}  />} />
                     <Route path="/receitas" element={<Receitas dados={conteudo?.receitas} styles={styles} modalStyles={modalStyles}  />} />
                     <Route path="/relatorio/:id" element={<Relatorio styles={styles} adminStyles={adminStyles}  />} />
@@ -214,8 +216,8 @@ export default function App() {
                     <Route path="/login" element={usuario && !perfilIncompleto(usuario) ? <Navigate to="/" /> : <Login styles={styles} loginStyles={loginStyles}/>} />
                     
                     <Route path="/admin" element={usuario?.role === 'admin' ? <Admin opcoes={opcoes} setOpcoes={setOpcoes} styles={styles} adminStyles={adminStyles} /> : <Navigate to="/login" />} />
-                    <Route path="/admin/item" element={usuario?.role === 'admin' ? <AdminItem opcoes={opcoes} setOpcoes={setOpcoes} styles={styles} adminStyles={adminStyles} /> : <Navigate to="/login" />} />
                     <Route path="/admin/conteudo" element={usuario?.role === 'admin' ? <AdminConteudo conteudo={conteudo} setConteudo={setConteudo} atualizarApp={() => setAtualizador(prev => prev + 1)} styles={styles} adminStyles={adminStyles} /> : <Navigate to="/login" />} />
+                    <Route path="/admin/item" element={usuario?.role === 'admin' ? <AdminItem opcoes={opcoes} setOpcoes={setOpcoes} styles={styles} adminStyles={adminStyles} /> : <Navigate to="/login" />} />
                     <Route path="/admin/relatorio" element={usuario?.role === 'admin' ? <AdminRelatorio styles={styles} adminStyles={adminStyles} /> : <Navigate to="/login" />} />
                     <Route path="/admin/usuarios" element={usuario?.role === 'admin' ? <AdminUsuario styles={styles} adminStyles={adminStyles} modalStyles={modalStyles} /> : <Navigate to="/" />} />
 
@@ -235,15 +237,23 @@ export default function App() {
                             <button style={modalStyles.closeBtn} onClick={() => setShowModalComplemento(false)}>✕</button>
                         )}  
                         <h2 style={ styles.modalHeader }>
-                            {perfilIncompleto(usuario) ? "Complete seu Perfil 🔥" : "Meu Perfil ⚙️"}
+                            {perfilIncompleto(usuario) ? "Complete seu Perfil 🔥" : "Meu Perfil"}
                         </h2>
                         <form onSubmit={salvarDadosPerfil} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                             <input placeholder="Nome Completo" required style={loginStyles.input} 
                                 value={complementoData.nome}
                                 onChange={e => setComplementoData({ ...complementoData, nome: e.target.value })} />
-                            <input placeholder="email" required style={loginStyles.input} 
+                            <input placeholder="email" required 
+                                {...usuario.googleId ? { readOnly: true } : {}}
+                                style={loginStyles.input} 
                                 value={complementoData.email}
                                 onChange={e => setComplementoData({ ...complementoData, email: e.target.value })} />
+                                { usuario?.googleId ?  (
+                                    <div style={avisoStyle}>
+                                        <span>⚠️</span>
+                                        <span>Não é possível alterar email de login associado a Conta do Google</span>
+                                    </div>
+                                    ) : null }
                             <div style={ styles.colorInputGroup }>
                                 {/* SELECT DE ESTADOS */}
                                 <select 

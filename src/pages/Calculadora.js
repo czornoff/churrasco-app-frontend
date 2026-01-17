@@ -193,13 +193,17 @@ function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar, styles, ge
                 </div>
 
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap' }}>
-                    <button onClick={() => enviarWhatsApp(pessoas, resultado)} style={
-                        {
-                            ...styles.btnWhatsapp, 
-                            flex: 1,
-                            backgroundColor: usuario ? '#339944' : '#ccc',
-                            cursor: (usuario) ? 'pointer' : 'not-allowed',
-                        }}>
+                    <button 
+                        onClick={usuario ? () => enviarWhatsApp(pessoas, resultado) : undefined}
+                        disabled={!usuario}
+                        style={
+                            {
+                                ...styles.btnWhatsapp, 
+                                flex: 1,
+                                backgroundColor: usuario ? '#339944' : '#ccc',
+                                cursor: (usuario) ? 'pointer' : 'not-allowed',
+                            }
+                        }>
                         📱 Enviar Lista por WhatsApp
                     </button>
                     

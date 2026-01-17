@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Inicial({ dados, styles }) {
     // Se o App.js ainda está carregando o conteúdo do banco
@@ -9,9 +10,9 @@ export default function Inicial({ dados, styles }) {
             <header style={styles.header}>
                 <h1 style={styles.title}>{dados.inicioTitulo || ''}</h1>
                 <div style={{marginTop: '2em'}}>
-                    <a href='./calculadora' style={{ ...styles.viewBtn, width: '20em', fontSize: '1em', textDecoration: 'none'}}>
+                    <Link to="/calculadora" style={{ ...styles.viewBtn, width: '20em', fontSize: '1em', textDecoration: 'none'}}>
                         🔥 PLANEJE SEU CHURRASCO AGORA! 🔥
-                    </a>
+                    </Link>
                 </div>
             </header>
 

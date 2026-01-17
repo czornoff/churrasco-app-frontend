@@ -12,35 +12,27 @@ const GOOGLE_MAPS_API_KEY = "AIzaSyCE1lyCvcJwnAXJ6fEI6dnOxFflQQnG-kY";
 const MAP_ID = "c40e634b60915d61a1edbffc";
 const containerStyle = { width: '100%', height: '500px', borderRadius: '15px' };
 
-export default function OndeComprar({ styles }) {
+export default function OndeComprar({ conteudo, styles }) {
     const [locais, setLocais] = useState([]);
     const [centro, setCentro] = useState({ lat: -23.5876, lng: -46.7403 });
     const [selecionado, setSelecionado] = useState(null);
 
-    const filtros = {
-        acougue: "açougue OR 'casa de carnes' OR 'boutique de carnes' OR carnes",
-        bebidas: "bebidas OR cerveja OR 'loja de bebidas' OR adega",
-        mercado: "supermercado OR mercado OR empório",
-        utensilio: "churrasqueira OR 'steak boutique' OR 'artigos para churrasco'",
-        parceiro: "Swift"
-    };
-
-    const [filtroAtivo, setFiltroAtivo] = useState(filtros.acougue);
+    // --- INTEGRAÇÃO DINÂMICA ---
+    // Pegamos os botões configurados no Admin
+    const botoesConfig = conteudo?.ondeComprar?.botoes || [];
+    
+    // Filtro inicial: pega o termo do primeiro botão ativo ou um fallback
+    const botaoInicial = botoesConfig.find(b => b.ativo);
+    const [filtroAtivo, setFiltroAtivo] = useState(botaoInicial?.termo || "");
 
     const icons = {
-        acougue: "https://bandalarga.com.br/img/churrasco/acougue.png",
-        bebidas: "https://bandalarga.com.br/img/churrasco/chopp.png",
-        utensilio: "https://bandalarga.com.br/img/churrasco/utensilio.png",
-        mercado: "https://bandalarga.com.br/img/churrasco/mercado.png",
-        parceiro: "https://bandalarga.com.br/img/churrasco/patrocinio.png",
         usuario: "https://bandalarga.com.br/img/churrasco/usuario.png"
     };
 
     // Função de busca principal
     const realizarBusca = useCallback(async (mapInstance, posicao, termo) => {
-        if (!mapInstance || !window.google) return;
+        if (!mapInstance || !window.google || !termo) return;
 
-        // Criamos uma chave única baseada na posição (arredondada) e no termo
         const cacheKey = `busca_${termo}_${posicao.lat.toFixed(3)}_${posicao.lng.toFixed(3)}`;
         const cacheSalvo = sessionStorage.getItem(cacheKey);
 
@@ -71,7 +63,6 @@ export default function OndeComprar({ styles }) {
                     user_ratings_total: p.userRatingCount
                 }));
 
-                // Salva no cache antes de atualizar o estado
                 sessionStorage.setItem(cacheKey, JSON.stringify(formatados));
                 setLocais(formatados);
             } else {
@@ -86,7 +77,7 @@ export default function OndeComprar({ styles }) {
         <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
             <div style={styles.container}>
                 <header style={styles.header}>
-                    <h1 style={styles.title}>Onde Comprar</h1>
+                    <h1 style={styles.title}>{conteudo?.nomeApp ? `Onde Comprar - ${conteudo.nomeApp}` : "Onde Comprar"}</h1>
                     <p style={styles.subtitle}>Encontre produtos para o seu churrasco</p>
                 </header>
                     <MapaConteudo 
@@ -94,24 +85,24 @@ export default function OndeComprar({ styles }) {
                         setCentro={setCentro}
                         locais={locais}
                         realizarBusca={realizarBusca}
-                        filtros={filtros}
+                        botoesConfig={botoesConfig} // Passando os botões do banco
                         filtroAtivo={filtroAtivo}
                         setFiltroAtivo={setFiltroAtivo}
                         selecionado={selecionado}
                         setSelecionado={setSelecionado}
                         icons={icons}
+                        primaryColor={conteudo?.primary}
                     />
             </div>
         </APIProvider>
     );
 }
 
-function MapaConteudo({ centro, setCentro, locais, realizarBusca, filtros, filtroAtivo, setFiltroAtivo, selecionado, setSelecionado, icons }) {
+function MapaConteudo({ centro, setCentro, locais, realizarBusca, botoesConfig, filtroAtivo, setFiltroAtivo, selecionado, setSelecionado, icons, primaryColor }) {
     const map = useMap();
     const jaBuscouRef = useRef(false);
     const [buscando, setBuscando] = useState(false);
 
-    // Ajuste de tamanho do mapa quando carrega
     useEffect(() => {
         if (map) {
             window.google.maps.event.trigger(map, 'resize');
@@ -137,7 +128,7 @@ function MapaConteudo({ centro, setCentro, locais, realizarBusca, filtros, filtr
     }, [map, filtroAtivo, realizarBusca, setCentro]);
 
     useEffect(() => {
-        if (map && !jaBuscouRef.current) {
+        if (map && !jaBuscouRef.current && filtroAtivo) {
             realizarBusca(map, centro, filtroAtivo);
             jaBuscouRef.current = true;
         }
@@ -148,39 +139,40 @@ function MapaConteudo({ centro, setCentro, locais, realizarBusca, filtros, filtr
         setBuscando(true);
         setFiltroAtivo(novoTermo);
         
-        // Buscamos usando o centro atual do mapa (onde o usuário está olhando agora)
         const centroAtual = map.getCenter().toJSON();
         realizarBusca(map, centroAtual, novoTermo).finally(() => {
             setTimeout(() => setBuscando(false), 1500);
         });
     };
 
-    const getIconePorFiltro = () => {
-        if (filtroAtivo === filtros.parceiro) return icons.parceiro;
-        if (filtroAtivo === filtros.bebidas) return icons.bebidas;
-        if (filtroAtivo === filtros.utensilio) return icons.utensilio;
-        if (filtroAtivo === filtros.mercado) return icons.mercado;
-        return icons.acougue;
+    // Pega o ícone/imagem configurado para o botão selecionado
+    const getIconeAtual = () => {
+        const botao = botoesConfig.find(b => b.termo === filtroAtivo);
+        if (botao?.pinUrl) return `${process.env.REACT_APP_API_URL}${botao.pinUrl}`;
+        return null; // Fallback para emoji no render se for null
     };
 
     return (
         <>
             <div style={{ marginBottom: '15px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                <button onClick={() => alterarFiltro(filtros.acougue)} style={{ ...btnStyle, backgroundColor: filtroAtivo === filtros.acougue ? '#FB6458' : '#555' }}>
-                    <img src={icons.acougue} alt="" style={btnImgStyle} /> Açougues
-                </button>
-                <button onClick={() => alterarFiltro(filtros.bebidas)} style={{ ...btnStyle, backgroundColor: filtroAtivo === filtros.bebidas ? '#7eb9fc' : '#555' }}>
-                    <img src={icons.bebidas} alt="" style={btnImgStyle} /> Bebidas
-                </button>
-                <button onClick={() => alterarFiltro(filtros.mercado)} style={{ ...btnStyle, backgroundColor: filtroAtivo === filtros.mercado ? '#FC7E84' : '#555' }}>
-                    <img src={icons.mercado} alt="" style={btnImgStyle} /> Mercados
-                </button>
-                <button onClick={() => alterarFiltro(filtros.utensilio)} style={{ ...btnStyle, backgroundColor: filtroAtivo === filtros.utensilio ? '#EDAF23' : '#555' }}>
-                    <img src={icons.utensilio} alt="" style={btnImgStyle} /> Utensílios
-                </button>
-                <button onClick={() => alterarFiltro(filtros.parceiro)} style={{ ...btnStyle, backgroundColor: filtroAtivo === filtros.parceiro ? '#000' : '#555' }}>
-                    <img src={icons.parceiro} alt="" style={btnImgStyle} /> Swift
-                </button>
+                {/* RENDERIZAÇÃO DINÂMICA DOS BOTÕES DO BANCO */}
+                {botoesConfig.filter(b => b.ativo).map((botao) => (
+                    <button 
+                        key={botao.id}
+                        onClick={() => alterarFiltro(botao.termo)} 
+                        style={{ 
+                            ...btnStyle, 
+                            backgroundColor: filtroAtivo === botao.termo ? botao.cor : '#555' 
+                        }}
+                    >
+                        {botao.pinUrl ? (
+                            <img src={`${process.env.REACT_APP_API_URL}${botao.pinUrl}`} alt="" style={btnImgStyle} />
+                        ) : (
+                            <span style={{marginRight: '5px'}}>{botao.icone}</span>
+                        )}
+                        {botao.label}
+                    </button>
+                ))}
                 
                 <button onClick={localizarUsuario} style={{ ...btnStyle, backgroundColor: '#4285F4', marginLeft: 'auto', border: '2px solid #fff' }}>
                     📍 Onde estou?
@@ -193,43 +185,36 @@ function MapaConteudo({ centro, setCentro, locais, realizarBusca, filtros, filtr
                 defaultZoom={14}
                 mapId={MAP_ID}
                 disableDefaultUI={true}
-                // REMOVIDO: onCenterChanged para evitar deslocamento visual
             >
-                {/* Marcador do Usuário - Centralizado (ponto no meio) */}
                 <AdvancedMarker position={centro}>
                     <img 
                         src={icons.usuario} 
                         width={45} 
                         height={45} 
                         alt="Você" 
-                        style={
-                            {
-                                transform: 'translate(calc(-50% + 20px), calc(-50% + 50px))', 
-                                filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))',
-                                pointerEvents: 'none' 
-                            }
-                        }
+                        style={{
+                            transform: 'translate(calc(-50% + 20px), calc(-50% + 50px))', 
+                            filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))',
+                            pointerEvents: 'none' 
+                        }}
                     />
                 </AdvancedMarker>
 
-                {/* Marcadores das Lojas - Ancorados na base (pé do ícone) */}
                 {locais.map(local => (
                     <AdvancedMarker 
                         key={local.place_id} 
                         position={local.location} 
                         onClick={() => setSelecionado(local)}
                     >
-                        <img 
-                            src={getIconePorFiltro()} 
-                            width={40} 
-                            height={40} 
-                            alt="Local" 
-                            style={{ 
-                                position: 'absolute',
-                                left: '-20px', // Metade da largura (40/2)
-                                top: '-40px'   // Total da altura para a base tocar o ponto
-                            }} 
-                        />
+                        {getIconeAtual() ? (
+                            <img 
+                                src={getIconeAtual()} 
+                                width={40} height={40} alt="Local" 
+                                style={{ position: 'absolute', left: '-20px', top: '-40px' }} 
+                            />
+                        ) : (
+                            <div style={{fontSize: '30px', position: 'absolute', left: '-15px', top: '-35px'}}>📍</div>
+                        )}
                     </AdvancedMarker>
                 ))}
 
@@ -250,7 +235,7 @@ function MapaConteudo({ centro, setCentro, locais, realizarBusca, filtros, filtr
                                 href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(selecionado.formatted_address)}`} 
                                 target="_blank" 
                                 rel="noreferrer" 
-                                style={linkStyle}
+                                style={{...linkStyle, backgroundColor: primaryColor || '#e67e22'}}
                             >
                                 🚗 Como Chegar
                             </a>
@@ -258,33 +243,17 @@ function MapaConteudo({ centro, setCentro, locais, realizarBusca, filtros, filtr
                     </InfoWindow>
                 )}
             </Map>
+            
+            <div style={avisoStyle}>
+                <span>⚠️</span>
+                <span>Ao mover o mapa, clique novamente no botão para recarregar mais locais disponíveis.</span>
+            </div>
         </>
     );
 }
 
-// --- ESTILOS COMPLEMENTARES ---
-const btnStyle = { 
-    padding: '10px 15px', 
-    color: '#fff', 
-    border: 'none', 
-    borderRadius: '8px', 
-    cursor: 'pointer', 
-    fontWeight: 'bold', 
-    display: 'flex', 
-    alignItems: 'center',
-    transition: 'all 0.2s ease'
-};
-
-const btnImgStyle = { width: '15px', height: '15px', marginRight: '5px' };
-
-const linkStyle = { 
-    display: 'block', 
-    textAlign: 'center', 
-    backgroundColor: '#e67e22', 
-    color: '#fff', 
-    padding: '8px', 
-    borderRadius: '5px', 
-    textDecoration: 'none', 
-    fontSize: '12px', 
-    fontWeight: 'bold' 
-};
+// --- ESTILOS ---
+const btnStyle = { padding: '10px 15px', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', transition: 'all 0.2s ease' };
+const btnImgStyle = { width: '18px', height: '18px', marginRight: '5px', objectFit: 'contain' };
+const linkStyle = { display: 'block', textAlign: 'center', color: '#fff', padding: '8px', borderRadius: '5px', textDecoration: 'none', fontSize: '12px', fontWeight: 'bold' };
+const avisoStyle = { width: '100%', backgroundColor: '#fff3cd', color: '#856404', padding: '10px', borderRadius: '8px', fontSize: '13px', textAlign: 'center', border: '1px solid #ffeeba', marginTop: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' };
