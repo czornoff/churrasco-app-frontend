@@ -1,8 +1,48 @@
-import React, { useState, useEffect } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
+import React, { useState, useEffect, useMemo, memo } from 'react';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 const API_URL = process.env.REACT_APP_API_URL;
-const TINYMCE_API_KEY = process.env.REACT_APP_TINYMCE_KEY;
+
+// --- COMPONENTE DE EDITOR ISOLADO (CORREÇÃO PARA REACT 19) ---
+const EditorItem = memo(({ value, onChange, modules, formats, height = '200px' }) => {
+    const [carregado, setCarregado] = useState(false);
+
+    useEffect(() => {
+        // Delay para evitar renderização concorrente pesada
+        const timer = setTimeout(() => setCarregado(true), 150);
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (!carregado) {
+        return (
+            <div style={{ 
+                height, 
+                background: '#f8f9fa', 
+                borderRadius: '8px', 
+                border: '1px solid #ddd', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                color: '#888',
+                marginBottom: '45px'
+            }}>
+                Carregando editor...
+            </div>
+        );
+    }
+
+    return (
+        <ReactQuill
+            theme="snow"
+            value={value || ''}
+            onChange={onChange}
+            modules={modules}
+            formats={formats}
+            style={{ height, marginBottom: '75px' }}
+        />
+    );
+});
 
 const TEMPLATE_INICIAL_MAPA = {
     botoes: [
@@ -15,18 +55,31 @@ const TEMPLATE_INICIAL_MAPA = {
     ]
 };
 
-const TINYMCE_INIT = {
-    menubar: false,
-    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media', 'table', 'help', 'wordcount'],
-    toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-};
+const QUILL_FORMATS = [
+    'header', 'bold', 'italic', 'underline', 'strike',
+    'color', 'background', 'list', 'bullet', 'link'
+];
 
 export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, styles, adminStyles }) {
     const [abaAtiva, setAbaAtiva] = useState('layout');
     const [mensagem, setMensagem] = useState('');
     const [ultimasLogos, setUltimasLogos] = useState([]);
     const [modalGaleria, setModalGaleria] = useState({ aberto: false, tipo: '', index: null });
+    const [montado, setMontado] = useState(false);
+
+    useEffect(() => {
+        setMontado(true);
+    }, []);
+
+    const modules = useMemo(() => ({
+        toolbar: [
+            [{ 'header': [1, 2, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['link', 'clean']
+        ],
+    }), []);
 
     useEffect(() => {
         if (conteudo && (!conteudo.ondeComprar || !conteudo.ondeComprar.botoes || conteudo.ondeComprar.botoes.length === 0)) {
@@ -47,13 +100,33 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
     if (!conteudo) return <div style={adminStyles.loading}>Carregando configurações...</div>;
 
     const salvarDados = async () => {
+        const conteudoLimpo = JSON.parse(JSON.stringify(conteudo));
+
+        const limparHtml = (html) => {
+            if (typeof html !== 'string') return html;
+            return html.replace(/&nbsp;/g, ' ');
+        };
+
+        if (conteudoLimpo.inicioTexto) conteudoLimpo.inicioTexto = limparHtml(conteudo.inicioTexto);
+        if (conteudoLimpo.sobreTexto) conteudoLimpo.sobreTexto = limparHtml(conteudo.sobreTexto);
+
+        ['dicas', 'produtos', 'receitas', 'utensilios'].forEach(aba => {
+            if (conteudoLimpo[aba]?.itens) {
+                conteudoLimpo[aba].itens = conteudoLimpo[aba].itens.map(item => ({
+                    ...item,
+                    texto: limparHtml(item.texto),
+                    preparo: limparHtml(item.preparo)
+                }));
+            }
+        });
+
         try {
             const res = await fetch(`${API_URL}/admin/conteudo/salvar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(conteudo),
-                credentials: 'include'
-            });
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(conteudoLimpo), // Enviamos o limpo
+            credentials: 'include'
+        });
             const respostaJson = await res.json();
             if (res.ok && respostaJson.success) {
                 setConteudo(respostaJson.data); 
@@ -87,9 +160,11 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
     };
 
     const handleListChange = (categoria, index, campo, valor) => {
-        const novaLista = [...(conteudo[categoria]?.itens || [])];
-        novaLista[index] = { ...novaLista[index], [campo]: valor };
-        setConteudo(prev => ({ ...prev, [categoria]: { ...prev[categoria], itens: novaLista } }));
+        setConteudo(prev => {
+            const novaLista = [...(prev[categoria]?.itens || [])];
+            novaLista[index] = { ...novaLista[index], [campo]: valor };
+            return { ...prev, [categoria]: { ...prev[categoria], itens: novaLista } };
+        });
     };
 
     const fazerUploadImagem = async (arquivo, tipo, index = null) => {
@@ -114,7 +189,6 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
         setModalGaleria({ aberto: false, tipo: '', index: null });
     };
 
-    // Estilos Inline Dinâmicos para Responsividade
     const responsiveGrid = {
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
@@ -134,7 +208,6 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
 
     return (
         <div style={{ ...styles.container, paddingBottom: '100px' }}>
-            {/* CSS para ajustes finos de mobile */}
             <style>{`
                 @media (max-width: 600px) {
                     .admin-tab-bar { display: flex; overflow-x: auto; white-space: nowrap; padding-bottom: 10px; }
@@ -152,7 +225,7 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
             </header>
 
             <div className="admin-tab-bar" style={{ ...adminStyles.tabBar, flexWrap: 'wrap' }}>
-                {['layout', 'inicio', 'ondeComprar', 'sobre', 'dicas', 'produtos', 'utensilios', 'receitas'].map(tab => (
+                {['layout', 'inicio', 'sobre', 'ondeComprar', 'dicas', 'produtos', 'utensilios', 'receitas'].map(tab => (
                     <button 
                         key={tab} 
                         onClick={() => setAbaAtiva(tab)}
@@ -162,16 +235,16 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
                             margin: '4px'
                         }}
                     >
-                        {tab === 'ondeComprar' ? 'ONDE ENCONTRAR' : tab.toUpperCase()}
+                        {tab === 'ondeComprar' ? 'ONDE COMPRAR' : tab.toUpperCase()}
                     </button>
                 ))}
             </div>
 
             <div style={styles.contentWrapper}>
-                
                 {/* ABA LAYOUT */}
                 {abaAtiva === 'layout' && (
                     <div style={styles.column}>
+                        <h3 style={{...styles.cardTitle, marginBottom: '0px'}}>{abaAtiva.toUpperCase()}</h3>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '20px' }}>
                             <div>
                                 <label style={adminStyles.label}>Nome do Aplicativo:</label>
@@ -223,58 +296,61 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
 
                 {/* ABA ONDE ENCONTRAR */}
                 {abaAtiva === 'ondeComprar' && (
-                    <div style={responsiveGrid}>
-                        {conteudo.ondeComprar?.botoes?.map((botao, index) => (
-                            <div key={index} style={{ ...adminStyles.cardBox, borderLeft: `5px solid ${botao.cor}`, margin: 0 }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <input type="checkbox" checked={botao.ativo} onChange={(e) => handleOndeComprarChange(index, 'ativo', e.target.checked)} /> 
-                                        <strong>{botao.ativo ? 'Ativo' : 'Inativo'}</strong>
-                                    </label>
-                                    <input type="color" value={botao.cor} onChange={e => handleOndeComprarChange(index, 'cor', e.target.value)} style={{ width: '30px', height: '30px', border: 'none', cursor: 'pointer' }} />
-                                </div>
-                                <label style={adminStyles.label}>Título:</label>
-                                <input style={{ ...adminStyles.input, marginBottom: '10px' }} value={botao.label} onChange={e => handleOndeComprarChange(index, 'label', e.target.value)} />
-                                <label style={adminStyles.label}>Busca Maps:</label>
-                                <input style={{ ...adminStyles.input, marginBottom: '10px' }} value={botao.termo} onChange={e => handleOndeComprarChange(index, 'termo', e.target.value)} />
-                                
-                                <div className="pin-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '10px', background: '#fff', padding: '10px', borderRadius: '8px' }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                                        <div style={{ textAlign: 'center' }}>
-                                            <span style={{ fontSize: '10px', display: 'block' }}>EMOJI</span>
-                                            <input style={{ width: '100%', textAlign: 'center', fontSize: '30px', border: '0px solid #eee' }} value={botao.icone} onChange={e => handleOndeComprarChange(index, 'icone', e.target.value)} />
+                    <div style={styles.column}>
+                        <h3 style={styles.cardTitle}>{abaAtiva.toUpperCase()}</h3>
+                        <div style={responsiveGrid}>
+                            {conteudo.ondeComprar?.botoes?.map((botao, index) => (
+                                <div key={index} style={{ ...adminStyles.cardBox, borderLeft: `5px solid ${botao.cor}`, margin: 0 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <input type="checkbox" checked={botao.ativo} onChange={(e) => handleOndeComprarChange(index, 'ativo', e.target.checked)} /> 
+                                            <strong>{botao.ativo ? 'Ativo' : 'Inativo'}</strong>
+                                        </label>
+                                        <input type="color" value={botao.cor} onChange={e => handleOndeComprarChange(index, 'cor', e.target.value)} style={{ width: '30px', height: '30px', border: 'none', cursor: 'pointer' }} />
+                                    </div>
+                                    <label style={adminStyles.label}>Título:</label>
+                                    <input style={{ ...adminStyles.input, marginBottom: '10px' }} value={botao.label} onChange={e => handleOndeComprarChange(index, 'label', e.target.value)} />
+                                    <label style={adminStyles.label}>Busca Maps:</label>
+                                    <input style={{ ...adminStyles.input, marginBottom: '10px' }} value={botao.termo} onChange={e => handleOndeComprarChange(index, 'termo', e.target.value)} />
+                                    
+                                    <div className="pin-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '10px', background: '#fff', padding: '10px', borderRadius: '8px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                            <div style={{ textAlign: 'center' }}>
+                                                <span style={{ fontSize: '10px', display: 'block' }}>EMOJI</span>
+                                                <input style={{ width: '100%', textAlign: 'center', fontSize: '30px', border: '0px solid #eee', background: 'transparent' }} value={botao.icone} onChange={e => handleOndeComprarChange(index, 'icone', e.target.value)} />
+                                            </div>
+                                            <div style={{ textAlign: 'center' }}>
+                                                <span style={{ fontSize: '10px', display: 'block' }}>PIN</span>
+                                                {botao.pinUrl ? <img alt="PIN" src={`${API_URL}${botao.pinUrl}`} style={{ width: '45px', height: '45px', objectFit: 'contain' }} /> : <span>-</span>}
+                                            </div>
                                         </div>
-                                        <div style={{ textAlign: 'center' }}>
-                                            <span style={{ fontSize: '10px', display: 'block' }}>PIN</span>
-                                            {botao.pinUrl ? <img alt="PIN" src={`${API_URL}${botao.pinUrl}`} style={{ width: '45px', height: '45px', objectFit: 'contain' }} /> : <span>-</span>}
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                            <div>
+                                                <input 
+                                                    id={`upload-pin-${index}`}
+                                                    type="file" accept="image/*" onChange={(e) => fazerUploadImagem(e.target.files[0], 'pin', index)} style={{ display: 'none' }} />
+                                                <label htmlFor={`upload-pin-${index}`} style={{ ...adminStyles.addBtn, 
+                                                    display: 'block', textAlign: 'center', cursor: 'pointer', padding: '8px 20px', fontSize: '13px'  }}>
+                                                    📤 Enviar
+                                                </label>
+                                            </div>
+                                            <button onClick={() => setModalGaleria({ aberto: true, tipo: 'pin', index })} style={{ ...adminStyles.addBtn, 
+                                                display: 'block', textAlign: 'center', cursor: 'pointer', padding: '11px 20px', fontSize: '13px',
+                                                backgroundColor: '#555' }}>
+                                                    🖼️ Galeria
+                                            </button>
+                                            <button 
+                                                onClick={() => handleOndeComprarChange(index, 'pinUrl', '')} 
+                                                style={{ ...adminStyles.addBtn, 
+                                                display: 'block', textAlign: 'center', cursor: 'pointer', padding: '11px 20px', fontSize: '13px',
+                                                backgroundColor: '#ff5555' }}>
+                                                    🗑️ Limpar
+                                            </button>
                                         </div>
                                     </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                                        <div>
-                                            <input 
-                                                id={`upload-pin-${index}`}
-                                                type="file" accept="image/*" onChange={(e) => fazerUploadImagem(e.target.files[0], 'pin', index)} style={{ display: 'none' }} />
-                                            <label htmlFor={`upload-pin-${index}`} style={{ ...adminStyles.addBtn, 
-                                                display: 'block', textAlign: 'center', cursor: 'pointer', padding: '8px 20px', fontSize: '13px'  }}>
-                                                📤 Enviar
-                                            </label>
-                                        </div>
-                                        <button onClick={() => setModalGaleria({ aberto: true, tipo: 'pin', index })} style={{ ...adminStyles.addBtn, 
-                                            display: 'block', textAlign: 'center', cursor: 'pointer', padding: '11px 20px', fontSize: '13px',
-                                            backgroundColor: '#555' }}>
-                                                🖼️ Galeria
-                                        </button>
-                                        <button 
-                                            onClick={() => handleOndeComprarChange(index, 'pinUrl', '')} 
-                                            style={{ ...adminStyles.addBtn, 
-                                            display: 'block', textAlign: 'center', cursor: 'pointer', padding: '11px 20px', fontSize: '13px',
-                                            backgroundColor: '#ff5555' }}>
-                                                🗑️ Limpar
-                                        </button>
-                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 )}
 
@@ -282,14 +358,17 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
                 {(abaAtiva === 'inicio' || abaAtiva === 'sobre') && (
                     <div style={styles.column}>
                         <h3 style={styles.cardTitle}>{abaAtiva.toUpperCase()}</h3>
-                        <label style={adminStyles.label}>Título da Página:</label>
+                        <label style={{...adminStyles.label, marginTop: '15px'}}>Título da Página:</label>
                         <input style={{ ...adminStyles.input, marginBottom: '15px' }} value={conteudo[`${abaAtiva}Titulo`] || ''} onChange={e => handleConfigChange(abaAtiva, `${abaAtiva}Titulo`, e.target.value)} />
-                        <Editor
-                            apiKey={TINYMCE_API_KEY}
-                            value={conteudo[`${abaAtiva}Texto`] || ''}
-                            init={{ ...TINYMCE_INIT, height: 400 }}
-                            onEditorChange={(novo) => handleConfigChange(abaAtiva, `${abaAtiva}Texto`, novo)}
-                        />
+                        {montado && (
+                            <EditorItem 
+                                value={conteudo[`${abaAtiva}Texto`]} 
+                                onChange={(val) => handleConfigChange(abaAtiva, `${abaAtiva}Texto`, val)}
+                                modules={modules}
+                                formats={QUILL_FORMATS}
+                                height="300px"
+                            />
+                        )}
                     </div>
                 )}
 
@@ -299,7 +378,8 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                             <h3 style={styles.cardTitle}>{abaAtiva.toUpperCase()}</h3>
                             <button onClick={() => {
-                                const novo = { titulo: 'Novo Item', texto: '', icone: '🔥' };
+                                const campoTexto = abaAtiva === 'receitas' ? 'preparo' : 'texto';
+                                const novo = { titulo: 'Novo Item', [campoTexto]: '', icone: '🔥' };
                                 const lista = [...(conteudo[abaAtiva]?.itens || []), novo];
                                 setConteudo(prev => ({ ...prev, [abaAtiva]: { ...prev[abaAtiva], itens: lista } }));
                             }} style={adminStyles.addBtn}>+ Adicionar</button>
@@ -311,16 +391,20 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
                                         <input style={{ ...adminStyles.input, flex: 4 }} value={item.titulo} onChange={e => handleListChange(abaAtiva, index, 'titulo', e.target.value)} />
                                         <input style={{ ...adminStyles.input, flex: 1, textAlign: 'center' }} value={item.icone} onChange={e => handleListChange(abaAtiva, index, 'icone', e.target.value)} />
                                     </div>
-                                    <Editor
-                                        apiKey={TINYMCE_API_KEY}
-                                        value={abaAtiva === 'receitas' ? item.preparo : item.texto || ''}
-                                        init={{ ...TINYMCE_INIT, height: 200 }}
-                                        onEditorChange={(n) => handleListChange(abaAtiva, index, abaAtiva === 'receitas' ? 'preparo' : 'texto', n)}
-                                    />
+                                    <div style={{backgroundColor: '#fff', padding: '0px'}}>
+                                        {montado && (
+                                            <EditorItem 
+                                                value={abaAtiva === 'receitas' ? item.preparo : item.texto}
+                                                onChange={(val) => handleListChange(abaAtiva, index, abaAtiva === 'receitas' ? 'preparo' : 'texto', val)}
+                                                modules={modules}
+                                                formats={QUILL_FORMATS}
+                                            />
+                                        )}
+                                    </div>
                                     <button onClick={() => {
                                         const nl = conteudo[abaAtiva].itens.filter((_, i) => i !== index);
                                         setConteudo(prev => ({ ...prev, [abaAtiva]: { ...prev[abaAtiva], itens: nl } }));
-                                    }} style={{ ...adminStyles.deleteBtn, marginTop: '10px', width: '100%' }}>🗑️ Remover</button>
+                                    }} style={{ ...adminStyles.deleteBtn, marginTop: '10px', width: '100%', border: '1px solid #ccc', borderRadius: '5px', padding: '10px' }}>🗑️ Remover</button>
                                 </div>
                             ))}
                         </div>
@@ -328,8 +412,8 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
                 )}
             </div>
 
-            <div style={{ position: 'sticky', bottom: '20px', textAlign: 'right', marginRight: '20px' }}>
-                <button onClick={salvarDados} style={{ ...adminStyles.saveBtn, backgroundColor: '#2299FF', zIndex: 0, boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }}>💾 Salvar Alterações</button>
+            <div style={{ position: 'sticky', bottom: '20px', textAlign: 'right', marginRight: '20px', zIndex: 1000 }}>
+                <button onClick={salvarDados} style={{ ...adminStyles.saveBtn, backgroundColor: '#2299FF', boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }}>💾 Salvar Alterações</button>
             </div>
 
             {/* MODAL GALERIA */}

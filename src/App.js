@@ -72,6 +72,32 @@ export default function App() {
     }
     }, [usuario]);
 
+    const aplicarMascaraWhatsapp = (value) => {
+        if (!value) return "";
+        
+        // Remove tudo que não é dígito
+        let v = value.replace(/\D/g, "");
+        
+        // Limita a 11 números (2 do DDD + 9 do número)
+        v = v.slice(0, 11);
+
+        // Aplica a máscara de DDD: (00)
+        v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
+
+        // Aplica o hífen dinâmico
+        // Se tem 11 dígitos (celular), o hífen vai após o 5º número (ex: 99999-9999)
+        // Se tem até 10 dígitos (fixo), o hífen vai após o 4º número (ex: 8888-8888)
+        if (v.length > 13) { 
+            // Formato Celular: (00) 90000-0000 (total 15 caracteres com máscara)
+            v = v.replace(/(\d{5})(\d)/, "$1-$2");
+        } else {
+            // Formato Fixo: (00) 0000-0000 (total 14 caracteres com máscara)
+            v = v.replace(/(\d{4})(\d)/, "$1-$2");
+        }
+
+        return v;
+    };
+
     useEffect(() => {
         const handleResize = () => setWindowWidth(window.innerWidth);
         window.addEventListener('resize', handleResize);
@@ -287,7 +313,12 @@ export default function App() {
                                 onChange={e => setComplementoData({ ...complementoData, birthday: e.target.value })} />
                             <input placeholder="WhatsApp (com DDD)" required style={loginStyles.input} 
                                 value={complementoData.whatsApp}
-                                onChange={e => setComplementoData({ ...complementoData, whatsApp: e.target.value })} />
+                                maxLength={15} // Limita caracteres no campo
+                                onChange={e => {
+                                    const valorFormatado = aplicarMascaraWhatsapp(e.target.value);
+                                    setComplementoData({ ...complementoData, whatsApp: valorFormatado });
+                                }}
+                            />
                             <select required style={loginStyles.input} 
                                 onChange={e => setComplementoData({ ...complementoData, genero: e.target.value })}
                                 value={complementoData.genero}>

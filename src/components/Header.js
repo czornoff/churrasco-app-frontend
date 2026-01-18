@@ -116,7 +116,7 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
                                     cursor: 'pointer',
                                     fontSize: "12px",
                                 }
-                                }>Calculadora</Link>
+                                }>🔢</Link>
                             {usuario && (
                                 <button onClick={handleLogout} style={
                                     {
@@ -124,7 +124,7 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
                                         fontSize: "12px",
                                         padding: "8px 20px",
                                     }
-                                }>Sair</button>
+                                }>❌ Sair</button>
                             )} 
                             {!usuario && (
                                 <Link to="/login" style={
@@ -132,7 +132,7 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
                                         ...headerStyles.loginBtn,
                                         fontSize: "12px",
                                     }
-                                }>Entrar</Link>
+                                }>🔑</Link>
                             )}
                             <button onClick={() => setMenuAberto(!menuAberto)} style={headerStyles.hamburger}>
                                 {menuAberto ? '✕' : '☰'}
