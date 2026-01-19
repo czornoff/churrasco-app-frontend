@@ -11,6 +11,7 @@ const EMOJIS = {
     'bebidas': '🍺', 
     'adicionais': '🧀',
     'acompanhamentos': '🥗', 
+    'sobremesas': '🍰',
     'utensilios': '🍴'
 };
 
@@ -148,9 +149,9 @@ export default function Calculadora({ dados, opcoes, styles, usuario }) {
 
             <h3>Outros Itens</h3>
             <div style={styles.gridOutros}>
-                {['bebidas', 'adicionais', 'acompanhamentos', 'utensilios'].map(cat => (
+                {['bebidas', 'adicionais', 'acompanhamentos', 'sobremesas', 'utensilios'].map(cat => (
                     <div key={cat} style={styles.cardOutros}>
-                        <strong style={styles.cardOutrosTitle}>{EMOJIS[cat]} {cat}</strong>
+                        <strong style={{...styles.cardOutrosTitle, fontSize: '0.8em'}}>{EMOJIS[cat]} {cat}</strong>
                         {opcoes[cat].filter(i => i.ativo).map(i => (
                             <div key={i.id} style={styles.checkboxRowCentered}>
                                 <input type="checkbox" id={`it-${i.id}`} onChange={() => handleToggle(i.id)} />
@@ -272,7 +273,7 @@ function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar, styles, ge
 
                 <hr />
                 
-                {['comida', 'bebida', 'outros'].map(tipo => (
+                {['comida', 'bebida', 'acompanhamentos', 'sobremesas', 'outros'].map(tipo => (
                     <div key={tipo} style={{ marginBottom: '20px' }}>
                         <h4 style={styles.tipoTitle}>{tipo.toUpperCase()}</h4>
                         {resultado.filter(r => r.tipo === tipo).map((r, i) => (

@@ -63,11 +63,17 @@ export default function AdminItem({ opcoes, setOpcoes, styles, adminStyles }) {
             item.base = 'pessoa';
             item.fator = 1;
             item.unidade = 'un';
+        } else if (novoItem.categoria === 'sobremesas') {
+            item.gramasPorAdulto = 100;
+            item.unidade = 'g';
         } else {
             item.gramasPorAdulto = 50;
             item.unidade = 'g';
         }
 
+        if (!novosDados[novoItem.categoria]) {
+            novosDados[novoItem.categoria] = [];
+        }
         novosDados[novoItem.categoria].push(item);
         salvarNoServidor(novosDados);
         setNovoItem({ ...novoItem, nome: '' });
@@ -126,12 +132,13 @@ export default function AdminItem({ opcoes, setOpcoes, styles, adminStyles }) {
                         <option value="bebidas">Bebidas</option>
                         <option value="adicionais">Adicionais</option>
                         <option value="acompanhamentos">Acompanhamentos</option>
+                        <option value="sobremesas">Sobremesas</option>
                         <option value="utensilios">Utensílios</option>
                     </select>
 
                     {novoItem.categoria === 'carnes' && (
                         <select value={novoItem.subcategoria} onChange={e => setNovoItem({...novoItem, subcategoria: e.target.value})} style={adminStyles.select}>
-                            {['Bovina', 'Suína', 'Frango', 'Linguiças', 'Outros'].map(s => <option key={s} value={s}>{s}</option>)}
+                            {['Bovina', 'Suína', 'Frango', 'Linguiças', 'Outras'].map(s => <option key={s} value={s}>{s}</option>)}
                         </select>
                     )}
 
@@ -161,7 +168,7 @@ export default function AdminItem({ opcoes, setOpcoes, styles, adminStyles }) {
                                 <div style={adminStyles.itemConfigs}>
                                     {cat === 'carnes' && (
                                         <div style={adminStyles.configField}>
-                                            <label>Peso Rel.:</label>
+                                            <label>Peso Relativo:</label>
                                             <input type="number" style={adminStyles.numInput} value={item.pesoRelativo} onChange={e => atualizarCampoItem(cat, item.id, 'pesoRelativo', e.target.value)} />
                                         </div>
                                     )}
@@ -173,11 +180,19 @@ export default function AdminItem({ opcoes, setOpcoes, styles, adminStyles }) {
                                                 <option value="Alcoólica">Alcoólica</option>
                                             </select>
                                             <div style={adminStyles.configField}>
-                                                <label>Emb:</label>
+                                                <label>Embalagem:</label>
                                                 <input type="number" style={adminStyles.numInput} value={item.embalagem} onChange={e => atualizarCampoItem(cat, item.id, 'embalagem', e.target.value)} />
                                                 <span>ml</span>
                                             </div>
                                         </>
+                                    )}
+
+                                    {(cat === 'acompanhamentos' || cat === 'adicionais' || cat === 'sobremesas') && (
+                                        <div style={adminStyles.configField}>
+                                            <label>Quantidade por Adulto:</label>
+                                            <input type="number" style={adminStyles.numInput} value={item.gramasPorAdulto || item.qtdPorAdulto} onChange={e => atualizarCampoItem(cat, item.id, item.gramasPorAdulto !== undefined ? 'gramasPorAdulto' : 'qtdPorAdulto', e.target.value)} />
+                                            <span>{!item.unidade ? 'g' : item.unidade}</span>
+                                        </div>
                                     )}
 
                                     {cat === 'utensilios' && (
@@ -192,14 +207,6 @@ export default function AdminItem({ opcoes, setOpcoes, styles, adminStyles }) {
                                                 <option value="fixo">Fixo</option>
                                             </select>
                                         </>
-                                    )}
-
-                                    {(cat === 'acompanhamentos' || cat === 'adicionais') && (
-                                        <div style={adminStyles.configField}>
-                                            <label>Qtd/Adulto:</label>
-                                            <input type="number" style={adminStyles.numInput} value={item.gramasPorAdulto || item.qtdPorAdulto} onChange={e => atualizarCampoItem(cat, item.id, item.gramasPorAdulto !== undefined ? 'gramasPorAdulto' : 'qtdPorAdulto', e.target.value)} />
-                                            <span>{item.unidade}</span>
-                                        </div>
                                     )}
                                 </div>
 
