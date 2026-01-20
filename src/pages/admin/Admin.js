@@ -31,6 +31,14 @@ export default function Admin({styles, adminStyles}) {
                         </div>
                     </Link>
 
+                    <Link to="/admin/ips" style={adminStyles.shortcutCard}>
+                        <span style={adminStyles.icon}>💻</span>
+                        <div style={adminStyles.shortcutInfo}>
+                            <strong style={adminStyles.shortcutTitle}>Bloqueio IPS</strong>
+                            <p style={adminStyles.shortcutDesc}>Liberação de Acesso</p>
+                        </div>
+                    </Link>
+
                     <Link to="/admin/usuarios" style={adminStyles.shortcutCard}>
                         <span style={adminStyles.icon}>👥</span>
                         <div style={adminStyles.shortcutInfo}>

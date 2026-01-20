@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -28,6 +29,8 @@ export default function Calculadora({ dados, opcoes, styles, usuario }) {
     const [estimativa, setEstimativa] = useState(null);
     const [carregandoIA, setCarregandoIA] = useState(false);
 
+    const navigate = useNavigate();
+
     const obterEstimativaIA = async () => {
         if (!usuario) return alert("Você precisa estar logado!");
         
@@ -56,18 +59,33 @@ export default function Calculadora({ dados, opcoes, styles, usuario }) {
     );
 
     const calcular = async () => {
-        if (pessoas.homens === 0 && pessoas.mulheres === 0 && pessoas.criancas === 0) {
-            return alert("Informe o número de pessoas");
+        try {
+            const res = await fetch(`${API_URL}/api/calcular`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ ...pessoas, selecionados })
+            });
+
+            const data = await res.json();
+
+            // --- TRATAMENTO DO LIMITE DE IP (403) ---
+            if (res.status === 403 && data.limiteAtingido) {
+                alert("🔥 Limite atingido! Visitantes podem ver apenas 5 conteúdos/cálculos por dia. Faça login para continuar!");
+                navigate('/login', { state: { mensagem: "Atingiu o limite" } }); // Redireciona o usuário
+                return;
+            }
+
+            if (!res.ok) {
+                throw new Error(data.message || "Erro ao calcular");
+            }
+
+            setResultado(data);
+            setModalAberto(true);
+
+        } catch (error) {
+            alert("Erro na conexão: " + error.message);
         }
-        const res = await fetch(`${API_URL}/api/calcular`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ ...pessoas, selecionados })
-        });
-        const data = await res.json();
-        setResultado(data);
-        setModalAberto(true);
     };
 
     const enviarWhatsApp = (p, resultados) => {

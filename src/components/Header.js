@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -7,6 +7,7 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
     const [menuAberto, setMenuAberto] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const [dropdownAberto, setDropdownAberto] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const handleResize = () => {
@@ -17,6 +18,36 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    const navegarComVerificacao = async (e, destino) => {
+    e.preventDefault();
+    setMenuAberto(false);
+
+    // 1. Se logado, vai direto
+    if (usuario) {
+        navigate(destino);
+        return;
+    }
+
+    // 2. Se visitante, pergunta ao backend se ele ainda tem saldo
+    try {
+        const res = await fetch(`${API_URL}/api/verificar-acesso`, { 
+            method: 'POST',
+            credentials: 'include' 
+        });
+        const data = await res.json();
+
+        if (res.status === 403 && data.limiteAtingido) {
+            alert("🔥 Limite atingido! Visitantes podem ver apenas 5 conteúdos/cálculos por dia. Faça login para continuar!");
+            navigate('/login', { state: { mensagem: "Atingiu o limite" } });
+        } else {
+            navigate(destino);
+        }
+    } catch (error) {
+        console.error("Erro ao verificar acesso", error);
+        navigate(destino); // Em caso de erro de rede, libera por precaução
+    }
+};
 
     const handleLogout = () => {
         window.location.href = `${API_URL}/auth/logout`;
@@ -38,11 +69,11 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
                         <nav style={headerStyles.mainNav}>
                             <Link to="/" style={headerStyles.navLink}>Início</Link>
                             <Link to="/calculadora" style={headerStyles.navLink}>Calculadora</Link>
-                            <Link to="/dicas" style={headerStyles.navLink}>Dicas</Link>
-                            <Link to="/produtos" style={headerStyles.navLink}>Produtos</Link>
-                            <Link to="/receitas" style={headerStyles.navLink}>Receitas</Link>
-                            <Link to="/utensilios" style={headerStyles.navLink}>Utensílios</Link>
-                            <Link to="/onde-comprar" style={headerStyles.navLink}>Onde Comprar</Link>
+                            <Link to="/dicas" onClick={(e) => navegarComVerificacao(e, "/dicas")} style={headerStyles.navLink}>Dicas</Link>
+                            <Link to="/produtos" onClick={(e) => navegarComVerificacao(e, "/produtos")} style={headerStyles.navLink}>Produtos</Link>
+                            <Link to="/receitas" onClick={(e) => navegarComVerificacao(e, "/receitas")} style={headerStyles.navLink}>Receitas</Link>
+                            <Link to="/utensilios" onClick={(e) => navegarComVerificacao(e, "/utensilios")} style={headerStyles.navLink}>Utensílios</Link>
+                            <Link to="/onde-comprar" onClick={(e) => navegarComVerificacao(e, "/onde-comprar")} style={headerStyles.navLink}>Onde Comprar</Link>
                             <Link to="/sobre" style={headerStyles.navLink}>Sobre</Link>
                         </nav>
                     )}
@@ -88,6 +119,9 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
                                                 <Link to="/admin/relatorio" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
                                                     📊 Relatórios
                                                 </Link>
+                                                <Link to="/admin/ips" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
+                                                    💻 Bloqueio IPs
+                                                </Link>
                                                 <Link to="/admin/usuarios" style={headerStyles.dropdownItem} onClick={() => setDropdownAberto(false)}>
                                                     👥 Usuários
                                                 </Link>
@@ -124,7 +158,7 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
                                         fontSize: "12px",
                                         padding: "8px 20px",
                                     }
-                                }>❌ Sair</button>
+                                }>❌</button>
                             )} 
                             {!usuario && (
                                 <Link to="/login" style={
@@ -147,11 +181,11 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
                 <div style={headerStyles.mobileMenu}>
                     <Link to="/" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Início</Link>
                     <Link to="/calculadora" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Calculadora</Link>
-                    <Link to="/dicas" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Dicas</Link>
-                    <Link to="/produtos" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Produtos</Link>
-                    <Link to="/receitas" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Receitas</Link>
-                    <Link to="/utensilios" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Utensílios</Link>
-                    <Link to="/onde-comprar" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Onde Comprar</Link>
+                    <Link to="/dicas" style={headerStyles.mobileNavLink} onClick={(e) => {setMenuAberto(false); navegarComVerificacao(e, "/dicas")}}>Dicas</Link>
+                    <Link to="/produtos" style={headerStyles.mobileNavLink} onClick={(e) => {setMenuAberto(false); navegarComVerificacao(e, "/dicas")}}>Produtos</Link>
+                    <Link to="/receitas" style={headerStyles.mobileNavLink} onClick={(e) => {setMenuAberto(false); navegarComVerificacao(e, "/receitas")}}>Receitas</Link>
+                    <Link to="/utensilios" style={headerStyles.mobileNavLink} onClick={(e) => {setMenuAberto(false); navegarComVerificacao(e, "/utensilios")}}>Utensílios</Link>
+                    <Link to="/onde-comprar" style={headerStyles.mobileNavLink} onClick={(e) => {setMenuAberto(false); navegarComVerificacao(e, "/onde-comprar")}}>Onde Comprar</Link>
                     <Link to="/sobre" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>Sobre</Link>
                     {usuario ? (
                         <>
@@ -164,6 +198,7 @@ export default function Header({ dados, usuario, headerStyles, abrirPerfil }) {
                                 <Link to="/admin/conteudo" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>📝 Conteúdo</Link>
                                 <Link to="/admin/item" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>⚙️ Itens</Link>
                                 <Link to="/admin/relatorio" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>📊 Relatórios</Link>
+                                <Link to="/admin/ips" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>💻 Bloqueio IPs</Link>
                                 <Link to="/admin/usuarios" style={headerStyles.mobileNavLink} onClick={() => setMenuAberto(false)}>👥 Usuários</Link>
                             <button onClick={handleLogout} style={headerStyles.mobileMenuBtn}>Sair da Conta</button>
                             </>

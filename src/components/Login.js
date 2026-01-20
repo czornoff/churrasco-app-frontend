@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
 export default function Login({loginStyles}) {
+    const location = useLocation();
+    const mensagemDeErro = location.state?.mensagem;
+
     const [isRegistro, setIsRegistro] = useState(false);
     const [formData, setFormData] = useState({ nome: '', email: '', password: '' });
     const [mensagem, setMensagem] = useState({ texto: '', tipo: '' });
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     const handleGoogleLogin = () => {
         window.location.href = `${API_URL}/auth/google`;
@@ -53,8 +61,27 @@ export default function Login({loginStyles}) {
         <div style={loginStyles.container}>
             <div style={loginStyles.card}>
                 <h2 style={loginStyles.titulo}>{isRegistro ? 'Criar Conta' : 'Acesso Restrito'}</h2>
+
+                {mensagemDeErro && 
+                    <span style={{ 
+                            width: '100%', 
+                            backgroundColor: '#fff3cd', // Amarelo alerta suave
+                            color: '#856404',           // Marrom texto de alerta
+                            padding: '10px', 
+                            borderRadius: '8px', 
+                            fontSize: '13px', 
+                            textAlign: 'center',
+                            border: '1px solid #ffeeba',
+                            marginTop: '10px',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}>
+                            <span>⚠️</span>
+                            <span>Faça <strong>login</strong> para liberar o acesso total ao app.</span>
+                        </span>
+                }
                 
-                <button onClick={handleGoogleLogin} style={loginStyles.googleBtn}>
+                <button onClick={handleGoogleLogin} style={{...loginStyles.googleBtn, marginTop: mensagemDeErro ? '40px' : '0'}}>
                     <img 
                         src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" 
                         alt="Google" style={{ width: '18px' }} 

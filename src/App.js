@@ -11,6 +11,8 @@ import AdminConteudo from './pages/admin/AdminConteudo';
 import AdminItem from './pages/admin/AdminItem';
 import AdminRelatorio from './pages/admin/AdminRelatorio';
 import AdminUsuario from './pages/admin/AdminUsuario';
+import AdminIP from './pages/admin/AdminIP';
+
 import Inicial from './pages/Inicial';
 import Calculadora from './pages/Calculadora';
 import Dicas from './pages/Dicas';
@@ -246,7 +248,8 @@ export default function App() {
                     <Route path="/admin/item" element={usuario?.role === 'admin' ? <AdminItem opcoes={opcoes} setOpcoes={setOpcoes} styles={styles} adminStyles={adminStyles} /> : <Navigate to="/login" />} />
                     <Route path="/admin/relatorio" element={usuario?.role === 'admin' ? <AdminRelatorio styles={styles} adminStyles={adminStyles} /> : <Navigate to="/login" />} />
                     <Route path="/admin/usuarios" element={usuario?.role === 'admin' ? <AdminUsuario styles={styles} adminStyles={adminStyles} modalStyles={modalStyles} /> : <Navigate to="/" />} />
-
+                    <Route path="/admin/ips" element={usuario?.role === 'admin' ? <AdminIP styles={styles} adminStyles={adminStyles} /> : <Navigate to="/login" />} 
+/>
                     <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
             </div>
