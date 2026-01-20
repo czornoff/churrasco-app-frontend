@@ -52,7 +52,48 @@ export default function Relatorio({ styles, adminStyles }) {
         setLogsFiltrados(resultado);
     }, [filtroUsuario, filtroDataInicio, filtroDataFim, dados.logs]);
 
-    if (loading) return <div style={adminStyles.loading}>Carregando relatórios...</div>;
+    if (loading) return <div style={{ 
+            height: '100vh', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            backgroundColor: '#f8f9fa',
+            fontFamily: 'sans-serif'
+        }}>
+            {/* Ícone ou Logo Animado */}
+            <div style={{
+                fontSize: '50px',
+                marginBottom: '20px',
+                animation: 'pulse 1.5s infinite ease-in-out'
+            }}>
+                🔥
+            </div>
+
+            {/* Texto de Carregamento */}
+            <h2 style={{ 
+                color: '#d9534f', 
+                marginBottom: '10px',
+                fontWeight: 'bold' 
+            }}>
+                Preparando a brasa...
+            </h2>
+            
+            <p style={{ color: '#666', fontSize: '14px' }}>
+                Carregando Relatórios
+            </p>
+
+            {/* CSS inline para a animação de pulso */}
+            <style>
+                {`
+                    @keyframes pulse {
+                        0% { transform: scale(1); opacity: 1; }
+                        50% { transform: scale(1.2); opacity: 0.7; }
+                        100% { transform: scale(1); opacity: 1; }
+                    }
+                `}
+            </style>
+        </div>;
 
     return (
         <div style={styles.container}>

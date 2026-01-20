@@ -256,4 +256,4 @@ function MapaConteudo({ centro, setCentro, locais, realizarBusca, botoesConfig, 
 const btnStyle = { padding: '10px 15px', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', transition: 'all 0.2s ease' };
 const btnImgStyle = { width: '18px', height: '18px', marginRight: '5px', objectFit: 'contain' };
 const linkStyle = { display: 'block', textAlign: 'center', color: '#fff', padding: '8px', borderRadius: '5px', textDecoration: 'none', fontSize: '12px', fontWeight: 'bold' };
-const avisoStyle = { width: '100%', backgroundColor: '#fff3cd', color: '#856404', padding: '10px', borderRadius: '8px', fontSize: '13px', textAlign: 'center', border: '1px solid #ffeeba', marginTop: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' };
+const avisoStyle = { width: '100%', backgroundColor: '#fff3cd', color: '#856404', padding: '10px 0', borderRadius: '8px', fontSize: '13px', textAlign: 'center', border: '1px solid #ffeeba', marginTop: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' };

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/Login';
 import Header from './components/Header';
+import BadgeLimite from './components/BadgeLimite';
 import Footer from './components/Footer';
 import AdBanner from './components/AdBanner';
 import { obterEstilos } from './components/Styles';
@@ -26,15 +27,7 @@ import Utensilios from './pages/Utensilios';
 const API_URL = process.env.REACT_APP_API_URL;
 
 export default function App() {
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
-    const avisoStyle = { width: '100%', backgroundColor: '#fff3cd', color: '#856404', padding: '10px', borderRadius: '8px', fontSize: '13px', textAlign: 'center', border: '1px solid #ffeeba', marginTop: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' };
-
-    useEffect(() => {
-        const handleResize = () => setWindowWidth(window.innerWidth);
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    const avisoStyle = { width: '100%', backgroundColor: '#fff3cd', color: '#856404', padding: '10px 0', borderRadius: '8px', fontSize: '13px', textAlign: 'center', border: '1px solid #ffeeba', marginTop: '5px', alignItems: 'center', justifyContent: 'center', gap: '8px', display: 'flex' };
 
     const [opcoes, setOpcoes] = useState(null);
     const [usuario, setUsuario] = useState(null);
@@ -100,10 +93,17 @@ export default function App() {
         return v;
     };
 
+    const [exibirDicaIOS, setExibirDicaIOS] = useState(false);
+
     useEffect(() => {
-        const handleResize = () => setWindowWidth(window.innerWidth);
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        // Verifica se é iOS
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        // Verifica se já não está instalado (modo standalone)
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+
+        if (isIOS && !isStandalone) {
+            setExibirDicaIOS(true);
+        }
     }, []);
 
     useEffect(() => {
@@ -226,6 +226,7 @@ export default function App() {
     return (
         <Router basename="/calculodechurrasco">
             <Header dados={conteudo} usuario={usuario} styles={styles} headerStyles={headerStyles} abrirPerfil = {() => abrirEdicao()}/> 
+                <BadgeLimite usuario={usuario} API_URL={API_URL} limite={conteudo.limiteConsulta}/> 
 
             {window.location.hostname !== 'localhost' && <AdBanner slot="2870360789" />}
             
@@ -248,11 +249,20 @@ export default function App() {
                     <Route path="/admin/item" element={usuario?.role === 'admin' ? <AdminItem opcoes={opcoes} setOpcoes={setOpcoes} styles={styles} adminStyles={adminStyles} /> : <Navigate to="/login" />} />
                     <Route path="/admin/relatorio" element={usuario?.role === 'admin' ? <AdminRelatorio styles={styles} adminStyles={adminStyles} /> : <Navigate to="/login" />} />
                     <Route path="/admin/usuarios" element={usuario?.role === 'admin' ? <AdminUsuario styles={styles} adminStyles={adminStyles} modalStyles={modalStyles} /> : <Navigate to="/" />} />
-                    <Route path="/admin/ips" element={usuario?.role === 'admin' ? <AdminIP styles={styles} adminStyles={adminStyles} /> : <Navigate to="/login" />} 
+                    <Route path="/admin/ips" element={usuario?.role === 'admin' ? <AdminIP styles={styles} adminStyles={adminStyles} limite={conteudo.limiteConsulta} /> : <Navigate to="/login" />} 
 />
                     <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
+                
+                {exibirDicaIOS && (
+                    <div style={styles.bannerIOS}>
+                        <p>Para instalar o App no seu iPhone:</p>
+                        <p>Clique em <strong>Compartilhar</strong> 📤 e depois em <strong>Adicionar à Tela de Início</strong> ➕</p>
+                        <button onClick={() => setExibirDicaIOS(false)}>Entendi</button>
+                    </div>
+                )}
             </div>
+
 
             {showModalComplemento && (
                 

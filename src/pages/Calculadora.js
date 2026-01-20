@@ -71,7 +71,7 @@ export default function Calculadora({ dados, opcoes, styles, usuario }) {
 
             // --- TRATAMENTO DO LIMITE DE IP (403) ---
             if (res.status === 403 && data.limiteAtingido) {
-                alert("🔥 Limite atingido! Visitantes podem ver apenas 5 conteúdos/cálculos por dia. Faça login para continuar!");
+                alert(`🔥 Limite atingido! Visitantes podem ver apenas ${dados.limiteConsulta} conteúdos/cálculos por dia. Faça login para continuar!`);
                 navigate('/login', { state: { mensagem: "Atingiu o limite" } }); // Redireciona o usuário
                 return;
             }

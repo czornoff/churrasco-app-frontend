@@ -1,63 +1,81 @@
 import React, { useEffect, useState } from 'react';
 
-export default function AdminIP({ styles, adminStyles }) {
+export default function AdminIP({ styles, adminStyles, limite }) {
     const [ips, setIps] = useState([]);
     const API_URL = process.env.REACT_APP_API_URL;
 
-    const carregarIps = async () => {
-        const res = await fetch(`${API_URL}/admin/ips`, { credentials: 'include' });
-        const data = await res.json();
-        setIps(data);
-    };
+    useEffect(() => {
+        // Função definida dentro para evitar avisos de dependência
+        const carregarIps = async () => {
+            try {
+                const res = await fetch(`${API_URL}/admin/ips`, { credentials: 'include' });
+                const data = await res.json();
+                setIps(data);
+            } catch (err) {
+                console.error("Erro ao carregar IPs:", err);
+            }
+        };
 
-    useEffect(() => { carregarIps(); }, []);
+        carregarIps();
+    }, [API_URL]);
 
     const deletarIP = async (id) => {
-        if (!window.confirm("Liberar este IP para mais 5 consultas gratuitas?")) return;
-        
+        if (!window.confirm(`Liberar este IP para mais ${limite} consultas gratuitas?`)) return;
         const res = await fetch(`${API_URL}/admin/ips/${id}`, { 
             method: 'DELETE', 
             credentials: 'include' 
         });
-        
         if (res.ok) {
             setIps(ips.filter(ip => ip._id !== id));
-            alert("IP liberado!");
         }
     };
 
     return (
         <div style={styles.container}>
-            <h2 style={styles.modalHeader}>Gerenciar Bloqueios de IP</h2>
-            <p>Lista de visitantes que utilizaram o limite de consultas.</p>
+            <header style={styles.header}>
+                <h1 style={styles.title}>🚫 IPs Bloqueados</h1>
+                <p style={{ color: '#666' }}>Visitantes que atingiram o limite de {limite} consultas.</p>
+            </header>
             
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
-                <thead>
-                    <tr style={{ backgroundColor: '#eee', textAlign: 'left' }}>
-                        <th style={{ padding: '10px' }}>IP</th>
-                        <th style={{ padding: '10px' }}>Consultas</th>
-                        <th style={{ padding: '10px' }}>Último Acesso</th>
-                        <th style={{ padding: '10px' }}>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {ips.map(ip => (
-                        <tr key={ip._id} style={{ borderBottom: '1px solid #ddd' }}>
-                            <td style={{ padding: '10px' }}>{ip.ip}</td>
-                            <td style={{ padding: '10px' }}>{ip.consultas} / 2</td>
-                            <td style={{ padding: '10px' }}>{new Date(ip.createdAt).toLocaleString()}</td>
-                            <td style={{ padding: '10px' }}>
-                                <button 
-                                    onClick={() => deletarIP(ip._id)}
-                                    style={{ backgroundColor: '#d9534f', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
-                                >
-                                    Remover Bloqueio
-                                </button>
-                            </td>
+            <section style={styles.contentWrapper}>
+                <table style={adminStyles.table}>
+                    <thead style={adminStyles.thead}>
+                        <tr style={adminStyles.tr}>
+                            <th>IP</th>
+                            <th>Consultas</th>
+                            <th>Último Acesso</th>
+                            <th>Ações</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody style={adminStyles.tbody}>
+                        {ips.map(ip => (
+                            <tr key={ip._id} style={adminStyles.tr}>
+                                <td style={adminStyles.td}>
+                                    <span style={adminStyles.mobileLabel}>IP:</span>
+                                    <code>{ip.ip}</code>
+                                </td>
+                                <td style={adminStyles.td}>
+                                    <span style={adminStyles.mobileLabel}>Uso:</span>
+                                    {ip.consultas} / {limite}
+                                </td>
+                                <td style={adminStyles.td}>
+                                    <span style={adminStyles.mobileLabel}>Data:</span>
+                                    {new Date(ip.createdAt).toLocaleString('pt-BR')}
+                                </td>
+                                <td style={adminStyles.tdAcoes}>
+                                    <button 
+                                        onClick={() => deletarIP(ip._id)}
+                                        style={{...styles.btnView, backgroundColor: '#d9534f'}}
+                                    >
+                                        🗑️ Liberar IP
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                {ips.length === 0 && <p style={{textAlign: 'center', padding: '20px'}}>Nenhum IP bloqueado no momento.</p>}
+            </section>
         </div>
     );
 }

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -13,7 +12,48 @@ export default function AdminItem({ opcoes, setOpcoes, styles, adminStyles }) {
     const [mensagem, setMensagem] = useState('');
 
     if (!opcoes || Object.keys(opcoes).length === 0) {
-        return <div style={adminStyles.loading}><h2>Carregando configurações...</h2></div>;
+        return <div style={{ 
+            height: '100vh', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            backgroundColor: '#f8f9fa',
+            fontFamily: 'sans-serif'
+        }}>
+            {/* Ícone ou Logo Animado */}
+            <div style={{
+                fontSize: '50px',
+                marginBottom: '20px',
+                animation: 'pulse 1.5s infinite ease-in-out'
+            }}>
+                🔥
+            </div>
+
+            {/* Texto de Carregamento */}
+            <h2 style={{ 
+                color: '#d9534f', 
+                marginBottom: '10px',
+                fontWeight: 'bold' 
+            }}>
+                Preparando a brasa...
+            </h2>
+            
+            <p style={{ color: '#666', fontSize: '14px' }}>
+                Carregando Configurações
+            </p>
+
+            {/* CSS inline para a animação de pulso */}
+            <style>
+                {`
+                    @keyframes pulse {
+                        0% { transform: scale(1); opacity: 1; }
+                        50% { transform: scale(1.2); opacity: 0.7; }
+                        100% { transform: scale(1); opacity: 1; }
+                    }
+                `}
+            </style>
+        </div>;
     }
 
     const salvarNoServidor = async (dadosParaSalvar) => {
@@ -155,101 +195,108 @@ export default function AdminItem({ opcoes, setOpcoes, styles, adminStyles }) {
 
             {/* LISTAGEM DE ITENS POR CATEGORIA */}
             {Object.keys(opcoes).filter(k => Array.isArray(opcoes[k])).map(cat => (
-                <div key={cat} style={adminStyles.categorySection}>
-                    <h3 style={adminStyles.categoryHeader}>{cat.toUpperCase()}</h3>
-                    <div style={adminStyles.itemsList}>
+                <div key={cat} style={{...adminStyles.categorySection, border: '1px solid #ddd', padding: '15px', borderRadius: '12px', marginBottom: '30px'}}>
+                    <h3 style={{...adminStyles.categoryHeader, margin: '-15px -15px 15px -15px'}}>{cat.toUpperCase()}</h3>
+                    <div style={styles.grid}>
                         {opcoes[cat].sort((a, b) => a.nome.localeCompare(b.nome)).map(item => (
-                            <div key={item.id} style={adminStyles.itemRow}>
-                                <div style={adminStyles.itemMainInfo}>
-                                    <strong style={adminStyles.itemName}>{item.nome}</strong>
-                                    <span style={adminStyles.itemSub}>{item.subcategoria}</span>
+                            <div key={item.id} style={{...adminStyles.userCard, display: 'block'}}>
+                                <div style={{justifyContent: 'space-between', display: 'flex'}}>
+                                    <div><strong style={adminStyles.itemName}>{item.nome}</strong></div>
+                                    <span style={{...adminStyles.itemSub}}>
+                                        {cat === 'carnes' && (
+                                            <select style={adminStyles.smallSelect} value={item.subcategoria} onChange={e => atualizarCampoItem(cat, item.id, 'subcategoria', e.target.value)}>
+                                                {['Bovina', 'Suína', 'Frango', 'Linguiças', 'Outras'].map(s => <option key={s} value={s}>{s}</option>)}
+                                            </select>
+                                        )}
+                                        { cat === 'bebidas' && (
+                                            <select style={adminStyles.smallSelect} value={item.subcategoria} onChange={e => atualizarCampoItem(cat, item.id, 'subcategoria', e.target.value)}>
+                                                <option value="Não Alcoólica">Não Alcoólica</option>
+                                                <option value="Alcoólica">Alcoólica</option>
+                                            </select>
+                                        )}
+                                    </span>
                                 </div>
 
-                                <div style={adminStyles.itemConfigs}>
+                                <div style={{...adminStyles.itemConfigs, justifyContent: 'space-between', alignItems: 'end',}}>
                                     {cat === 'carnes' && (
-                                        <div style={adminStyles.configField}>
+                                        <div style={{...adminStyles.configField, flexDirection: 'column', alignItems: 'unset'}}>
                                             <label>Peso Relativo:</label>
                                             <input type="number" style={adminStyles.numInput} value={item.pesoRelativo} onChange={e => atualizarCampoItem(cat, item.id, 'pesoRelativo', e.target.value)} />
                                         </div>
                                     )}
 
                                     {cat === 'bebidas' && (
-                                        <>
-                                            <select style={adminStyles.smallSelect} value={item.subcategoria} onChange={e => atualizarCampoItem(cat, item.id, 'subcategoria', e.target.value)}>
-                                                <option value="Não Alcoólica">Não Alcoólica</option>
-                                                <option value="Alcoólica">Alcoólica</option>
-                                            </select>
-                                            <div style={adminStyles.configField}>
-                                                <label>Embalagem:</label>
+                                        <div style={{...adminStyles.configField, flexDirection: 'column', alignItems: 'unset'}}>
+                                            <label>Embalagem:</label>
+                                            <div>
                                                 <input type="number" style={adminStyles.numInput} value={item.embalagem} onChange={e => atualizarCampoItem(cat, item.id, 'embalagem', e.target.value)} />
-                                                <span>ml</span>
+                                                <span> ml</span>
                                             </div>
-                                        </>
+                                        </div>
                                     )}
 
                                     {(cat === 'acompanhamentos' || cat === 'adicionais' || cat === 'sobremesas') && (
-                                        <div style={adminStyles.configField}>
+                                        <div style={{...adminStyles.configField, flexDirection: 'column', alignItems: 'unset'}}>
                                             <label>Quantidade por Adulto:</label>
-                                            <input type="number" style={adminStyles.numInput} value={item.gramasPorAdulto || item.qtdPorAdulto} onChange={e => atualizarCampoItem(cat, item.id, item.gramasPorAdulto !== undefined ? 'gramasPorAdulto' : 'qtdPorAdulto', e.target.value)} />
-                                            <span>{!item.unidade ? 'g' : item.unidade}</span>
+                                            <div>
+                                                <input type="number" style={adminStyles.numInput} value={item.gramasPorAdulto || item.qtdPorAdulto} onChange={e => atualizarCampoItem(cat, item.id, item.gramasPorAdulto !== undefined ? 'gramasPorAdulto' : 'qtdPorAdulto', e.target.value)} />
+                                                <span> {!item.unidade ? 'g' : item.unidade}</span>
+                                            </div>
                                         </div>
                                     )}
 
                                     {cat === 'utensilios' && (
                                         <>
-                                            <div style={adminStyles.configField}>
+                                            <div style={{...adminStyles.configField, flexDirection: 'column', alignItems: 'unset'}}>
                                                 <label>Fator:</label>
-                                                <input type="number" step="0.1" style={adminStyles.numInput} value={item.fator} onChange={e => atualizarCampoItem(cat, item.id, 'fator', e.target.value)} />
+                                                <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                                    <input type="number" step="0.1" style={adminStyles.numInput} value={item.fator} onChange={e => atualizarCampoItem(cat, item.id, 'fator', e.target.value)} />
+                                                    <select style={adminStyles.smallSelect} value={item.base} onChange={e => atualizarCampoItem(cat, item.id, 'base', e.target.value)}>
+                                                        <option value="pessoa">p/ Pessoa</option>
+                                                        <option value="carne">p/ kg Carne</option>
+                                                        <option value="fixo">Fixo</option>
+                                                    </select>
+                                                </div>
                                             </div>
-                                            <select style={adminStyles.smallSelect} value={item.base} onChange={e => atualizarCampoItem(cat, item.id, 'base', e.target.value)}>
-                                                <option value="pessoa">p/ Pessoa</option>
-                                                <option value="carne">p/ kg Carne</option>
-                                                <option value="fixo">Fixo</option>
-                                            </select>
                                         </>
                                     )}
+                                    <div style={adminStyles.itemActions}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#333', borderRadius: '6px', border: '1px solid #ccc', padding: '6px 8px', marginTop: '4px', cursor: 'pointer' }}>
+                                            <input 
+                                                type="checkbox" 
+                                                checked={item.ativo || false} 
+                                                onChange={() => {
+                                                    const novos = { ...opcoes };
+                                                    const target = novos[cat].find(x => x.id === item.id);
+                                                    target.ativo = !target.ativo;
+                                                    setOpcoes(novos);
+                                                }} 
+                                            /> 
+                                            <strong>{item.ativo ? 'Ativo' : 'Inativo'}</strong>
+                                        </label>
+                                        
+                                        <button 
+                                            onClick={() => {if(window.confirm('Excluir item?')){ const n = {...opcoes}; n[cat] = n[cat].filter(x => x.id !== item.id); salvarNoServidor(n); }}}
+                                            style={{...adminStyles.deleteBtn, fontSize: '12px', backgroundColor: '#d9534f', padding: '8px 10px', borderRadius: '6px'}}
+                                        >
+                                            🗑️
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <div style={adminStyles.itemActions}>
-                                    <label style={adminStyles.switch}>
-                                        <input 
-                                            type="checkbox" 
-                                            checked={item.ativo || false} 
-                                            onChange={() => {
-                                                const novos = { ...opcoes };
-                                                const target = novos[cat].find(x => x.id === item.id);
-                                                target.ativo = !target.ativo;
-                                                setOpcoes(novos);
-                                            }} 
-                                            style={adminStyles.switchInput}
-                                        />
-                                        <span style={{
-                                            ...adminStyles.slider,
-                                            ...(item.ativo ? adminStyles.statusAtivo : adminStyles.statusInativo)
-                                        }}>
-                                            <span style={{
-                                                ...adminStyles.sliderText,
-                                                left: item.ativo ? '20px' : '40px'
-                                            }}>{item.ativo ? 'ATIVADO' : 'DESATIVADO'}</span>
-                                            <span style={{
-                                                ...adminStyles.sliderBall,
-                                                transform: item.ativo ? 'translateX(91px)' : 'translateX(4px)'
-                                            }} />
-                                        </span>
-                                    </label>
-                                    <button onClick={() => {if(window.confirm('Excluir item?')){ const n = {...opcoes}; n[cat] = n[cat].filter(x => x.id !== item.id); salvarNoServidor(n); }}} style={adminStyles.deleteBtn}>🗑️</button>
-                                </div>
                             </div>
                         ))}
                     </div>
                 </div>
             ))}
 
-            <div style={adminStyles.divBtnSalvar}>
-                <div style={adminStyles.headerButtons}>
-                    <button onClick={() => salvarNoServidor(opcoes)} style={adminStyles.saveAllBtn}>SALVAR TUDO</button>
-                    <Link to="/admin"><button style={adminStyles.exitBtn}>VOLTAR</button></Link>
-                </div>
+            <div style={{ position: 'sticky', bottom: '20px', textAlign: 'right', marginRight: '20px', zIndex: 1000 }}>
+                <button 
+                    onClick={() => salvarNoServidor(opcoes)} 
+                    style={{ ...adminStyles.saveBtn, backgroundColor: '#2299FF', boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }}
+                >
+                    💾 Salvar Alterações
+                </button>
             </div>
         </div>
     );

@@ -95,11 +95,11 @@ export const obterEstilos = (dbConfig = {}) => {
             },
             contentWrapper: {
                 backgroundColor: COLORS.white,
-                padding: "30px",
+                padding: "15px",
                 borderRadius: "12px",
                 marginTop: "20px",
                 marginBottom: "20px",
-                lineHeight: "1.8",
+                lineHeight: "1.3",
                 fontSize: "16px",
                 color: COLORS.grey75,
                 boxShadow: `0 8px 16px ${COLORS.shadow}`,
@@ -499,7 +499,27 @@ export const obterEstilos = (dbConfig = {}) => {
             inputIcon: {
                 width: '80px', 
                 marginBottom: 0
-            }
+            },
+            bannerIOS: {
+                fontFamily: FONT_FAMILY,
+                position: 'fixed',
+                bottom: '20px',
+                left: '20px',
+                right: '20px',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)', // Efeito levemente translúcido
+                backdropFilter: 'blur(10px)', // Desfoque de fundo estilo Apple
+                padding: '20px',
+                borderRadius: '16px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+                zIndex: 9999,
+                border: '1px solid rgba(255,255,255,0.3)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                gap: '10px',
+                animation: 'slideUp 0.5s ease-out' // Animação de entrada
+            },
         };
     const adminStyles = {
             tabBar: {

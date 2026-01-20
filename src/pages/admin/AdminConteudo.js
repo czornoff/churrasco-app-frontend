@@ -9,38 +9,23 @@ const EditorItem = memo(({ value, onChange, modules, formats, height = '200px' }
     const [carregado, setCarregado] = useState(false);
 
     useEffect(() => {
-        // Delay para evitar renderização concorrente pesada
-        const timer = setTimeout(() => setCarregado(true), 150);
+        const timer = setTimeout(() => setCarregado(true), 100);
         return () => clearTimeout(timer);
     }, []);
 
-    if (!carregado) {
-        return (
-            <div style={{ 
-                height, 
-                background: '#f8f9fa', 
-                borderRadius: '8px', 
-                border: '1px solid #ddd', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                color: '#888',
-                marginBottom: '45px'
-            }}>
-                Carregando editor...
-            </div>
-        );
-    }
+    if (!carregado) return <div style={{ height, marginBottom: '75px', background: '#eee' }}>Carregando...</div>;
 
     return (
-        <ReactQuill
-            theme="snow"
-            value={value || ''}
-            onChange={onChange}
-            modules={modules}
-            formats={formats}
-            style={{ height, marginBottom: '75px' }}
-        />
+        <div className="quill-wrapper"> 
+            <ReactQuill
+                theme="snow"
+                value={value || ''}
+                onChange={onChange}
+                modules={modules}
+                formats={formats}
+                style={{ height, marginBottom: '75px' }}
+            />
+        </div>
     );
 });
 
@@ -57,7 +42,7 @@ const TEMPLATE_INICIAL_MAPA = {
 
 const QUILL_FORMATS = [
     'header', 'bold', 'italic', 'underline', 'strike',
-    'color', 'background', 'list', 'bullet', 'link'
+    'color', 'background', 'list', 'link', 'image'
 ];
 
 export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, styles, adminStyles }) {
@@ -100,42 +85,43 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
     if (!conteudo) return <div style={adminStyles.loading}>Carregando configurações...</div>;
 
     const salvarDados = async () => {
-        const conteudoLimpo = JSON.parse(JSON.stringify(conteudo));
-
-        const limparHtml = (html) => {
-            if (typeof html !== 'string') return html;
-            return html.replace(/&nbsp;/g, ' ');
+    // Função para limpar recursivamente &nbsp; de qualquer string dentro de um objeto ou array
+        const limparProfundo = (obj) => {
+            if (typeof obj === 'string') {
+                return obj.replace(/&nbsp;/g, ' ').replace(/\u00A0/g, ' ');
+            }
+            if (Array.isArray(obj)) {
+                return obj.map(limparProfundo);
+            }
+            if (obj !== null && typeof obj === 'object') {
+                return Object.fromEntries(
+                    Object.entries(obj).map(([key, val]) => [key, limparProfundo(val)])
+                );
+            }
+            return obj;
         };
 
-        if (conteudoLimpo.inicioTexto) conteudoLimpo.inicioTexto = limparHtml(conteudo.inicioTexto);
-        if (conteudoLimpo.sobreTexto) conteudoLimpo.sobreTexto = limparHtml(conteudo.sobreTexto);
-
-        ['dicas', 'produtos', 'receitas', 'utensilios'].forEach(aba => {
-            if (conteudoLimpo[aba]?.itens) {
-                conteudoLimpo[aba].itens = conteudoLimpo[aba].itens.map(item => ({
-                    ...item,
-                    texto: limparHtml(item.texto),
-                    preparo: limparHtml(item.preparo)
-                }));
-            }
-        });
+        const conteudoLimpo = limparProfundo(conteudo);
 
         try {
+            setMensagem('⏳ Salvando conteúdo limpo...');
             const res = await fetch(`${API_URL}/admin/conteudo/salvar`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(conteudoLimpo), // Enviamos o limpo
-            credentials: 'include'
-        });
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(conteudoLimpo),
+                credentials: 'include'
+            });
+
             const respostaJson = await res.json();
             if (res.ok && respostaJson.success) {
                 setConteudo(respostaJson.data); 
                 if (atualizarApp) atualizarApp(); 
-                setMensagem('✅ Conteúdo atualizado com sucesso!');
+                setMensagem('✅ Conteúdo atualizado e limpo!');
                 setTimeout(() => setMensagem(''), 3000);
             }
         } catch (err) {
-            console.error("Erro de conexão:", err);
+            console.error("Erro ao salvar:", err);
+            setMensagem('❌ Erro de conexão.');
         }
     };
 
@@ -161,9 +147,27 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
 
     const handleListChange = (categoria, index, campo, valor) => {
         setConteudo(prev => {
-            const novaLista = [...(prev[categoria]?.itens || [])];
-            novaLista[index] = { ...novaLista[index], [campo]: valor };
-            return { ...prev, [categoria]: { ...prev[categoria], itens: novaLista } };
+            // 1. Pegamos a lista da categoria específica (ex: 'dicas')
+            const listaAtual = prev[categoria]?.itens || [];
+            
+            // 2. Criamos uma cópia da lista
+            const novaLista = [...listaAtual];
+
+            // 3. Criamos uma cópia do ITEM específico que está sendo editado
+            // Isso impede que a edição de um item afete outros que compartilham a mesma referência
+            novaLista[index] = { 
+                ...novaLista[index], 
+                [campo]: valor 
+            };
+
+            // 4. Retornamos o novo estado preservando todo o resto
+            return { 
+                ...prev, 
+                [categoria]: { 
+                    ...prev[categoria], 
+                    itens: novaLista 
+                } 
+            };
         });
     };
 
@@ -244,7 +248,9 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
                 {/* ABA LAYOUT */}
                 {abaAtiva === 'layout' && (
                     <div style={styles.column}>
-                        <h3 style={{...styles.cardTitle, marginBottom: '0px'}}>{abaAtiva.toUpperCase()}</h3>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', padding: '13px 0'}}>
+                            <h3 style={styles.cardTitle}>{abaAtiva.toUpperCase()}</h3>
+                        </div>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '20px' }}>
                             <div>
                                 <label style={adminStyles.label}>Nome do Aplicativo:</label>
@@ -257,6 +263,10 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
                             <div>
                                 <label style={adminStyles.label}>E-mail de Contato:</label>
                                 <input style={adminStyles.input} value={conteudo.emailContato || ''} onChange={e => handleConfigChange('layout', 'emailContato', e.target.value)} placeholder="contato@email.com" />
+                            </div>
+                            <div>
+                                <label style={adminStyles.label}>Limite de Consultas:</label>
+                                <input type="number" style={adminStyles.numInput} value={conteudo.limiteConsulta || ''} onChange={e => handleConfigChange('layout', 'limiteConsulta', e.target.value)} />
                             </div>
                         </div>
 
@@ -297,7 +307,9 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
                 {/* ABA ONDE ENCONTRAR */}
                 {abaAtiva === 'ondeComprar' && (
                     <div style={styles.column}>
-                        <h3 style={styles.cardTitle}>{abaAtiva.toUpperCase()}</h3>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', padding: '13px 0'}}>
+                            <h3 style={styles.cardTitle}>{abaAtiva.toUpperCase()}</h3>
+                        </div>
                         <div style={responsiveGrid}>
                             {conteudo.ondeComprar?.botoes?.map((botao, index) => (
                                 <div key={index} style={{ ...adminStyles.cardBox, borderLeft: `5px solid ${botao.cor}`, margin: 0 }}>
@@ -357,32 +369,42 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
                 {/* INICIO E SOBRE */}
                 {(abaAtiva === 'inicio' || abaAtiva === 'sobre') && (
                     <div style={styles.column}>
-                        <h3 style={styles.cardTitle}>{abaAtiva.toUpperCase()}</h3>
-                        <label style={{...adminStyles.label, marginTop: '15px'}}>Título da Página:</label>
-                        <input style={{ ...adminStyles.input, marginBottom: '15px' }} value={conteudo[`${abaAtiva}Titulo`] || ''} onChange={e => handleConfigChange(abaAtiva, `${abaAtiva}Titulo`, e.target.value)} />
-                        {montado && (
-                            <EditorItem 
-                                value={conteudo[`${abaAtiva}Texto`]} 
-                                onChange={(val) => handleConfigChange(abaAtiva, `${abaAtiva}Texto`, val)}
-                                modules={modules}
-                                formats={QUILL_FORMATS}
-                                height="300px"
-                            />
-                        )}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', padding: '13px 0'}}>
+                            <h3 style={styles.cardTitle}>{abaAtiva.toUpperCase()}</h3>
+                        </div>
+                        <div>
+                            <label style={{...adminStyles.label, marginTop: '15px'}}>Título da Página:</label>
+                            <input style={{ ...adminStyles.input, marginBottom: '15px' }} value={conteudo[`${abaAtiva}Titulo`] || ''} onChange={e => handleConfigChange(abaAtiva, `${abaAtiva}Titulo`, e.target.value)} />
+                            {montado && (
+                                <EditorItem 
+                                    key={`editor-${abaAtiva}`}
+                                    value={conteudo[`${abaAtiva}Texto`]} 
+                                    onChange={(val) => handleConfigChange(abaAtiva, `${abaAtiva}Texto`, val)}
+                                    modules={modules}
+                                    formats={QUILL_FORMATS}
+                                    height="300px"
+                                />
+                            )}
+                        </div>
                     </div>
                 )}
 
                 {/* LISTAGENS (DICAS, PRODUTOS, ETC) */}
                 {['dicas', 'produtos', 'receitas', 'utensilios'].includes(abaAtiva) && (
-                    <div>
+                    <div style={styles.column}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                             <h3 style={styles.cardTitle}>{abaAtiva.toUpperCase()}</h3>
-                            <button onClick={() => {
-                                const campoTexto = abaAtiva === 'receitas' ? 'preparo' : 'texto';
-                                const novo = { titulo: 'Novo Item', [campoTexto]: '', icone: '🔥' };
-                                const lista = [...(conteudo[abaAtiva]?.itens || []), novo];
-                                setConteudo(prev => ({ ...prev, [abaAtiva]: { ...prev[abaAtiva], itens: lista } }));
-                            }} style={adminStyles.addBtn}>+ Adicionar</button>
+                            <button 
+                                onClick={() => {
+                                    const campoTexto = abaAtiva === 'receitas' ? 'preparo' : 'texto';
+                                    const novo = { titulo: 'Novo Item', [campoTexto]: '', icone: '🔥' };
+                                    const lista = [...(conteudo[abaAtiva]?.itens || []), novo];
+                                    setConteudo(prev => ({ ...prev, [abaAtiva]: { ...prev[abaAtiva], itens: lista } }));
+                                }}
+                                style={adminStyles.addBtn}
+                            >
+                                + Adicionar
+                            </button>
                         </div>
                         <div style={responsiveGrid}>
                             {conteudo[abaAtiva]?.itens?.map((item, index) => (
@@ -391,9 +413,30 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
                                         <input style={{ ...adminStyles.input, flex: 4 }} value={item.titulo} onChange={e => handleListChange(abaAtiva, index, 'titulo', e.target.value)} />
                                         <input style={{ ...adminStyles.input, flex: 1, textAlign: 'center' }} value={item.icone} onChange={e => handleListChange(abaAtiva, index, 'icone', e.target.value)} />
                                     </div>
+                                    {abaAtiva === 'receitas' && (
+                                        <>
+                                            <div style={adminStyles.recipeGrid}>
+                                                    <input style={adminStyles.input} placeholder="Tempo" value={item.tempo || ''} onChange={e => handleListChange(abaAtiva, index, 'tempo', e.target.value)} />
+                                                    <select style={adminStyles.input} value={item.nivel || 'Fácil'} onChange={e => handleListChange(abaAtiva, index, 'nivel', e.target.value)}>
+                                                        <option value="Fácil">Fácil</option>
+                                                        <option value="Médio">Médio</option>
+                                                        <option value="Difícil">Difícil</option>
+                                                    </select>
+                                                </div>
+                                                <label style={adminStyles.label}>Ingredientes:</label>
+                                                <textarea
+                                                    rows="8" 
+                                                    style={adminStyles.textarea} 
+                                                    value={Array.isArray(item.ingredientes) ? item.ingredientes.join('\n') : item.ingredientes || ''} 
+                                                    onChange={e => handleListChange(abaAtiva, index, 'ingredientes', e.target.value.split('\n'))} 
+                                                />
+                                                <label style={adminStyles.label}>Modo de Preparo:</label>
+                                        </>
+                                    )}
                                     <div style={{backgroundColor: '#fff', padding: '0px'}}>
                                         {montado && (
                                             <EditorItem 
+                                                key={`editor-${abaAtiva}-${index}`}
                                                 value={abaAtiva === 'receitas' ? item.preparo : item.texto}
                                                 onChange={(val) => handleListChange(abaAtiva, index, abaAtiva === 'receitas' ? 'preparo' : 'texto', val)}
                                                 modules={modules}
