@@ -1,6 +1,3 @@
-// Este código permite que o aplicativo carregue mais rápido em visitas subsequentes
-// e dá a ele capacidades offline.
-
 const isLocalhost = Boolean(
     window.location.hostname === 'localhost' ||
     window.location.hostname === '[::1]' ||
@@ -13,16 +10,13 @@ export function register(config) {
         if (publicUrl.origin !== window.location.origin) return;
 
         window.addEventListener('load', () => {
-        const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
+            const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
 
-        if (isLocalhost) {
-            checkValidServiceWorker(swUrl, config);
-            navigator.serviceWorker.ready.then(() => {
-            console.log('App servido por cache por um service worker.');
-            });
-        } else {
-            registerValidSW(swUrl, config);
-        }
+            if (isLocalhost) {
+                checkValidServiceWorker(swUrl, config);
+            } else {
+                registerValidSW(swUrl, config);
+            }
         });
     }
 }
@@ -31,54 +25,55 @@ function registerValidSW(swUrl, config) {
     navigator.serviceWorker
         .register(swUrl)
         .then((registration) => {
+            // Verifica se já existe um SW esperando atualização ao abrir o app
+            if (registration.waiting) {
+                if (config && config.onUpdate) config.onUpdate(registration);
+            }
+
             registration.onupdatefound = () => {
                 const installingWorker = registration.installing;
                 if (installingWorker == null) return;
                 installingWorker.onstatechange = () => {
-                if (installingWorker.state === 'installed') {
-                    if (navigator.serviceWorker.controller) {
-                    console.log('Novo conteúdo disponível; por favor atualize.');
-                    if (config && config.onUpdate) config.onUpdate(registration);
-                    } else {
-                    console.log('Conteúdo em cache para uso offline.');
-                    if (config && config.onSuccess) config.onSuccess(registration);
+                    if (installingWorker.state === 'installed') {
+                        if (navigator.serviceWorker.controller) {
+                            // Novo conteúdo encontrado!
+                            if (config && config.onUpdate) config.onUpdate(registration);
+                        } else {
+                            if (config && config.onSuccess) config.onSuccess(registration);
+                        }
                     }
-                }
                 };
             };
         })
         .catch((error) => {
-            console.error('Erro durante o registro do service worker:', error);
+            console.error('Erro no Service Worker:', error);
         });
 }
 
+// ... manter funções checkValidServiceWorker e unregister como estão ...
 function checkValidServiceWorker(swUrl, config) {
     fetch(swUrl, { headers: { 'Service-Worker': 'script' } })
         .then((response) => {
             const contentType = response.headers.get('content-type');
             if (response.status === 404 || (contentType != null && contentType.indexOf('javascript') === -1)) {
                 navigator.serviceWorker.ready.then((registration) => {
-                registration.unregister().then(() => {
-                    window.location.reload();
-                });
+                    registration.unregister().then(() => {
+                        window.location.reload();
+                    });
                 });
             } else {
                 registerValidSW(swUrl, config);
             }
         })
         .catch(() => {
-            console.log('Sem conexão à internet. O app está rodando em modo offline.');
+            console.log('Modo offline.');
         });
 }
 
 export function unregister() {
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.ready
-            .then((registration) => {
-                registration.unregister();
-            })
-            .catch((error) => {
-                console.error(error.message);
-            });
+        navigator.serviceWorker.ready.then((registration) => {
+            registration.unregister();
+        });
     }
 }

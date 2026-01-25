@@ -18,16 +18,27 @@ export default function Footer({dados, footerStyles}) {
                     <p style={footerStyles.description}>
                         A solução inteligente para organizar seu churrasco sem desperdícios.
                     </p>
+                    <nav style={footerStyles.nav}>
+                        <a 
+                            href="https://mandebem.com/politicadeprivacidade.html" 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            style={footerStyles.link}
+                        >
+                            Política de Privacidade
+                        </a>
+                    </nav>
                 </div>
 
                 {/* Coluna 2: Navegação */}
                 <div style={footerStyles.column}>
                     <h4 style={footerStyles.heading}>Links Úteis</h4>
                     <nav style={footerStyles.nav}>
-                        <Link to="/sobre" style={footerStyles.link}>Sobre Nós</Link>
+                        <Link to="/calculadora" style={footerStyles.link}>Calculadora</Link>
                         <Link to="/dicas" style={footerStyles.link}>Dicas de Mestre</Link>
-                        <Link to="/receitas" style={footerStyles.link}>Receitas</Link>
                         <Link to="/produtos" style={footerStyles.link}>Produtos</Link>
+                        <Link to="/receitas" style={footerStyles.link}>Receitas</Link>
+                        <Link to="/sobre" style={footerStyles.link}>Sobre Nós</Link>
                     </nav>
                 </div>
 

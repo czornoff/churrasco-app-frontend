@@ -284,14 +284,14 @@ export const obterEstilos = (dbConfig = {}) => {
             itemResultRow: {
                 display: "flex",
                 justifyContent: "space-between",
-                padding: "8px 0",
+                padding: "3px 0",
                 borderBottom: `1px solid ${COLORS.grey10}`,
             },
             textItem: { 
-                fontSize: "16px", 
+                fontSize: "12px", 
                 color: COLORS.grey75 },
             textObs: { 
-                fontSize: "12px", 
+                fontSize: "10px", 
                 color: COLORS.textMuted },
             btnCloseGray: {
                 width: "100%",

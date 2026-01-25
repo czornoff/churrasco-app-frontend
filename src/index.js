@@ -23,20 +23,23 @@ root.render(
 );
 
 serviceWorkerRegistration.register({
-    onUpdate: registration => {
-        // Caso você atualize o código do app, isso avisa o usuário
+    onUpdate: (registration) => {
         const waitingServiceWorker = registration.waiting;
+
         if (waitingServiceWorker) {
-        waitingServiceWorker.addEventListener("statechange", event => {
-            if (event.target.state === "activated") {
-            if (window.confirm("Nova versão disponível! Atualizar agora?")) {
+        // Alerta para o usuário
+        const atualizar = window.confirm("🚀 Nova versão disponível! Deseja atualizar o app agora?");
+        
+        if (atualizar) {
+            waitingServiceWorker.postMessage({ type: 'SKIP_WAITING' });
+            waitingServiceWorker.addEventListener('statechange', (event) => {
+            if (event.target.state === 'activated') {
                 window.location.reload();
             }
-            }
-        });
-        waitingServiceWorker.postMessage({ type: "SKIP_WAITING" });
+            });
         }
-    }
+        }
+    },
 });
 
 reportWebVitals();

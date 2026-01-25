@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useMemo, memo } from 'react';
-import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css';
+import React, { useState, useEffect, memo } from 'react';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-// --- COMPONENTE DE EDITOR ISOLADO (CORREÇÃO PARA REACT 19) ---
-const EditorItem = memo(({ value, onChange, modules, formats, height = '200px' }) => {
+const EditorItem = memo(({ value, onChange, height = '300px' }) => {
     const [carregado, setCarregado] = useState(false);
 
     useEffect(() => {
@@ -13,18 +12,39 @@ const EditorItem = memo(({ value, onChange, modules, formats, height = '200px' }
         return () => clearTimeout(timer);
     }, []);
 
-    if (!carregado) return <div style={{ height, marginBottom: '75px', background: '#eee' }}>Carregando...</div>;
+    if (!carregado) return <div style={{ height, marginBottom: '20px', background: '#eee' }}>Carregando Editor...</div>;
 
     return (
-        <div className="quill-wrapper"> 
-            <ReactQuill
-                theme="snow"
-                value={value || ''}
-                onChange={onChange}
-                modules={modules}
-                formats={formats}
-                style={{ height, marginBottom: '75px' }}
+        <div className="ckeditor-wrapper" style={{ marginBottom: '40px' }}> 
+            <CKEditor
+                editor={ClassicEditor}
+                data={value || ''}
+                config={{
+                    toolbar: [
+                            'undo', 'redo',
+                            '|',
+                            'heading',
+                            '|',
+                            'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor',
+                            '|',
+                            'bold', 'italic', 'strikethrough', 'subscript', 'superscript', 'code',
+                            '|',
+                            'link', 'uploadImage', 'blockQuote', 'codeBlock',
+                            '|',
+                            'bulletedList', 'numberedList', 'todoList', 'outdent', 'indent'
+                    ],
+                    placeholder: 'Comece a escrever aqui...'
+                }}
+                onChange={(event, editor) => {
+                    const data = editor.getData();
+                    onChange(data);
+                }}
             />
+            <style>{`
+                .ck-editor__editable_inline {
+                    min-height: ${height};
+                }
+            `}</style>
         </div>
     );
 });
@@ -40,11 +60,6 @@ const TEMPLATE_INICIAL_MAPA = {
     ]
 };
 
-const QUILL_FORMATS = [
-    'header', 'bold', 'italic', 'underline', 'strike',
-    'color', 'background', 'list', 'link', 'image'
-];
-
 export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, styles, adminStyles }) {
     const [abaAtiva, setAbaAtiva] = useState('layout');
     const [mensagem, setMensagem] = useState('');
@@ -55,16 +70,6 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
     useEffect(() => {
         setMontado(true);
     }, []);
-
-    const modules = useMemo(() => ({
-        toolbar: [
-            [{ 'header': [1, 2, false] }],
-            ['bold', 'italic', 'underline', 'strike'],
-            [{ 'color': [] }, { 'background': [] }],
-            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-            ['link', 'clean']
-        ],
-    }), []);
 
     useEffect(() => {
         if (conteudo && (!conteudo.ondeComprar || !conteudo.ondeComprar.botoes || conteudo.ondeComprar.botoes.length === 0)) {
@@ -85,14 +90,11 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
     if (!conteudo) return <div style={adminStyles.loading}>Carregando configurações...</div>;
 
     const salvarDados = async () => {
-    // Função para limpar recursivamente &nbsp; de qualquer string dentro de um objeto ou array
         const limparProfundo = (obj) => {
             if (typeof obj === 'string') {
                 return obj.replace(/&nbsp;/g, ' ').replace(/\u00A0/g, ' ');
             }
-            if (Array.isArray(obj)) {
-                return obj.map(limparProfundo);
-            }
+            if (Array.isArray(obj)) return obj.map(limparProfundo);
             if (obj !== null && typeof obj === 'object') {
                 return Object.fromEntries(
                     Object.entries(obj).map(([key, val]) => [key, limparProfundo(val)])
@@ -104,7 +106,7 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
         const conteudoLimpo = limparProfundo(conteudo);
 
         try {
-            setMensagem('⏳ Salvando conteúdo limpo...');
+            setMensagem('⏳ Salvando conteúdo...');
             const res = await fetch(`${API_URL}/admin/conteudo/salvar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -116,7 +118,7 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
             if (res.ok && respostaJson.success) {
                 setConteudo(respostaJson.data); 
                 if (atualizarApp) atualizarApp(); 
-                setMensagem('✅ Conteúdo atualizado e limpo!');
+                setMensagem('✅ Conteúdo atualizado!');
                 setTimeout(() => setMensagem(''), 3000);
             }
         } catch (err) {
@@ -136,38 +138,21 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
         }
     };
 
+    const handleListChange = (categoria, index, campo, valor) => {
+        setConteudo(prev => {
+            const listaAtual = prev[categoria]?.itens || [];
+            const novaLista = [...listaAtual];
+            novaLista[index] = { ...novaLista[index], [campo]: valor };
+            return { ...prev, [categoria]: { ...prev[categoria], itens: novaLista } };
+        });
+    };
+
     const handleOndeComprarChange = (index, campo, valor) => {
         setConteudo(prev => {
             const atual = prev.ondeComprar?.botoes || TEMPLATE_INICIAL_MAPA.botoes;
             const novosBotoes = [...atual];
             novosBotoes[index] = { ...novosBotoes[index], [campo]: valor };
             return { ...prev, ondeComprar: { ...prev.ondeComprar, botoes: novosBotoes } };
-        });
-    };
-
-    const handleListChange = (categoria, index, campo, valor) => {
-        setConteudo(prev => {
-            // 1. Pegamos a lista da categoria específica (ex: 'dicas')
-            const listaAtual = prev[categoria]?.itens || [];
-            
-            // 2. Criamos uma cópia da lista
-            const novaLista = [...listaAtual];
-
-            // 3. Criamos uma cópia do ITEM específico que está sendo editado
-            // Isso impede que a edição de um item afete outros que compartilham a mesma referência
-            novaLista[index] = { 
-                ...novaLista[index], 
-                [campo]: valor 
-            };
-
-            // 4. Retornamos o novo estado preservando todo o resto
-            return { 
-                ...prev, 
-                [categoria]: { 
-                    ...prev[categoria], 
-                    itens: novaLista 
-                } 
-            };
         });
     };
 
@@ -266,7 +251,7 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
                             </div>
                             <div>
                                 <label style={adminStyles.label}>Limite de Consultas:</label>
-                                <input type="number" style={adminStyles.numInput} value={conteudo.limiteConsulta || ''} onChange={e => handleConfigChange('layout', 'limiteConsulta', e.target.value)} />
+                                <input type="number" style={adminStyles.input} value={conteudo.limiteConsulta || ''} onChange={e => handleConfigChange('layout', 'limiteConsulta', e.target.value)} />
                             </div>
                         </div>
 
@@ -376,12 +361,10 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
                             <label style={{...adminStyles.label, marginTop: '15px'}}>Título da Página:</label>
                             <input style={{ ...adminStyles.input, marginBottom: '15px' }} value={conteudo[`${abaAtiva}Titulo`] || ''} onChange={e => handleConfigChange(abaAtiva, `${abaAtiva}Titulo`, e.target.value)} />
                             {montado && (
-                                <EditorItem 
+                               <EditorItem 
                                     key={`editor-${abaAtiva}`}
                                     value={conteudo[`${abaAtiva}Texto`]} 
                                     onChange={(val) => handleConfigChange(abaAtiva, `${abaAtiva}Texto`, val)}
-                                    modules={modules}
-                                    formats={QUILL_FORMATS}
                                     height="300px"
                                 />
                             )}
@@ -439,8 +422,7 @@ export default function AdminConteudo({ conteudo, setConteudo, atualizarApp, sty
                                                 key={`editor-${abaAtiva}-${index}`}
                                                 value={abaAtiva === 'receitas' ? item.preparo : item.texto}
                                                 onChange={(val) => handleListChange(abaAtiva, index, abaAtiva === 'receitas' ? 'preparo' : 'texto', val)}
-                                                modules={modules}
-                                                formats={QUILL_FORMATS}
+                                                height="200px"
                                             />
                                         )}
                                     </div>

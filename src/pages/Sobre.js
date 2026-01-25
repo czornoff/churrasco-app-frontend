@@ -1,5 +1,7 @@
 import React from 'react';
 
+const VERSION = process.env.REACT_APP_VERSION || 'desconhecida';
+
 export default function Sobre({ dados, styles }) {
     // Se o App.js ainda está carregando o conteúdo do banco
     if (!dados) return <div style={{ 
@@ -58,6 +60,9 @@ export default function Sobre({ dados, styles }) {
                     style={styles.cardText}
                     dangerouslySetInnerHTML={{ __html: dados.sobreTexto || '<p>História em breve...</p>' }} 
                 />
+            </div>
+            <div style={{float: 'right', color: '#666', fontSize: '14px' }}>
+                <span>Versão: { VERSION }</span>
             </div>
         </div>
     );

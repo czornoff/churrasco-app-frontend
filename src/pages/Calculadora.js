@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { marked } from 'marked';
+
+marked.setOptions({
+    breaks: true, 
+    gfm: true
+});
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -14,6 +20,22 @@ const EMOJIS = {
     'acompanhamentos': '🥗', 
     'sobremesas': '🍰',
     'utensilios': '🍴'
+};
+
+const formatarMarkdown = (texto) => {
+    if (!texto) return '';
+
+    // 1. Configura o marked para quebras de linha
+    marked.setOptions({
+        breaks: true,
+        gfm: true
+    });
+
+    // 2. Ajuste manual para transformar "--- Texto ---" em um título (<h3>)
+    // Isso substitui o padrão --- Texto --- por ### Texto
+    let textoFormatado = texto.replace(/--- (.*?) ---/g, '### $1');
+
+    return marked.parse(textoFormatado);
 };
 
 export default function Calculadora({ dados, opcoes, styles, usuario }) {
@@ -141,7 +163,7 @@ export default function Calculadora({ dados, opcoes, styles, usuario }) {
                 {['homens', 'mulheres', 'adultosQueBebem', 'criancas', 'horas'].map(campo => (
                     <div key={campo}>
                         <label style={styles.labelBold}>
-                            {campo === 'adultosQueBebem' ? '🍺 Bebem' : campo.charAt(0).toUpperCase() + campo.slice(1)}
+                            {campo === 'criancas' ? 'Crianças até 10 anos' : (campo === 'adultosQueBebem' ? '🍺 Bebem' : campo.charAt(0).toUpperCase() + campo.slice(1))}
                         </label>
                         <input 
                             type="number" 
@@ -198,6 +220,7 @@ export default function Calculadora({ dados, opcoes, styles, usuario }) {
                 />
             )}
         </div>
+        
     );
 }
 
@@ -282,9 +305,16 @@ function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar, styles, ge
                             <strong style={{ color: '#d9534f', fontSize: '18px' }}>R$ {estimativa.total.toFixed(2)}</strong>
                         </div>
                         {estimativa.observacao && (
-                            <p style={{ fontSize: '12px', color: '#666', marginTop: '10px', fontStyle: 'italic' }}>
-                                💡 {estimativa.observacao}
-                            </p>
+                            <div 
+                                style={{ 
+                                    fontSize: '13px', 
+                                    color: '#444', 
+                                    marginTop: '10px',
+                                    lineHeight: '1.6' // Melhora a leitura do detalhamento
+                                }}
+                                className="markdown-container"
+                                dangerouslySetInnerHTML={{ __html: formatarMarkdown(estimativa.observacao) }} 
+                            />
                         )}
                     </div>
                 )}
@@ -295,20 +325,35 @@ function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar, styles, ge
                     <div key={tipo} style={{ marginBottom: '20px' }}>
                         <h4 style={styles.tipoTitle}>{tipo.toUpperCase()}</h4>
                         {resultado.filter(r => r.tipo === tipo).map((r, i) => (
-                            <div key={i} style={styles.itemResultRow}>
+                            <div 
+                                key={i} 
+                                style={{
+                                    ...styles.itemResultRow,
+                                    fontWeight: r.isBold ? 'bold' : 'normal',
+                                    backgroundColor: r.subtipo === 'subtotal' ? '#f8f9fa' : 'transparent',
+                                    borderTop: r.subtipo === 'total_secao' ? '2px solid #333' : '1px solid #eee',
+                                    marginLeft: r.subtipo === 'subtotal' ? '5px' : r.subtipo === 'total_secao' ? '0px' : '10px',
+                                }}
+                            >
                                 <span style={r.subtipo === 'observacao' ? styles.textObs : styles.textItem}>
                                     {r.nome}
                                 </span>
-                                <strong style={r.subtipo === 'observacao' ? styles.textObs : styles.textItem}>
+                                <span style={r.subtipo === 'observacao' ? styles.textObs : styles.textItem}>
                                     {r.quantidade}
-                                </strong>
+                                </span>
                             </div>
                         ))}
                     </div>
                 ))}
-
+                <div style={avisoStyle}>
+                    <span>
+                        Os cálculos são recomendações baseadas em médias estabelecidas em estudos. As quantidades reais podem variar para mais ou para menos de acordo com o apetite dos seus convidados e a dinâmica do evento. Lembre-se que cada churrasco é único e você conhece melhor seus convidados do que qualquer sistema!
+                    </span>
+                </div>
                 <button onClick={fechar} style={styles.btnCloseGray}>FECHAR</button>
             </div>
         </div>
     );
 }
+
+const avisoStyle = { width: '100%', backgroundColor: '#fff3cd', color: '#856404', padding: '10px 0', borderRadius: '8px', fontSize: '13px', textAlign: 'center', border: '1px solid #ffeeba', marginTop: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' };
