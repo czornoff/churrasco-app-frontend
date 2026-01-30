@@ -7,21 +7,18 @@ import {
   useMap 
 } from '@vis.gl/react-google-maps';
 
-// --- CONFIGURAÇÕES ESTÁTICAS ---
 const GOOGLE_MAPS_API_KEY = "AIzaSyCE1lyCvcJwnAXJ6fEI6dnOxFflQQnG-kY";
-const MAP_ID = "c40e634b60915d61a1edbffc";
-const containerStyle = { width: '100%', height: '500px', borderRadius: '15px' };
 
-export default function OndeComprar({ conteudo, styles }) {
+// IDs do Cloud Console - Agora vinculados corretamente aos estilos no painel do Google
+const MAP_ID_LIGHT = "c40e634b60915d61a1edbffc";
+const MAP_ID_DARK = "c40e634b60915d61dd7ebe40";
+
+export default function OndeComprar({ conteudo }) {
     const [locais, setLocais] = useState([]);
     const [centro, setCentro] = useState({ lat: -23.5876, lng: -46.7403 });
     const [selecionado, setSelecionado] = useState(null);
 
-    // --- INTEGRAÇÃO DINÂMICA ---
-    // Pegamos os botões configurados no Admin
     const botoesConfig = conteudo?.ondeComprar?.botoes || [];
-    
-    // Filtro inicial: pega o termo do primeiro botão ativo ou um fallback
     const botaoInicial = botoesConfig.find(b => b.ativo);
     const [filtroAtivo, setFiltroAtivo] = useState(botaoInicial?.termo || "");
 
@@ -29,7 +26,6 @@ export default function OndeComprar({ conteudo, styles }) {
         usuario: "https://bandalarga.com.br/img/churrasco/usuario.png"
     };
 
-    // Função de busca principal
     const realizarBusca = useCallback(async (mapInstance, posicao, termo) => {
         if (!mapInstance || !window.google || !termo) return;
 
@@ -43,7 +39,6 @@ export default function OndeComprar({ conteudo, styles }) {
         
         try {
             const { Place } = await window.google.maps.importLibrary("places");
-            
             const request = {
                 textQuery: termo,
                 fields: ['displayName', 'formattedAddress', 'location', 'rating', 'userRatingCount', 'id'],
@@ -75,17 +70,23 @@ export default function OndeComprar({ conteudo, styles }) {
 
     return (
         <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
-            <div style={styles.container}>
-                <header style={styles.header}>
-                    <h1 style={styles.title}>{conteudo?.nomeApp ? `Onde Comprar - ${conteudo.nomeApp}` : "Onde Comprar"}</h1>
-                    <p style={styles.subtitle}>Encontre produtos para o seu churrasco</p>
-                </header>
+            <div className="max-w-8xl mx-auto px-4 py-8 md:py-12 bg-white dark:bg-zinc-900 transition-colors duration-300">
+                <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 transition-colors duration-300">
+                    <header className="text-center mb-10">
+                        <h1 className="text-3xl font-black text-neutral-900 dark:text-white mb-3 tracking-tight uppercase">
+                            Onde Comprar
+                        </h1>
+                        <p className="text-lg md:text-xl text-orange-700 dark:text-orange-400 font-medium">
+                            Encontre os melhores suprimentos para o seu churrasco perto de você
+                        </p>
+                    </header>
+
                     <MapaConteudo 
                         centro={centro} 
                         setCentro={setCentro}
                         locais={locais}
                         realizarBusca={realizarBusca}
-                        botoesConfig={botoesConfig} // Passando os botões do banco
+                        botoesConfig={botoesConfig}
                         filtroAtivo={filtroAtivo}
                         setFiltroAtivo={setFiltroAtivo}
                         selecionado={selecionado}
@@ -93,6 +94,7 @@ export default function OndeComprar({ conteudo, styles }) {
                         icons={icons}
                         primaryColor={conteudo?.primary}
                     />
+                </div>
             </div>
         </APIProvider>
     );
@@ -103,6 +105,17 @@ function MapaConteudo({ centro, setCentro, locais, realizarBusca, botoesConfig, 
     const jaBuscouRef = useRef(false);
     const [buscando, setBuscando] = useState(false);
 
+    // Estado para o tema detectando a classe 'dark' no HTML
+    const [isDarkMode, setIsDarkMode] = useState(document.documentElement.classList.contains('dark'));
+
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            setIsDarkMode(document.documentElement.classList.contains('dark'));
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+        return () => observer.disconnect();
+    }, []);
+
     useEffect(() => {
         if (map) {
             window.google.maps.event.trigger(map, 'resize');
@@ -111,7 +124,6 @@ function MapaConteudo({ centro, setCentro, locais, realizarBusca, botoesConfig, 
 
     const localizarUsuario = useCallback(() => {
         if (!navigator.geolocation) return;
-
         navigator.geolocation.getCurrentPosition(
             (pos) => {
                 const novaPosicao = { lat: pos.coords.latitude, lng: pos.coords.longitude };
@@ -138,122 +150,113 @@ function MapaConteudo({ centro, setCentro, locais, realizarBusca, botoesConfig, 
         if (buscando || !map) return;
         setBuscando(true);
         setFiltroAtivo(novoTermo);
-        
         const centroAtual = map.getCenter().toJSON();
         realizarBusca(map, centroAtual, novoTermo).finally(() => {
             setTimeout(() => setBuscando(false), 1500);
         });
     };
 
-    // Pega o ícone/imagem configurado para o botão selecionado
     const getIconeAtual = () => {
         const botao = botoesConfig.find(b => b.termo === filtroAtivo);
         if (botao?.pinUrl) return `${process.env.REACT_APP_API_URL}${botao.pinUrl}`;
-        return null; // Fallback para emoji no render se for null
+        return null;
     };
 
     return (
-        <>
-            <div style={{ marginBottom: '15px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                {/* RENDERIZAÇÃO DINÂMICA DOS BOTÕES DO BANCO */}
+        <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-3">
                 {botoesConfig.filter(b => b.ativo).map((botao) => (
                     <button 
                         key={botao.id}
                         onClick={() => alterarFiltro(botao.termo)} 
-                        style={{ 
-                            ...btnStyle, 
-                            backgroundColor: filtroAtivo === botao.termo ? botao.cor : '#555' 
-                        }}
+                        style={{ backgroundColor: filtroAtivo === botao.termo ? botao.cor : '#3f3f46' }}
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-bold text-sm transition-all shadow-xl active:scale-95 ${buscando ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-150'}`}
                     >
                         {botao.pinUrl ? (
-                            <img src={`${process.env.REACT_APP_API_URL}${botao.pinUrl}`} alt="" style={btnImgStyle} />
+                            <img src={`${process.env.REACT_APP_API_URL}${botao.pinUrl}`} alt="" className="w-5 h-5 object-contain" />
                         ) : (
-                            <span style={{marginRight: '5px'}}>{botao.icone}</span>
+                            <span className="text-lg">{botao.icone}</span>
                         )}
                         {botao.label}
                     </button>
                 ))}
                 
-                <button onClick={localizarUsuario} style={{ ...btnStyle, backgroundColor: '#4285F4', marginLeft: 'auto', border: '2px solid #fff' }}>
+                <button 
+                    onClick={localizarUsuario} 
+                    className="ml-auto flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-400 text-white rounded-xl font-bold text-sm shadow-xl border-2 border-white dark:border-zinc-800 transition-all active:scale-95"
+                >
                     📍 Onde estou?
                 </button>
             </div>
 
-            <Map
-                style={containerStyle}
-                defaultCenter={centro}
-                defaultZoom={14}
-                mapId={MAP_ID}
-                disableDefaultUI={true}
-            >
-                <AdvancedMarker position={centro}>
-                    <img 
-                        src={icons.usuario} 
-                        width={45} 
-                        height={45} 
-                        alt="Você" 
-                        style={{
-                            transform: 'translate(calc(-50% + 20px), calc(-50% + 50px))', 
-                            filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))',
-                            pointerEvents: 'none' 
-                        }}
-                    />
-                </AdvancedMarker>
-
-                {locais.map(local => (
-                    <AdvancedMarker 
-                        key={local.place_id} 
-                        position={local.location} 
-                        onClick={() => setSelecionado(local)}
-                    >
-                        {getIconeAtual() ? (
-                            <img 
-                                src={getIconeAtual()} 
-                                width={40} height={40} alt="Local" 
-                                style={{ position: 'absolute', left: '-20px', top: '-40px' }} 
-                            />
-                        ) : (
-                            <div style={{fontSize: '30px', position: 'absolute', left: '-15px', top: '-35px'}}>📍</div>
-                        )}
+            <div className="relative rounded-xl overflow-hidden shadow-xl border-4 border-white dark:border-zinc-800 h-[500px]">
+                <Map
+                    key={isDarkMode ? 'map-dark' : 'map-light'}
+                    className="w-full h-full"
+                    defaultCenter={centro}
+                    defaultZoom={14}
+                    mapId={isDarkMode ? MAP_ID_DARK : MAP_ID_LIGHT}
+                    disableDefaultUI={true}
+                >
+                    <AdvancedMarker position={centro}>
+                        <img 
+                            src={icons.usuario} 
+                            className="w-11 h-11 -translate-x-1/2 -translate-y-[90%] drop-shadow-xl pointer-events-none"
+                            alt="Você" 
+                        />
                     </AdvancedMarker>
-                ))}
 
-                {selecionado && (
-                    <InfoWindow 
-                        position={selecionado.location} 
-                        onCloseClick={() => setSelecionado(null)}
-                    >
-                        <div style={{ color: '#000', maxWidth: '200px', padding: '5px' }}>
-                            <h4 style={{ margin: '0 0 5px', fontSize: '14px' }}>{selecionado.name}</h4>
-                            {selecionado.rating && (
-                                <div style={{ marginBottom: '5px', color: '#f1c40f', fontSize: '12px' }}>
-                                    {"★".repeat(Math.round(selecionado.rating))} <span style={{color: '#666'}}>({selecionado.user_ratings_total})</span>
-                                </div>
+                    {locais.map(local => (
+                        <AdvancedMarker 
+                            key={local.place_id} 
+                            position={local.location} 
+                            onClick={() => setSelecionado(local)}
+                        >
+                            {getIconeAtual() ? (
+                                <img 
+                                    src={getIconeAtual()} 
+                                    className="w-10 h-10 absolute -left-5 -top-10" 
+                                    alt="Local" 
+                                />
+                            ) : (
+                                <div className="text-3xl absolute -left-4 -top-9">📍</div>
                             )}
-                            <p style={{ fontSize: '11px', margin: '0 0 10px', color: '#333' }}>{selecionado.formatted_address}</p>
-                            <a 
-                                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(selecionado.formatted_address)}`} 
-                                target="_blank" 
-                                rel="noreferrer" 
-                                style={{...linkStyle, backgroundColor: primaryColor || '#e67e22'}}
-                            >
-                                🚗 Como Chegar
-                            </a>
-                        </div>
-                    </InfoWindow>
-                )}
-            </Map>
-            
-            <div style={avisoStyle}>
-                <span>⚠️</span>
-                <span>Ao mover o mapa, clique novamente no botão para recarregar mais locais disponíveis.</span>
+                        </AdvancedMarker>
+                    ))}
+
+                    {selecionado && (
+                        <InfoWindow 
+                            position={selecionado.location} 
+                            onCloseClick={() => setSelecionado(null)}
+                        >
+                            <div className="p-1 max-w-[220px] text-zinc-900">
+                                <h4 className="font-bold text-sm mb-1">{selecionado.name}</h4>
+                                {selecionado.rating && (
+                                    <div className="flex items-center gap-1 mb-2 text-amber-500 text-xs">
+                                        {"★".repeat(Math.round(selecionado.rating))} 
+                                        <span className="text-zinc-500 font-medium">({selecionado.user_ratings_total})</span>
+                                    </div>
+                                )}
+                                <p className="text-[11px] leading-tight text-zinc-600 mb-3">{selecionado.formatted_address}</p>
+                                <a 
+                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selecionado.formatted_address)}`} 
+                                    target="_blank" 
+                                    rel="noreferrer" 
+                                    style={{ backgroundColor: primaryColor || '#ea580c' }}
+                                    className="block w-full text-center text-white py-2 rounded-xl text-xs font-bold hover:brightness-110 transition-all no-underline"
+                                >
+                                    🚗 Como Chegar
+                                </a>
+                            </div>
+                        </InfoWindow>
+                    )}
+                </Map>
             </div>
-        </>
+            
+            <div className="flex items-center justify-center gap-2 w-full bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 text-amber-800 dark:text-amber-400 p-3 rounded-xl text-xs md:text-sm font-medium">
+                <span>⚠️</span>
+                <span>Ao mover o mapa, clique nos filtros para buscar novos locais nesta região.</span>
+            </div>
+        </div>
     );
 }
-
-// --- ESTILOS ---
-const btnStyle = { padding: '10px 15px', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', transition: 'all 0.2s ease' };
-const btnImgStyle = { width: '18px', height: '18px', marginRight: '5px', objectFit: 'contain' };
-const linkStyle = { display: 'block', textAlign: 'center', color: '#fff', padding: '8px', borderRadius: '5px', textDecoration: 'none', fontSize: '12px', fontWeight: 'bold' };
-const avisoStyle = { width: '100%', backgroundColor: '#fff3cd', color: '#856404', padding: '10px 0', borderRadius: '8px', fontSize: '13px', textAlign: 'center', border: '1px solid #ffeeba', marginTop: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' };

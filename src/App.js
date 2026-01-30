@@ -5,7 +5,6 @@ import Header from './components/Header';
 import BadgeLimite from './components/BadgeLimite';
 import Footer from './components/Footer';
 import AdBanner from './components/AdBanner';
-import { obterEstilos } from './components/Styles';
 
 import Admin from './pages/admin/Admin';
 import AdminConteudo from './pages/admin/AdminConteudo';
@@ -14,21 +13,16 @@ import AdminRelatorio from './pages/admin/AdminRelatorio';
 import AdminUsuario from './pages/admin/AdminUsuario';
 import AdminIP from './pages/admin/AdminIP';
 
-import Inicial from './pages/Inicial';
+import PaginaTexto from './pages/PaginaTexto';
 import Calculadora from './pages/Calculadora';
-import Dicas from './pages/Dicas';
+import Items from './pages/Items';
 import OndeComprar from './pages/OndeComprar';
-import Produtos from './pages/Produtos';
 import Receitas from './pages/Receitas';
 import Relatorio from './pages/Relatorio';
-import Sobre from './pages/Sobre';
-import Utensilios from './pages/Utensilios';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
 export default function App() {
-    const avisoStyle = { width: '100%', backgroundColor: '#fff3cd', color: '#856404', padding: '10px 0', borderRadius: '8px', fontSize: '13px', textAlign: 'center', border: '1px solid #ffeeba', marginTop: '5px', alignItems: 'center', justifyContent: 'center', gap: '8px', display: 'flex' };
-
     const [opcoes, setOpcoes] = useState(null);
     const [usuario, setUsuario] = useState(null);
     const [carregando, setCarregando] = useState(true);
@@ -40,17 +34,16 @@ export default function App() {
     });
     const [ufs, setUfs] = useState([]);
     const [cidades, setCidades] = useState([]);
-    const { styles, adminStyles, headerStyles, footerStyles, modalStyles, loginStyles } = obterEstilos(conteudo);
+
+    const corPrimary = conteudo?.primary || '#ea580c';
 
     const perfilIncompleto = (u) => {
-        if (!u) 
-            return false;
+        if (!u) return false;
         return !u.UF || !u.Cidade || !u.birthday || !u.whatsApp || !u.genero;
     };
 
     const abrirEdicao = useCallback((usuarioManual = null) => {
         const u = usuarioManual || usuario;
-
         if (u) {
             setComplementoData({
                 nome: u.nome || '',
@@ -62,48 +55,28 @@ export default function App() {
                 genero: u.genero || ''
             });
             setShowModalComplemento(true);
-        } else {
-        // Log para debug caso você clique e não aconteça nada
-    }
+        }
     }, [usuario]);
 
     const aplicarMascaraWhatsapp = (value) => {
         if (!value) return "";
-        
-        // Remove tudo que não é dígito
         let v = value.replace(/\D/g, "");
-        
-        // Limita a 11 números (2 do DDD + 9 do número)
         v = v.slice(0, 11);
-
-        // Aplica a máscara de DDD: (00)
         v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
-
-        // Aplica o hífen dinâmico
-        // Se tem 11 dígitos (celular), o hífen vai após o 5º número (ex: 99999-9999)
-        // Se tem até 10 dígitos (fixo), o hífen vai após o 4º número (ex: 8888-8888)
         if (v.length > 13) { 
-            // Formato Celular: (00) 90000-0000 (total 15 caracteres com máscara)
             v = v.replace(/(\d{5})(\d)/, "$1-$2");
         } else {
-            // Formato Fixo: (00) 0000-0000 (total 14 caracteres com máscara)
             v = v.replace(/(\d{4})(\d)/, "$1-$2");
         }
-
         return v;
     };
 
     const [exibirDicaIOS, setExibirDicaIOS] = useState(false);
 
     useEffect(() => {
-        // Verifica se é iOS
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        // Verifica se já não está instalado (modo standalone)
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-
-        if (isIOS && !isStandalone) {
-            setExibirDicaIOS(true);
-        }
+        if (isIOS && !isStandalone) setExibirDicaIOS(true);
     }, []);
 
     useEffect(() => {
@@ -130,16 +103,12 @@ export default function App() {
                     fetch(`${API_URL}/api/conteudo`, { cache: 'no-store' }),
                     fetch(`${API_URL}/auth/usuario`, { credentials: 'include' })
                 ]);
-
                 if (resOpcoes.ok) setOpcoes(await resOpcoes.json());
                 if (resConteudo.ok) setConteudo(await resConteudo.json());
-                
                 if (resUser.ok) {
                     const dataUser = await resUser.json();
                     setUsuario(dataUser);
-                    if (perfilIncompleto(dataUser)) {
-                        abrirEdicao(dataUser);
-                    }
+                    if (perfilIncompleto(dataUser)) abrirEdicao(dataUser);
                 }
             } catch (err) {
                 console.error("Erro na inicialização:", err);
@@ -147,7 +116,6 @@ export default function App() {
                 setCarregando(false);
             }
         };
-
         carregarTudo();
     }, [atualizador]);
 
@@ -160,196 +128,187 @@ export default function App() {
                 body: JSON.stringify(complementoData),
                 credentials: 'include'
             });
-
             const data = await res.json();
-
             if (res.ok && data.success) {
                 setShowModalComplemento(false);
-                setUsuario(data.data); // Atualiza o usuário local com os dados do banco
-                window.location.href = '/calculodechurrasco'; // Redireciona para limpar o estado e fechar o modal
+                setUsuario(data.data);
+                window.location.href = '/calculodechurrasco';
             } else {
-                alert("Erro ao salvar: " + (data.message || "Verifique todos os campos."));
+                alert("Erro ao salvar: " + (data.message || "Verifique os campos."));
             }
         } catch (err) {
-            console.error("Erro ao salvar perfil:", err);
             alert("Erro de conexão com o servidor.");
         }
     };
 
     if (carregando || !opcoes || !conteudo) {
         return (
-        <div style={{ 
-            height: '100vh', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            backgroundColor: '#f8f9fa',
-            fontFamily: 'sans-serif'
-        }}>
-            {/* Ícone ou Logo Animado */}
-            <div style={{
-                fontSize: '50px',
-                marginBottom: '20px',
-                animation: 'pulse 1.5s infinite ease-in-out'
-            }}>
-                🔥
+            <div className="h-screen flex flex-col justify-center items-center bg-neutral-50 dark:bg-zinc-950 transition-colors">
+                <div className="text-6xl mb-6 animate-bounce">🔥</div>
+                <h2 className="text-2xl font-black text-orange-700 dark:text-orange-400 mb-2 uppercase">
+                    Preparando a brasa...
+                </h2>
+                <p className="text-neutral-500 dark:text-zinc-400 font-medium animate-pulse">
+                    Carregando Relatórios de Inteligência
+                </p>
             </div>
-
-            {/* Texto de Carregamento */}
-            <h2 style={{ 
-                color: '#d9534f', 
-                marginBottom: '10px',
-                fontWeight: 'bold' 
-            }}>
-                Preparando a brasa...
-            </h2>
-            
-            <p style={{ color: '#666', fontSize: '14px' }}>
-                Carregando a Calculadora de Churrasco
-            </p>
-
-            {/* CSS inline para a animação de pulso */}
-            <style>
-                {`
-                    @keyframes pulse {
-                        0% { transform: scale(1); opacity: 1; }
-                        50% { transform: scale(1.2); opacity: 0.7; }
-                        100% { transform: scale(1); opacity: 1; }
-                    }
-                `}
-            </style>
-        </div>
-    );
+        );
     }
 
     return (
         <Router basename="/calculodechurrasco">
-            <Header dados={conteudo} usuario={usuario} styles={styles} headerStyles={headerStyles} abrirPerfil = {() => abrirEdicao()}/> 
-                <BadgeLimite usuario={usuario} API_URL={API_URL} limite={conteudo.limiteConsulta}/> 
-
-            {window.location.hostname !== 'localhost' && <AdBanner slot="2870360789" />}
             
-            <div style={{ minHeight: '80vh' }}>
-                <Routes>
-                    <Route path="/" element={<Inicial dados={conteudo} styles={styles} />} />
-                    <Route path="/calculadora" element={<Calculadora dados={conteudo} opcoes={opcoes} styles={styles} modalStyles={modalStyles} usuario={usuario} />} />
-                    <Route path="/dicas" element={<Dicas dados={conteudo?.dicas} styles={styles} />} />
-                    <Route path="/onde-comprar" element={<OndeComprar conteudo={conteudo} styles={styles} />} />
-                    <Route path="/produtos" element={<Produtos dados={conteudo?.produtos} styles={styles}  />} />
-                    <Route path="/receitas" element={<Receitas dados={conteudo?.receitas} styles={styles} modalStyles={modalStyles}  />} />
-                    <Route path="/relatorio/:id" element={<Relatorio styles={styles} adminStyles={adminStyles}  />} />
-                    <Route path="/utensilios" element={<Utensilios dados={conteudo?.utensilios} styles={styles}  />} />
-                    <Route path="/sobre" element={<Sobre dados={conteudo} styles={styles}  />} />
+            <style>{`
+                :root {
+                    --cor-primary: ${corPrimary};
+                    --cor-primary-hover: ${corPrimary}cc; /* 80% opacidade */
+                }
+                .text-orange-700, .text-orange-400 { color: var(--cor-primary) !important; }
+                .bg-orange-700, .bg-orange-400 { background-color: var(--cor-primary) !important; }
+                .border-orange-700, .border-orange-400 { border-color: var(--cor-primary) !important; }
+                .focus\\:ring-orange-400:focus { --tw-ring-color: var(--cor-primary) !important; }
+                .shadow-orange-500\\/20 { --tw-shadow-color: var(--cor-primary) !important; }
+                .hover\\:bg-orange-400:hover { background-color: var(--cor-primary-hover) !important; }
+                .hover\\:text-orange-400:hover { color: var(--cor-primary-hover) !important; }
+            `}</style>
 
-                    <Route path="/login" element={usuario && !perfilIncompleto(usuario) ? <Navigate to="/" /> : <Login styles={styles} loginStyles={loginStyles}/>} />
-                    
-                    <Route path="/admin" element={usuario?.role === 'admin' ? <Admin opcoes={opcoes} setOpcoes={setOpcoes} styles={styles} adminStyles={adminStyles} /> : <Navigate to="/login" />} />
-                    <Route path="/admin/conteudo" element={usuario?.role === 'admin' ? <AdminConteudo conteudo={conteudo} setConteudo={setConteudo} atualizarApp={() => setAtualizador(prev => prev + 1)} styles={styles} adminStyles={adminStyles} /> : <Navigate to="/login" />} />
-                    <Route path="/admin/item" element={usuario?.role === 'admin' ? <AdminItem opcoes={opcoes} setOpcoes={setOpcoes} styles={styles} adminStyles={adminStyles} /> : <Navigate to="/login" />} />
-                    <Route path="/admin/relatorio" element={usuario?.role === 'admin' ? <AdminRelatorio styles={styles} adminStyles={adminStyles} /> : <Navigate to="/login" />} />
-                    <Route path="/admin/usuarios" element={usuario?.role === 'admin' ? <AdminUsuario styles={styles} adminStyles={adminStyles} modalStyles={modalStyles} /> : <Navigate to="/" />} />
-                    <Route path="/admin/ips" element={usuario?.role === 'admin' ? <AdminIP styles={styles} adminStyles={adminStyles} limite={conteudo.limiteConsulta} /> : <Navigate to="/login" />} 
-/>
-                    <Route path="*" element={<Navigate to="/" />} />
-                </Routes>
+            <div className="flex flex-col min-h-screen bg-white dark:bg-zinc-950 text-neutral-900 dark:text-zinc-100 transition-colors duration-300">
+                <Header dados={conteudo} usuario={usuario} abrirPerfil={() => abrirEdicao()}/> 
                 
-                {exibirDicaIOS && (
-                    <div style={styles.bannerIOS}>
-                        <p>Para instalar o App no seu iPhone:</p>
-                        <p>Clique em <strong>Compartilhar</strong> 📤 e depois em <strong>Adicionar à Tela de Início</strong> ➕</p>
-                        <button onClick={() => setExibirDicaIOS(false)}>Entendi</button>
+                <main className="flex-grow">
+                    <BadgeLimite usuario={usuario} API_URL={API_URL} limite={conteudo.limiteConsulta}/> 
+                    
+                    {window.location.hostname !== 'localhost' && (
+                        <div className="max-w-7xl mx-auto py-4 px-4 overflow-hidden">
+                            <AdBanner slot="2870360789" />
+                        </div>
+                    )}
+                    
+                    <div className="max-w-7xl mx-auto px-4 py-6">
+                        <Routes>
+                            <Route path="/" element={<PaginaTexto titulo={conteudo?.inicioTitulo} texto={conteudo?.inicioTexto} />} />
+                            <Route path="/calculadora" element={<Calculadora dados={conteudo} opcoes={opcoes} usuario={usuario} />} />
+                            <Route path="/dicas" element={<Items dados={conteudo?.dicas} />} />
+                            <Route path="/onde-comprar" element={<OndeComprar conteudo={conteudo} />} />
+                            <Route path="/produtos" element={<Items dados={conteudo?.produtos} />} />
+                            <Route path="/receitas" element={<Receitas dados={conteudo?.receitas} />} />
+                            <Route path="/relatorio/:id" element={<Relatorio />} />
+                            <Route path="/utensilios" element={<Items dados={conteudo?.utensilios} />} />
+                            <Route path="/sobre" element={<PaginaTexto titulo={conteudo?.sobreTitulo} texto={conteudo?.sobreTexto} />} />
+                            <Route path="/login" element={usuario && !perfilIncompleto(usuario) ? <Navigate to="/" /> : <Login />} />
+                            
+                            {/* Rotas Admin */}
+                            <Route path="/admin" element={usuario?.role === 'admin' ? <Admin opcoes={opcoes} setOpcoes={setOpcoes} /> : <Navigate to="/login" />} />
+                            <Route path="/admin/conteudo" element={usuario?.role === 'admin' ? <AdminConteudo conteudo={conteudo} setConteudo={setConteudo} atualizarApp={() => setAtualizador(prev => prev + 1)} /> : <Navigate to="/login" />} />
+                            <Route path="/admin/item" element={usuario?.role === 'admin' ? <AdminItem opcoes={opcoes} setOpcoes={setOpcoes} /> : <Navigate to="/login" />} />
+                            <Route path="/admin/relatorio" element={usuario?.role === 'admin' ? <AdminRelatorio /> : <Navigate to="/login" />} />
+                            <Route path="/admin/usuarios" element={usuario?.role === 'admin' ? <AdminUsuario /> : <Navigate to="/" />} />
+                            <Route path="/admin/ips" element={usuario?.role === 'admin' ? <AdminIP limite={conteudo.limiteConsulta} /> : <Navigate to="/login" />} />
+                            <Route path="*" element={<Navigate to="/" />} />
+                        </Routes>
+                    </div>
+
+                    {exibirDicaIOS && (
+                        <div className="fixed bottom-20 left-4 right-4 z-[60] bg-white dark:bg-zinc-900 border-t-4 border-orange-400 shadow-xl p-6 rounded-xl animate-in slide-in-from-bottom duration-500">
+                            <h4 className="font-black text-neutral-900 dark:text-white uppercase mb-2">📲 Instale o App</h4>
+                            <p className="text-sm mb-4">No seu iPhone: toque em <strong>Compartilhar</strong> 📤 e depois em <strong>Adicionar à Tela de Início</strong> ➕</p>
+                            <button onClick={() => setExibirDicaIOS(false)} className="w-full bg-orange-700 text-white font-black py-3 rounded-xl uppercase tracking-tighter">Entendi</button>
+                        </div>
+                    )}
+                </main>
+
+                {showModalComplemento && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto" onClick={!perfilIncompleto(usuario) ? () => setShowModalComplemento(false) : undefined}>
+                        <div className="bg-white dark:bg-zinc-900 w-full max-w-lg rounded-xl shadow-xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                            <div className="p-8">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-2xl font-black text-neutral-900 dark:text-white uppercase tracking-tighter">
+                                        {perfilIncompleto(usuario) ? "Complete seu Perfil 🔥" : "👤 Perfil"}
+                                    </h2>
+                                    {!perfilIncompleto(usuario) && (
+                                        <button onClick={() => setShowModalComplemento(false)} className="text-neutral-400 hover:text-red-500 transition-colors">✕</button>
+                                    )}
+                                </div>
+
+                                <form onSubmit={salvarDadosPerfil} className="flex flex-col gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">Nome Completo</label>
+                                        <input required className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold focus:ring-2 focus:ring-orange-400 transition-all"
+                                            value={complementoData.nome} onChange={e => setComplementoData({ ...complementoData, nome: e.target.value })} />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">E-mail</label>
+                                        <input required readOnly={!!usuario.googleId} className={`w-full px-4 py-3 rounded-xl border-none font-bold ${usuario.googleId ? 'bg-neutral-200 dark:bg-zinc-700 opacity-60 cursor-not-allowed' : 'bg-neutral-100 dark:bg-zinc-800 focus:ring-2 focus:ring-orange-400'}`}
+                                            value={complementoData.email} onChange={e => setComplementoData({ ...complementoData, email: e.target.value })} />
+                                        {usuario?.googleId && (
+                                            <div className="flex items-center gap-2 mt-2 p-2 bg-amber-50 dark:bg-amber-900/10 text-amber-600 dark:text-amber-400 rounded-xl text-[10px] font-bold">
+                                                <span>⚠️</span> Vinculado à Conta Google
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="flex gap-4">
+                                        <div className="w-24 space-y-1">
+                                            <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">UF</label>
+                                            <select required className="w-full px-3 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold"
+                                                value={complementoData.UF} onChange={e => setComplementoData({ ...complementoData, UF: e.target.value, Cidade: '' })}>
+                                                <option value="">--</option>
+                                                {ufs.map(uf => <option key={uf.id} value={uf.sigla}>{uf.sigla}</option>)}
+                                            </select>
+                                        </div>
+                                        <div className="flex-1 space-y-1">
+                                            <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">Cidade</label>
+                                            <select required disabled={!complementoData.UF} className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold disabled:opacity-40"
+                                                value={complementoData.Cidade} onChange={e => setComplementoData({ ...complementoData, Cidade: e.target.value })}>
+                                                <option value="">{complementoData.UF ? "Selecione..." : "Escolha a UF"}</option>
+                                                {cidades.map(cidade => <option key={cidade.id} value={cidade.nome}>{cidade.nome}</option>)}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">Nascimento</label>
+                                            <input type="date" required className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold"
+                                                value={complementoData.birthday} onChange={e => setComplementoData({ ...complementoData, birthday: e.target.value })} />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">WhatsApp</label>
+                                            <input required placeholder="(00) 00000-0000" className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold"
+                                                value={complementoData.whatsApp} maxLength={15} onChange={e => setComplementoData({ ...complementoData, whatsApp: aplicarMascaraWhatsapp(e.target.value) })} />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">Gênero</label>
+                                        <select required className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold"
+                                            value={complementoData.genero} onChange={e => setComplementoData({ ...complementoData, genero: e.target.value })}>
+                                            <option value="">Selecione...</option>
+                                            <option value="masculino">Masculino</option>
+                                            <option value="feminino">Feminino</option>
+                                            <option value="outros">Outros</option>
+                                            <option value="undefined">Não Informar</option>
+                                        </select>
+                                    </div>
+
+                                    <button type="submit" className="mt-4  py-4 rounded-xl uppercase tracking-tighter shadow-xl transition-all bg-orange-700 hover:bg-orange-400 text-white text-lg font-black hover:scale-110 active:scale-95 text-center ">
+                                        Salvar e Continuar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 )}
-            </div>
 
-
-            {showModalComplemento && (
-                
-                <div 
-                    style={modalStyles.overlay}
-                    onClick={!perfilIncompleto(usuario) ? () => setShowModalComplemento(false) : undefined}
-                
-                >
-                    <div style={modalStyles.content} onClick={e => e.stopPropagation()}>
-                        { !perfilIncompleto(usuario) && ( 
-                            <button style={modalStyles.closeBtn} onClick={() => setShowModalComplemento(false)}>✕</button>
-                        )}  
-                        <h2 style={ styles.modalHeader }>
-                            {perfilIncompleto(usuario) ? "Complete seu Perfil 🔥" : "Meu Perfil"}
-                        </h2>
-                        <form onSubmit={salvarDadosPerfil} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                            <input placeholder="Nome Completo" required style={loginStyles.input} 
-                                value={complementoData.nome}
-                                onChange={e => setComplementoData({ ...complementoData, nome: e.target.value })} />
-                            <input placeholder="email" required 
-                                {...usuario.googleId ? { readOnly: true } : {}}
-                                style={loginStyles.input} 
-                                value={complementoData.email}
-                                onChange={e => setComplementoData({ ...complementoData, email: e.target.value })} />
-                                { usuario?.googleId ?  (
-                                    <div style={avisoStyle}>
-                                        <span>⚠️</span>
-                                        <span>Não é possível alterar email de login associado a Conta do Google</span>
-                                    </div>
-                                    ) : null }
-                            <div style={ styles.colorInputGroup }>
-                                {/* SELECT DE ESTADOS */}
-                                <select 
-                                    required 
-                                    style={{ ...loginStyles.input, width: '80px' }} 
-                                    value={complementoData.UF}
-                                    onChange={e => setComplementoData({ ...complementoData, UF: e.target.value, Cidade: '' })} // Limpa a cidade ao trocar UF
-                                >
-                                    <option value="">UF</option>
-                                    {ufs.map(uf => (
-                                        <option key={uf.id} value={uf.sigla}>{uf.sigla}</option>
-                                    ))}
-                                </select>
-
-                                {/* SELECT DE CIDADES */}
-                                <select 
-                                    required 
-                                    style={{ ...loginStyles.input, flex: 1 }} 
-                                    value={complementoData.Cidade}
-                                    disabled={!complementoData.UF} // Desabilita se não tiver UF
-                                    onChange={e => setComplementoData({ ...complementoData, Cidade: e.target.value })}
-                                >
-                                    <option value="">{complementoData.UF ? "Selecione a Cidade" : "Escolha a UF primeiro"}</option>
-                                    {cidades.map(cidade => (
-                                        <option key={cidade.id} value={cidade.nome}>{cidade.nome}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <input type="date" required style={loginStyles.input} 
-                                value={complementoData.birthday}
-                                onChange={e => setComplementoData({ ...complementoData, birthday: e.target.value })} />
-                            <input placeholder="WhatsApp (com DDD)" required style={loginStyles.input} 
-                                value={complementoData.whatsApp}
-                                maxLength={15} // Limita caracteres no campo
-                                onChange={e => {
-                                    const valorFormatado = aplicarMascaraWhatsapp(e.target.value);
-                                    setComplementoData({ ...complementoData, whatsApp: valorFormatado });
-                                }}
-                            />
-                            <select required style={loginStyles.input} 
-                                onChange={e => setComplementoData({ ...complementoData, genero: e.target.value })}
-                                value={complementoData.genero}>
-                                <option value="">Gênero</option>
-                                <option value="masculino">Masculino</option>
-                                <option value="feminino">Feminino</option>
-                                <option value="outros">Outros</option>
-                                <option value="undefined">Não Informar</option>
-                            </select>
-                            <button type="submit" style={{ ...loginStyles.submitBtn, width: '100%' }}>Salvar e Continuar</button>
-                        </form>
+                {window.location.hostname !== 'localhost' && (
+                    <div className="max-w-7xl mx-auto py-6 px-4">
+                        <AdBanner slot="6694055728" />
                     </div>
-                </div>
-            )}
+                )}
 
-            {window.location.hostname !== 'localhost' && <AdBanner slot="6694055728" />}
-
-            <Footer dados={conteudo} footerStyles={footerStyles}/>
+                <Footer dados={conteudo} />
+            </div>
         </Router>
     );
 }

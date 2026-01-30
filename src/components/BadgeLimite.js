@@ -26,22 +26,29 @@ export default function BadgeLimite({ usuario, API_URL, limite }) {
     if (usuario || consultas === 0) return null;
 
     const resta = Math.max(0, limite - consultas);
+    const limiteAtingido = resta <= 1;
 
     return (
-        <div style={{
-            backgroundColor: resta <= 1 ? '#ff4444' : '#ffc107',
-            color: resta <= 1 ? '#fff' : '#000',
-            textAlign: 'center',
-            padding: '5px',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            transition: 'all 0.3s',
-            fontFamily: "'Segoe UI', Roboto, sans-serif"
-        }}>
-            {resta > 1 
-                ? `🎁 Você tem mais ${resta-1} consultas de ${limite} gratuitas hoje. Aproveite!` 
-                : `🔥 Limite atingido! Faça login para liberar acesso ilimitado.`
+        <div className={`
+            w-full py-2 px-4 text-center text-xs font-bold transition-all duration-300 shadow-xl
+            ${limiteAtingido 
+                ? 'bg-red-600 text-white animate-pulse' 
+                : 'bg-amber-400 text-amber-950 dark:bg-amber-500 dark:text-black'
             }
+        `}>
+            <div className="flex items-center justify-center gap-2">
+                {limiteAtingido ? (
+                    <>
+                        <span className="text-sm">🔥</span>
+                        <span>Limite atingido! Faça login para liberar acesso ilimitado.</span>
+                    </>
+                ) : (
+                    <>
+                        <span className="text-sm">🎁</span>
+                        <span>Você tem mais {resta - 1} consultas de {limite} gratuitas hoje. Aproveite!</span>
+                    </>
+                )}
+            </div>
         </div>
     );
 }

@@ -12,48 +12,23 @@ export default function AdminItem({ opcoes, setOpcoes, styles, adminStyles }) {
     const [mensagem, setMensagem] = useState('');
 
     if (!opcoes || Object.keys(opcoes).length === 0) {
-        return <div style={{ 
-            height: '100vh', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            backgroundColor: '#f8f9fa',
-            fontFamily: 'sans-serif'
-        }}>
-            {/* Ícone ou Logo Animado */}
-            <div style={{
-                fontSize: '50px',
-                marginBottom: '20px',
-                animation: 'pulse 1.5s infinite ease-in-out'
-            }}>
-                🔥
+        return (
+            <div className="h-screen flex flex-col justify-center items-center bg-gray-50 font-sans">
+                {/* Ícone ou Logo Animado */}
+                <div className="text-[50px] mb-5 animate-pulse">
+                    🔥
+                </div>
+
+                {/* Texto de Carregamento */}
+                <h2 className="text-red-600 mb-2.5 font-bold text-xl">
+                    Preparando a brasa...
+                </h2>
+                
+                <p className="text-gray-500 text-sm">
+                    Carregando Configurações
+                </p>
             </div>
-
-            {/* Texto de Carregamento */}
-            <h2 style={{ 
-                color: '#d9534f', 
-                marginBottom: '10px',
-                fontWeight: 'bold' 
-            }}>
-                Preparando a brasa...
-            </h2>
-            
-            <p style={{ color: '#666', fontSize: '14px' }}>
-                Carregando Configurações
-            </p>
-
-            {/* CSS inline para a animação de pulso */}
-            <style>
-                {`
-                    @keyframes pulse {
-                        0% { transform: scale(1); opacity: 1; }
-                        50% { transform: scale(1.2); opacity: 0.7; }
-                        100% { transform: scale(1); opacity: 1; }
-                    }
-                `}
-            </style>
-        </div>;
+        );
     }
 
     const salvarNoServidor = async (dadosParaSalvar) => {
@@ -120,54 +95,94 @@ export default function AdminItem({ opcoes, setOpcoes, styles, adminStyles }) {
     };
 
     return (
-        <div style={styles.container}>
-            {mensagem && <div style={adminStyles.toast}>{mensagem}</div>}
+        <div className="max-w-7xl mx-auto px-4 py-8 pb-32">
+            {mensagem && (
+                <div className="fixed top-5 right-5 bg-green-600 text-white px-6 py-3 rounded-xl shadow-xl z-[5000] animate-bounce">
+                    {mensagem}
+                </div>
+            )}
 
-            <header style={styles.header}>
-                <h1 style={styles.title}>⚙️ Gerenciar Itens e Regras</h1>
+            <header className="mb-12 border-b border-neutral-200 dark:border-zinc-800 pb-1">
+                <div className="flex items-center gap-4 mb-2">
+                    <span className="text-5xl">
+                        ⚙️
+                    </span>
+                    <div>
+                        <h1 className="text-3xl font-black text-neutral-900 dark:text-white mb-0 tracking-tight uppercase">
+                            Itens e Cálculos
+                        </h1>
+                        <p className="text-1 text-orange-700 dark:text-orange-400 font-medium mt-0">
+                            Configure gramaturas, carnes, bebidas e acompanhamentos do sistema.
+                        </p>
+                    </div>
+                </div>
             </header>
 
             {/* SEÇÃO DE COTAS GERAIS */}
-            <div style={adminStyles.cotaGrid}>
-                <div style={{ ...adminStyles.cotaCard, ...adminStyles.cotaCarne }}>
-                    <h4 style={adminStyles.cotaTitle}>🥩 Carne (Homem)</h4>
-                    <div style={adminStyles.inputGroup}>
-                        <input type="number" style={adminStyles.inlineInput} value={opcoes.configuracoes?.gramasCarneAdulto || 0} onChange={(e) => setOpcoes({...opcoes, configuracoes: {...opcoes.configuracoes, gramasCarneAdulto: parseInt(e.target.value) || 0}})} />
-                        <span>g</span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div className="p-5 rounded-xl shadow-xl border-l-8 border-red-500 bg-white dark:bg-zinc-800 border">
+                    <h4 className="text-sm font-bold uppercase tracking-wider text-gray-600 dark:text-neutral-200 mb-3">🥩 Carne (Homem)</h4>
+                    <div className="flex items-center gap-2">
+                        <input 
+                            type="number" 
+                            className="w-24 p-2 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-red-400 outline-none dark:bg-zinc-600 dark:text-white" 
+                            value={opcoes.configuracoes?.gramasCarneAdulto || 0} 
+                            onChange={(e) => setOpcoes({...opcoes, configuracoes: {...opcoes.configuracoes, gramasCarneAdulto: parseInt(e.target.value) || 0}})} 
+                        />
+                        <span className="font-medium dark:text-white">g</span>
                     </div>
-                    <p style={adminStyles.cotaDesc}>* Mulher: 75% | Criança: 45%</p>
+                    <p className="mt-3 text-xs dark:text-white">* Mulher: 75% | Criança: 45%</p>
                 </div>
                 
-                <div style={{ ...adminStyles.cotaCard, ...adminStyles.cotaAcomp }}>
-                    <h4 style={adminStyles.cotaTitle}>🥗 Acompanhamentos</h4>
-                    <div style={adminStyles.inputGroup}>
-                        <input type="number" style={adminStyles.inlineInput} value={opcoes.configuracoes?.gramasOutrosAdulto || 0} onChange={(e) => setOpcoes({...opcoes, configuracoes: {...opcoes.configuracoes, gramasOutrosAdulto: parseInt(e.target.value) || 0}})} />
-                        <span>g</span>
+                <div className="p-5 rounded-xl shadow-xl border-l-8 border-green-500 bg-white dark:bg-zinc-800 dark:text-white border">
+                    <h4 className="text-sm font-bold uppercase tracking-wider text-gray-600 dark:text-neutral-200 mb-3">🥗 Acompanhamentos</h4>
+                    <div className="flex items-center gap-2">
+                        <input 
+                            type="number" 
+                            className="w-24 p-2 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-green-400 outline-none dark:bg-zinc-600 dark:text-white" 
+                            value={opcoes.configuracoes?.gramasOutrosAdulto || 0} 
+                            onChange={(e) => setOpcoes({...opcoes, configuracoes: {...opcoes.configuracoes, gramasOutrosAdulto: parseInt(e.target.value) || 0}})} 
+                        />
+                        <span className="font-medium dark:text-white">g</span>
                     </div>
-                    <p style={adminStyles.cotaDesc}>* Distribuído entre os itens.</p>
+                    <p className="mt-3 text-xs dark:text-white italic">* Distribuído entre os itens.</p>
                 </div>
 
-                <div style={{ ...adminStyles.cotaCard, ...adminStyles.cotaBebida }}>
-                    <h4 style={adminStyles.cotaTitle}>🥤 Bebida Total</h4>
-                    <div style={adminStyles.inputGroup}>
-                        <input type="number" style={adminStyles.inlineInput} value={opcoes.configuracoes?.mlBebidaAdulto || 0} onChange={(e) => setOpcoes({...opcoes, configuracoes: {...opcoes.configuracoes, mlBebidaAdulto: parseInt(e.target.value) || 0}})} />
-                        <span>ml</span>
+                <div className="p-5 rounded-xl shadow-xl border-l-8 border-blue-500 bg-white dark:bg-zinc-800 dark:text-neutral-100 border">
+                    <h4 className="text-sm font-bold uppercase tracking-wider text-gray-600 dark:text-neutral-200 mb-3">🥤 Bebida Total</h4>
+                    <div className="flex items-center gap-2">
+                        <input 
+                            type="number" 
+                            className="w-24 p-2 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none dark:bg-zinc-600 dark:text-white" 
+                            value={opcoes.configuracoes?.mlBebidaAdulto || 0} 
+                            onChange={(e) => setOpcoes({...opcoes, configuracoes: {...opcoes.configuracoes, mlBebidaAdulto: parseInt(e.target.value) || 0}})} 
+                        />
+                        <span className="font-medium dark:text-white">ml</span>
                     </div>
-                    <p style={adminStyles.cotaDesc}>* Sugestão de consumo por adulto.</p>
+                    <p className="mt-3 text-xs dark:text-white italic">* Sugestão de consumo por adulto.</p>
                 </div>
             </div>
 
             {/* FORMULÁRIO DE ADIÇÃO */}
-            <section style={styles.contentWrapper}>
-                <h3 style={adminStyles.addFormTitle}>➕ Adicionar Novo Item</h3>
-                <div style={adminStyles.addForm}>
-                    <input placeholder="Nome do item (ex: Picanha)" value={novoItem.nome} onChange={e => setNovoItem({ ...novoItem, nome: e.target.value })} style={adminStyles.input} />
+            <section className="bg-neutral-50 p-6 rounded-xl mb-10 dark:bg-zinc-800 dark:text-white border border-neutral-200 dark:border-zinc-800">
+                <h3 className="text-lg font-bold text-gray-700 mb-4 dark:text-neutral-200">➕ Adicionar Novo Item</h3>
+                <div className="flex flex-wrap gap-3">
+                    <input 
+                        placeholder="Nome do item (ex: Picanha)" 
+                        className="flex-1 min-w-[200px] p-3 border border-gray-300 rounded-xl focus:bg-white outline-none transition-all dark:bg-zinc-600 dark:text-white"
+                        value={novoItem.nome} 
+                        onChange={e => setNovoItem({ ...novoItem, nome: e.target.value })} 
+                    />
                     
-                    <select value={novoItem.categoria} onChange={e => {
-                        const cat = e.target.value;
-                        let sub = (cat === 'carnes') ? 'Bovina' : (cat === 'bebidas' ? 'Não Alcoólica' : '');
-                        setNovoItem({ ...novoItem, categoria: cat, subcategoria: sub });
-                    }} style={adminStyles.select}>
+                    <select 
+                        className="p-3 border border-gray-300 rounded-xl bg-white outline-none cursor-pointer dark:bg-zinc-600 dark:text-white"
+                        value={novoItem.categoria} 
+                        onChange={e => {
+                            const cat = e.target.value;
+                            let sub = (cat === 'carnes') ? 'Bovina' : (cat === 'bebidas' ? 'Não Alcoólica' : '');
+                            setNovoItem({ ...novoItem, category: cat, categoria: cat, subcategoria: sub });
+                        }}
+                    >
                         <option value="carnes">Carnes</option>
                         <option value="bebidas">Bebidas</option>
                         <option value="adicionais">Adicionais</option>
@@ -177,39 +192,66 @@ export default function AdminItem({ opcoes, setOpcoes, styles, adminStyles }) {
                     </select>
 
                     {novoItem.categoria === 'carnes' && (
-                        <select value={novoItem.subcategoria} onChange={e => setNovoItem({...novoItem, subcategoria: e.target.value})} style={adminStyles.select}>
+                        <select 
+                            className="p-3 border border-gray-300 rounded-xl bg-white outline-none dark:bg-zinc-600 dark:text-white"
+                            value={novoItem.subcategoria} 
+                            onChange={e => setNovoItem({...novoItem, subcategoria: e.target.value})}
+                        >
                             {['Bovina', 'Suína', 'Frango', 'Linguiças', 'Outras'].map(s => <option key={s} value={s}>{s}</option>)}
                         </select>
                     )}
 
                     {novoItem.categoria === 'bebidas' && (
-                        <select value={novoItem.subcategoria} onChange={e => setNovoItem({...novoItem, subcategoria: e.target.value})} style={adminStyles.select}>
+                        <select 
+                            className="p-3 border border-gray-300 rounded-xl bg-white outline-none"
+                            value={novoItem.subcategoria} 
+                            onChange={e => setNovoItem({...novoItem, subcategoria: e.target.value})}
+                        >
                             <option value="Não Alcoólica">Não Alcoólica</option>
                             <option value="Alcoólica">Alcoólica</option>
                         </select>
                     )}
 
-                    <button onClick={adicionarItem} style={adminStyles.addBtn}>ADICIONAR</button>
+                    <button 
+                        onClick={adicionarItem} 
+                        className="bg-gray-800 text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition-colors"
+                    >
+                        ADICIONAR
+                    </button>
                 </div>
             </section>
 
             {/* LISTAGEM DE ITENS POR CATEGORIA */}
             {Object.keys(opcoes).filter(k => Array.isArray(opcoes[k])).map(cat => (
-                <div key={cat} style={{...adminStyles.categorySection, border: '1px solid #ddd', padding: '15px', borderRadius: '12px', marginBottom: '30px'}}>
-                    <h3 style={{...adminStyles.categoryHeader, margin: '-15px -15px 15px -15px'}}>{cat.toUpperCase()}</h3>
-                    <div style={styles.grid}>
+                <div key={cat} className="p-4 rounded-xl mb-8 overflow-hidden shadow-xl dark:bg-zinc-800 dark:text-white border border-neutral-200 dark:border-zinc-800">
+                    <h3 className="-mx-4 -mt-4 mb-4 px-5 py-3 text-sm font-black uppercase tracking-widest border-b 
+                    bg-neutral-200 dark:bg-zinc-900 dark:text-white border border-neutral-200 dark:border-zinc-900">
+                        {cat.toUpperCase()}
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {opcoes[cat].sort((a, b) => a.nome.localeCompare(b.nome)).map(item => (
-                            <div key={item.id} style={{...adminStyles.userCard, display: 'block'}}>
-                                <div style={{justifyContent: 'space-between', display: 'flex'}}>
-                                    <div><strong style={adminStyles.itemName}>{item.nome}</strong></div>
-                                    <span style={{...adminStyles.itemSub}}>
+                            <div key={item.id} className="p-4 rounded-xl hover:shadow-xl transition-shadow
+                            dark:bg-zinc-700 dark:text-white border border-neutral-200 dark:border-zinc-800">
+                                <div className="flex justify-between items-start mb-4">
+                                    <strong className="dark:text-white block truncate pr-2">{item.nome}</strong>
+                                    <span className="shrink-0">
                                         {cat === 'carnes' && (
-                                            <select style={adminStyles.smallSelect} value={item.subcategoria} onChange={e => atualizarCampoItem(cat, item.id, 'subcategoria', e.target.value)}>
+                                            <select 
+                                                className="text-[11px] p-1 border rounded outline-none
+                                                dark:bg-zinc-600 dark:text-white"
+                                                value={item.subcategoria} 
+                                                onChange={e => atualizarCampoItem(cat, item.id, 'subcategoria', e.target.value)}
+                                            >
                                                 {['Bovina', 'Suína', 'Frango', 'Linguiças', 'Outras'].map(s => <option key={s} value={s}>{s}</option>)}
                                             </select>
                                         )}
                                         { cat === 'bebidas' && (
-                                            <select style={adminStyles.smallSelect} value={item.subcategoria} onChange={e => atualizarCampoItem(cat, item.id, 'subcategoria', e.target.value)}>
+                                            <select 
+                                                className="text-[11px] p-1 border border-gray-200 rounded outline-none
+                                                dark:bg-zinc-600 dark:text-white"
+                                                value={item.subcategoria} 
+                                                onChange={e => atualizarCampoItem(cat, item.id, 'subcategoria', e.target.value)}
+                                            >
                                                 <option value="Não Alcoólica">Não Alcoólica</option>
                                                 <option value="Alcoólica">Alcoólica</option>
                                             </select>
@@ -217,53 +259,82 @@ export default function AdminItem({ opcoes, setOpcoes, styles, adminStyles }) {
                                     </span>
                                 </div>
 
-                                <div style={{...adminStyles.itemConfigs, justifyContent: 'space-between', alignItems: 'end',}}>
+                                <div className="flex justify-between items-end gap-2">
                                     {cat === 'carnes' && (
-                                        <div style={{...adminStyles.configField, flexDirection: 'column', alignItems: 'unset'}}>
-                                            <label>Peso Relativo:</label>
-                                            <input type="number" style={adminStyles.numInput} value={item.pesoRelativo} onChange={e => atualizarCampoItem(cat, item.id, 'pesoRelativo', e.target.value)} />
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[10px] dark:text-white font-bold uppercase">Peso Relativo:</label>
+                                            <input 
+                                                type="number" 
+                                                className="w-20 p-1.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-1 focus:ring-orange-300
+                                                dark:bg-zinc-600 dark:text-white" 
+                                                value={item.pesoRelativo} 
+                                                onChange={e => atualizarCampoItem(cat, item.id, 'pesoRelativo', e.target.value)} 
+                                            />
                                         </div>
                                     )}
 
                                     {cat === 'bebidas' && (
-                                        <div style={{...adminStyles.configField, flexDirection: 'column', alignItems: 'unset'}}>
-                                            <label>Embalagem:</label>
-                                            <div>
-                                                <input type="number" style={adminStyles.numInput} value={item.embalagem} onChange={e => atualizarCampoItem(cat, item.id, 'embalagem', e.target.value)} />
-                                                <span> ml</span>
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[10px] dark:text-white font-bold uppercase">Embalagem:</label>
+                                            <div className="flex items-center gap-1">
+                                                <input 
+                                                    type="number" 
+                                                    className="w-20 p-1.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-1 focus:ring-blue-300
+                                                    dark:bg-zinc-600 dark:text-white" 
+                                                    value={item.embalagem} 
+                                                    onChange={e => atualizarCampoItem(cat, item.id, 'embalagem', e.target.value)} 
+                                                />
+                                                <span className="text-xs dark:text-white">ml</span>
                                             </div>
                                         </div>
                                     )}
 
                                     {(cat === 'acompanhamentos' || cat === 'adicionais' || cat === 'sobremesas') && (
-                                        <div style={{...adminStyles.configField, flexDirection: 'column', alignItems: 'unset'}}>
-                                            <label>Quantidade por Adulto:</label>
-                                            <div>
-                                                <input type="number" style={adminStyles.numInput} value={item.gramasPorAdulto || item.qtdPorAdulto} onChange={e => atualizarCampoItem(cat, item.id, item.gramasPorAdulto !== undefined ? 'gramasPorAdulto' : 'qtdPorAdulto', e.target.value)} />
-                                                <span> {!item.unidade ? 'g' : item.unidade}</span>
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[10px] dark:text-white font-bold uppercase">Qtd por Adulto:</label>
+                                            <div className="flex items-center gap-1">
+                                                <input 
+                                                    type="number" 
+                                                    className="w-20 p-1.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-1 focus:ring-green-300
+                                                    dark:bg-zinc-600 dark:text-white" 
+                                                    value={item.gramasPorAdulto || item.qtdPorAdulto} 
+                                                    onChange={e => atualizarCampoItem(cat, item.id, item.gramasPorAdulto !== undefined ? 'gramasPorAdulto' : 'qtdPorAdulto', e.target.value)} 
+                                                />
+                                                <span className="text-xs text-gray-400"> {!item.unidade ? 'g' : item.unidade}</span>
                                             </div>
                                         </div>
                                     )}
 
                                     {cat === 'utensilios' && (
-                                        <>
-                                            <div style={{...adminStyles.configField, flexDirection: 'column', alignItems: 'unset'}}>
-                                                <label>Fator:</label>
-                                                <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                                                    <input type="number" step="0.1" style={adminStyles.numInput} value={item.fator} onChange={e => atualizarCampoItem(cat, item.id, 'fator', e.target.value)} />
-                                                    <select style={adminStyles.smallSelect} value={item.base} onChange={e => atualizarCampoItem(cat, item.id, 'base', e.target.value)}>
-                                                        <option value="pessoa">p/ Pessoa</option>
-                                                        <option value="carne">p/ kg Carne</option>
-                                                        <option value="fixo">Fixo</option>
-                                                    </select>
-                                                </div>
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[10px] dark:text-white font-bold uppercase">Fator:</label>
+                                            <div className="flex items-center gap-2">
+                                                <input 
+                                                    type="number" 
+                                                    step="0.1" 
+                                                    className="w-16 p-1.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-1 focus:ring-purple-300
+                                                    dark:bg-zinc-600 dark:text-white" 
+                                                    value={item.fator} 
+                                                    onChange={e => atualizarCampoItem(cat, item.id, 'fator', e.target.value)} 
+                                                />
+                                                <select 
+                                                    className="text-[11px] p-1.5 border border-gray-200 rounded bg-gray-50 outline-none dark:bg-zinc-600 dark:text-white"
+                                                    value={item.base} 
+                                                    onChange={e => atualizarCampoItem(cat, item.id, 'base', e.target.value)}
+                                                >
+                                                    <option value="pessoa">p/ Pessoa</option>
+                                                    <option value="carne">p/ kg Carne</option>
+                                                    <option value="fixo">Fixo</option>
+                                                </select>
                                             </div>
-                                        </>
+                                        </div>
                                     )}
-                                    <div style={adminStyles.itemActions}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#333', borderRadius: '6px', border: '1px solid #ccc', padding: '6px 8px', marginTop: '4px', cursor: 'pointer' }}>
+
+                                    <div className="flex flex-col gap-2">
+                                        <label className={`flex items-center gap-2 text-[10px] border rounded-xl px-2 py-1.5 cursor-pointer transition-colors ${item.ativo ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
                                             <input 
                                                 type="checkbox" 
+                                                className="accent-green-600"
                                                 checked={item.ativo || false} 
                                                 onChange={() => {
                                                     const novos = { ...opcoes };
@@ -272,30 +343,29 @@ export default function AdminItem({ opcoes, setOpcoes, styles, adminStyles }) {
                                                     setOpcoes(novos);
                                                 }} 
                                             /> 
-                                            <strong>{item.ativo ? 'Ativo' : 'Inativo'}</strong>
+                                            <strong className="uppercase">{item.ativo ? 'Ativo' : 'Inativo'}</strong>
                                         </label>
                                         
                                         <button 
                                             onClick={() => {if(window.confirm('Excluir item?')){ const n = {...opcoes}; n[cat] = n[cat].filter(x => x.id !== item.id); salvarNoServidor(n); }}}
-                                            style={{...adminStyles.deleteBtn, fontSize: '12px', backgroundColor: '#d9534f', padding: '8px 10px', borderRadius: '6px'}}
+                                            className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-xl transition-colors text-xs"
                                         >
                                             🗑️
                                         </button>
                                     </div>
                                 </div>
-
                             </div>
                         ))}
                     </div>
                 </div>
             ))}
 
-            <div style={{ position: 'sticky', bottom: '20px', textAlign: 'right', marginRight: '20px', zIndex: 1000 }}>
+            <div className="fixed bottom-8 right-8 z-[1000]">
                 <button 
                     onClick={() => salvarNoServidor(opcoes)} 
-                    style={{ ...adminStyles.saveBtn, backgroundColor: '#2299FF', boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-black px-8 py-4 rounded-full flex items-center gap-2 transform hover:scale-105 transition-all active:scale-95"
                 >
-                    💾 Salvar Alterações
+                    <span className="text-xl">💾</span> Salvar Alterações
                 </button>
             </div>
         </div>

@@ -6,24 +6,18 @@ const AdBanner = ({ slot }) => {
             try {
                 (window.adsbygoogle = window.adsbygoogle || []).push({});
             } catch (e) {
-                console.error(e);
+                console.error("Erro ao carregar AdSense:", e);
             }
         }
     }, []);
 
     return (
-        <div style={{ 
-            textAlign: 'center', 
-            margin: '10px 0', // Reduzi a margem
-            overflow: 'hidden', 
-            maxHeight: '100px', // Limita a altura para não ser um "quadradão"
-            background: 'transparent'
-        }}>
+        <div className="text-center my-3 overflow-hidden max-h-[100px] bg-transparent flex justify-center items-center">
             <ins className="adsbygoogle"
-                style={{ display: 'inline-block', width: '100%', height: '90px' }} // Altura fixa menor
+                style={{ display: 'inline-block', width: '100%', height: '90px' }}
                 data-ad-client="ca-pub-2950297102005696"
                 data-ad-slot={slot}
-                data-ad-format="horizontal" // Força o formato horizontal/fino
+                data-ad-format="horizontal"
                 data-full-width-responsive="false"></ins> 
         </div>
     );

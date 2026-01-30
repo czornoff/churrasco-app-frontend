@@ -1,6 +1,6 @@
 {
     "name": "calculo-de-churrasco",
-    "version": "2.1.1",
+    "version": "2.2.1",
     "private": true,
     "homepage": "https://mandebem.com/calculodechurrasco",
     "_comment_homepage": "/calculodechurrasco",
@@ -46,6 +46,9 @@
         ]
     },
     "devDependencies": {
-        "dotenv-cli": "^11.0.0"
+        "autoprefixer": "^10.4.23",
+        "dotenv-cli": "^11.0.0",
+        "postcss": "^8.5.6",
+        "tailwindcss": "^3.4.19"
     }
 }
