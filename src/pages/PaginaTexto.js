@@ -7,7 +7,7 @@ export default function PaginaTexto({ titulo, texto }) {
         return (
             <div className="h-screen flex flex-col justify-center items-center bg-neutral-50 dark:bg-zinc-950 transition-colors">
                 <div className="text-6xl mb-6 animate-bounce">🔥</div>
-                <h2 className="text-2xl font-black text-orange-700 dark:text-orange-400 mb-2 uppercase">
+                <h2 className="text-2xl font-black text-primary-700 dark:text-primary-400 mb-2 uppercase">
                     Preparando a brasa...
                 </h2>
                 <p className="text-neutral-500 dark:text-zinc-400 font-medium animate-pulse">
@@ -27,7 +27,7 @@ export default function PaginaTexto({ titulo, texto }) {
                     <div className="mt-8 w-full flex justify-center">
                         <Link 
                             to="/calculadora" 
-                            className="w-full max-w-sm bg-orange-700 hover:bg-orange-400 text-white text-lg font-black py-5 rounded-xl transition-all shadow-xl hover:scale-110 active:scale-95 text-center no-underline"
+                            className="w-full max-w-sm bg-primary-700 hover:bg-primary-400 text-white text-lg font-black py-5 rounded-xl transition-all shadow-xl hover:scale-110 active:scale-95 text-center no-underline"
                         >
                             🔥 CALCULE AGORA! 🔥
                         </Link>

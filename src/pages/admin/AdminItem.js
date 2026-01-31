@@ -111,7 +111,7 @@ export default function AdminItem({ opcoes, setOpcoes, styles, adminStyles }) {
                         <h1 className="text-3xl font-black text-neutral-900 dark:text-white mb-0 tracking-tight uppercase">
                             Itens e Cálculos
                         </h1>
-                        <p className="text-1 text-orange-700 dark:text-orange-400 font-medium mt-0">
+                        <p className="text-1 text-primary-700 dark:text-primary-400 font-medium mt-0">
                             Configure gramaturas, carnes, bebidas e acompanhamentos do sistema.
                         </p>
                     </div>
@@ -265,7 +265,7 @@ export default function AdminItem({ opcoes, setOpcoes, styles, adminStyles }) {
                                             <label className="text-[10px] dark:text-white font-bold uppercase">Peso Relativo:</label>
                                             <input 
                                                 type="number" 
-                                                className="w-20 p-1.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-1 focus:ring-orange-300
+                                                className="w-20 p-1.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-1 focus:ring-primary-300
                                                 dark:bg-zinc-600 dark:text-white" 
                                                 value={item.pesoRelativo} 
                                                 onChange={e => atualizarCampoItem(cat, item.id, 'pesoRelativo', e.target.value)} 

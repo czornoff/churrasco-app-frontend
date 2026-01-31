@@ -101,7 +101,7 @@ export default function Calculadora({ dados, opcoes, usuario }) {
 
     const ColunaCarne = (sub) => (
         <div key={sub} className="bg-white dark:bg-zinc-800 p-5 rounded-xl border border-neutral-200 dark:border-zinc-800 shadow-xl flex-1 min-w-[200px]">
-            <strong className="block text-sm font-black text-orange-700 dark:text-orange-400 mb-4 uppercase tracking-wider">
+            <strong className="block text-sm font-black text-primary-700 dark:text-primary-400 mb-4 uppercase tracking-wider">
                 {EMOJIS[sub]} {sub}
             </strong>
             <div className="space-y-3">
@@ -113,10 +113,10 @@ export default function Calculadora({ dados, opcoes, usuario }) {
                             <input 
                                 type="checkbox" 
                                 id={`it-${c.id}`} 
-                                className="w-5 h-5 rounded border-neutral-200 text-orange-700 focus:ring-orange-400 cursor-pointer"
+                                className="w-5 h-5 rounded border-neutral-200 text-primary-700 focus:ring-primary-400 cursor-pointer"
                                 onChange={() => handleToggle(c.id)} 
                             />
-                            <label htmlFor={`it-${c.id}`} className="ml-3 text-sm font-medium text-neutral-700 dark:text-zinc-300 group-hover:text-orange-700 dark:group-hover:text-orange-400 transition-colors cursor-pointer">
+                            <label htmlFor={`it-${c.id}`} className="ml-3 text-sm font-medium text-neutral-700 dark:text-zinc-300 group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors cursor-pointer">
                                 {c.nome}
                             </label>
                         </div>
@@ -131,7 +131,7 @@ export default function Calculadora({ dados, opcoes, usuario }) {
                 {/* Botão de Ajuda */}
                 <button 
                     onClick={() => setAjudaAberta(true)} 
-                    className="fixed bottom-8 right-8 z-40 w-14 h-14 bg-orange-700 hover:bg-orange-400 text-white rounded-full flex items-center justify-center text-2xl hover:scale-110 active:scale-95 transition-all font-black shadow-xl"
+                    className="fixed bottom-8 right-8 z-40 w-14 h-14 bg-primary-700 hover:bg-primary-400 text-white rounded-full flex items-center justify-center text-2xl hover:scale-110 active:scale-95 transition-all font-black shadow-xl"
                 >
                     ?
                 </button>
@@ -149,7 +149,7 @@ export default function Calculadora({ dados, opcoes, usuario }) {
                             />
                             <button 
                                 onClick={() => setAjudaAberta(false)} 
-                                className="w-full bg-neutral-900 dark:bg-orange-700 text-white font-black py-4 rounded-xl hover:bg-orange-700 dark:hover:bg-orange-400 hover:text-white transition-all"
+                                className="w-full bg-neutral-900 dark:bg-primary-700 text-white font-black py-4 rounded-xl hover:bg-primary-700 dark:hover:bg-primary-400 hover:text-white transition-all"
                             >
                                 ENTENDI!
                             </button>
@@ -168,7 +168,7 @@ export default function Calculadora({ dados, opcoes, usuario }) {
                                 type="number" 
                                 min="0" 
                                 value={pessoas[campo]} 
-                                className="w-full bg-neutral-50 dark:bg-zinc-700 border-none rounded-xl text-xl font-bold text-neutral-800 dark:text-white focus:ring-2 focus:ring-orange-400 px-6 py-2 text-center"
+                                className="w-full bg-neutral-50 dark:bg-zinc-700 rounded-xl text-xl font-bold text-neutral-800 dark:text-white px-6 py-2 text-left focus:ring-2 focus:ring-primary-400 outline-none "
                                 onChange={e => {
                                     let val = parseInt(e.target.value) || 0;
                                     if (campo === 'adultosQueBebem') val = Math.min(val, pessoas.homens + pessoas.mulheres);
@@ -182,7 +182,7 @@ export default function Calculadora({ dados, opcoes, usuario }) {
                 {/* Seleção de Carnes */}
                 <section className="mb-12">
                     <h3 className="text-2xl font-black text-neutral-800 dark:text-white mb-6 uppercase flex items-center gap-3">
-                        <span className="w-8 h-8 bg-orange-700 rounded-xl flex items-center justify-center text-white text-sm">1</span>
+                        <span className="w-8 h-8 bg-primary-700 rounded-xl flex items-center justify-center text-white text-sm">1</span>
                         Selecione as Carnes
                     </h3>
                     <div className="flex flex-wrap gap-4">
@@ -193,7 +193,7 @@ export default function Calculadora({ dados, opcoes, usuario }) {
                 {/* Outros Itens */}
                 <section className="mb-12">
                     <h3 className="text-2xl font-black text-neutral-800 dark:text-white mb-6 uppercase flex items-center gap-3">
-                        <span className="w-8 h-8 bg-orange-700 rounded-xl flex items-center justify-center text-white text-sm">2</span>
+                        <span className="w-8 h-8 bg-primary-700 rounded-xl flex items-center justify-center text-white text-sm">2</span>
                         Outros Itens
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -205,7 +205,7 @@ export default function Calculadora({ dados, opcoes, usuario }) {
                                 <div className="space-y-3">
                                     {opcoes[cat].filter(i => i.ativo).map(i => (
                                         <div key={i.id} className="flex items-center group cursor-pointer">
-                                            <input type="checkbox" id={`it-${i.id}`} className="w-4 h-4 rounded border-neutral-200 text-orange-700 focus:ring-orange-400" onChange={() => handleToggle(i.id)} />
+                                            <input type="checkbox" id={`it-${i.id}`} className="w-4 h-4 rounded border-neutral-200 text-primary-700 focus:ring-primary-400" onChange={() => handleToggle(i.id)} />
                                             <label htmlFor={`it-${i.id}`} className="ml-2 text-xs font-bold text-neutral-600 dark:text-zinc-400 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors cursor-pointer">{i.nome}</label>
                                         </div>
                                     ))}
@@ -217,7 +217,7 @@ export default function Calculadora({ dados, opcoes, usuario }) {
                 <div className="mt-8 w-full flex justify-center">
                     <button 
                         onClick={calcular} 
-                        className="w-full max-w-sm bg-orange-700 hover:bg-orange-400 text-white text-lg font-black py-5 rounded-xl transition-all shadow-xl hover:scale-110 active:scale-95 text-center no-underline"
+                        className="w-full max-w-sm bg-primary-700 hover:bg-primary-400 text-white text-lg font-black py-5 rounded-xl transition-all shadow-xl hover:scale-110 active:scale-95 text-center no-underline"
                     >
                         📑 GERAR LISTA DE COMPRAS
                     </button>
@@ -245,9 +245,9 @@ function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar, gerarEstim
         <div className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-4 bg-black/80 backdrop-blur-md">
             <div className="bg-white dark:bg-zinc-900 w-full max-w-3xl h-full md:h-auto md:max-h-[90vh] overflow-y-auto md:rounded-2xl p-6 md:p-10 shadow-xl relative">
                 
-                <h2 className="text-3xl font-black text-red-600 dark:text-red-500 mb-6 uppercase tracking-tighter">📋 Lista Gerada</h2>
+                <h2 className="text-2xl font-black text-primary-700 dark:text-red-500 mb-6 uppercase tracking-tighter">📋 Lista Gerada</h2>
                 
-                <div className="bg-neutral-100 dark:bg-zinc-800 p-4 rounded-xl mb-8 flex justify-center gap-6 text-sm font-bold text-neutral-600 dark:text-zinc-300">
+                <div className="bg-neutral-100 dark:bg-zinc-800 p-4 rounded-xl mb-8 flex justify-center gap-6 text-md font-bold text-neutral-600 dark:text-zinc-300">
                     <span>🧔 {pessoas.homens}</span>
                     <span>👩 {pessoas.mulheres}</span>
                     <span>👶 {pessoas.criancas}</span>
@@ -258,7 +258,7 @@ function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar, gerarEstim
                     <button 
                         onClick={usuario ? () => enviarWhatsApp(pessoas, resultado) : undefined}
                         disabled={!usuario}
-                        className={`flex items-center justify-center gap-2 py-4 rounded-xl font-black transition-all ${usuario ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'}`}
+                        className={`flex items-center justify-center gap-2 py-4 rounded-xl font-bold transition-all ${usuario ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'}`}
                     >
                         📱 WhatsApp
                     </button>
@@ -266,7 +266,7 @@ function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar, gerarEstim
                     <button 
                         onClick={gerarEstimativaComIA} 
                         disabled={!usuario || carregandoIA}
-                        className={`flex items-center justify-center gap-2 py-4 rounded-xl font-black transition-all ${usuario ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'}`}
+                        className={`flex items-center justify-center gap-2 py-4 rounded-xl font-bold transition-all ${usuario ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'}`}
                     >
                         {carregandoIA ? "⏳ Calculando..." : "💰 Estimativa IA"}
                     </button>
@@ -282,7 +282,7 @@ function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar, gerarEstim
                 {estimativa && (
                     <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-xl mb-8 border-l-8 border-green-500">
                         <h4 className="text-green-700 dark:text-green-400 font-black mb-4 uppercase text-sm tracking-widest">💰 Custos Estimados (IA)</h4>
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                             {estimativa.grupos.map((g, i) => (
                                 <div key={i} className="flex justify-between text-sm text-neutral-600 dark:text-zinc-300">
                                     <span>{g.nome}:</span>
@@ -309,15 +309,15 @@ function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar, gerarEstim
                         if (itens.length === 0) return null;
                         return (
                             <div key={tipo}>
-                                <h4 className="text-[10px] font-black text-orange-700 dark:text-orange-400 uppercase tracking-[0.2em] mb-4 border-b border-orange-400 dark:border-orange-700/30 pb-2">{tipo}</h4>
+                                <h4 className="text-sm font-black text-primary-700 dark:text-primary-400 uppercase tracking-[0.2em] mb-2 border-b border-primary-400 dark:border-primary-700 pb-0">{tipo}</h4>
                                 <div className="space-y-1">
                                     {itens.map((r, i) => (
                                         <div 
                                             key={i} 
-                                            className={`flex justify-between py-2 px-3 rounded-xl text-sm transition-colors ${r.subtipo === 'subtotal' ? 'bg-neutral-50 dark:bg-zinc-800/50 font-black text-neutral-900 dark:text-white mt-2' : r.subtipo === 'total_secao' ? 'bg-neutral-900 text-white dark:bg-zinc-100 dark:text-neutral-900 font-black mt-4' : 'text-neutral-600 dark:text-zinc-400'}`}
+                                            className={`flex justify-between px-3 rounded-xl text-sm transition-colors ${r.subtipo === 'subtotal' ? 'bg-neutral-50 dark:bg-zinc-800/50 font-black text-neutral-900 dark:text-white mt-2' : r.subtipo === 'total_secao' ? 'bg-neutral-900 text-white dark:bg-zinc-100 dark:text-neutral-900 font-black mt-4' : 'text-neutral-600 dark:text-zinc-400'}`}
                                         >
-                                            <span className={r.subtipo === 'observacao' ? 'text-xs opacity-75' : ''}>{r.nome}</span>
-                                            <span className="font-mono">{r.quantidade}</span>
+                                            <span className={r.subtipo === 'observacao' ? 'font-medium text-sm opacity-50' : ''}>{r.nome}</span>
+                                            <span className="font-mono font-black">{r.quantidade}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -332,7 +332,7 @@ function ModalResultado({ resultado, pessoas, enviarWhatsApp, fechar, gerarEstim
 
                 <button 
                     onClick={fechar} 
-                    className="w-full bg-neutral-200 dark:bg-red-800 text-neutral-600 dark:text-zinc-300 font-black py-4 rounded-xl hover:bg-neutral-300 dark:hover:bg-orange-400 transition-all"
+                    className="w-full bg-primary-700 dark:bg-primary-400 text-white font-black py-4 rounded-xl hover:bg-neutral-300 dark:hover:bg-primary-400 transition-all hover:scale-110 active:scale-95"
                 >
                     FECHAR
                 </button>

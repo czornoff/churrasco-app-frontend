@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Login from './components/Login';
 import Header from './components/Header';
 import BadgeLimite from './components/BadgeLimite';
@@ -21,6 +21,15 @@ import Receitas from './pages/Receitas';
 import Relatorio from './pages/Relatorio';
 
 const API_URL = process.env.REACT_APP_API_URL;
+
+// Componente para rolar ao topo automaticamente em cada troca de rota
+function ScrollToTop() {
+    const { pathname } = useLocation();
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname]);
+    return null;
+}
 
 export default function App() {
     const [opcoes, setOpcoes] = useState(null);
@@ -56,7 +65,7 @@ export default function App() {
             });
             setShowModalComplemento(true);
         }
-    }, [usuario]);
+    }, []);
 
     const aplicarMascaraWhatsapp = (value) => {
         if (!value) return "";
@@ -117,7 +126,7 @@ export default function App() {
             }
         };
         carregarTudo();
-    }, [atualizador]);
+    }, [atualizador, abrirEdicao]);
 
     const salvarDadosPerfil = async (e) => {
         e.preventDefault();
@@ -145,7 +154,7 @@ export default function App() {
         return (
             <div className="h-screen flex flex-col justify-center items-center bg-neutral-50 dark:bg-zinc-950 transition-colors">
                 <div className="text-6xl mb-6 animate-bounce">🔥</div>
-                <h2 className="text-2xl font-black text-orange-700 dark:text-orange-400 mb-2 uppercase">
+                <h2 className="text-2xl font-black text-primary-700 dark:text-primary-400 mb-2 uppercase">
                     Preparando a brasa...
                 </h2>
                 <p className="text-neutral-500 dark:text-zinc-400 font-medium animate-pulse">
@@ -157,22 +166,24 @@ export default function App() {
 
     return (
         <Router basename="/calculodechurrasco">
+            <ScrollToTop />
             
             <style>{`
                 :root {
                     --cor-primary: ${corPrimary};
                     --cor-primary-hover: ${corPrimary}cc; /* 80% opacidade */
                 }
-                .text-orange-700, .text-orange-400 { color: var(--cor-primary) !important; }
-                .bg-orange-700, .bg-orange-400 { background-color: var(--cor-primary) !important; }
-                .border-orange-700, .border-orange-400 { border-color: var(--cor-primary) !important; }
-                .focus\\:ring-orange-400:focus { --tw-ring-color: var(--cor-primary) !important; }
-                .shadow-orange-500\\/20 { --tw-shadow-color: var(--cor-primary) !important; }
-                .hover\\:bg-orange-400:hover { background-color: var(--cor-primary-hover) !important; }
-                .hover\\:text-orange-400:hover { color: var(--cor-primary-hover) !important; }
+                .bg-primary-700, .bg-primary-400 { background-color: var(--cor-primary) !important; }
+                .border-primary-700, .border-primary-400 { border-color: var(--cor-primary) !important; }
+                .focus\\:ring-primary-400:focus { --tw-ring-color: var(--cor-primary) !important; }
+                .text-primary-700, .text-primary-400 { color: var(--cor-primary) !important; }
+                .shadow-primary-500\\/20 { --tw-shadow-color: var(--cor-primary) !important; }
+                .hover\\:bg-primary-400:hover { background-color: var(--cor-primary-hover) !important; }
+                .hover\\:border-primary-400:hover { border-color: var(--cor-primary-hover) !important; }
+                .hover\\:text-primary-400:hover { color: var(--cor-primary-hover) !important; }
             `}</style>
 
-            <div className="flex flex-col min-h-screen bg-white dark:bg-zinc-950 text-neutral-900 dark:text-zinc-100 transition-colors duration-300">
+            <div className="flex flex-col min-h-screen bg-white dark:bg-zinc-900 text-neutral-900 dark:text-zinc-100 transition-colors duration-300 rounded-xl">
                 <Header dados={conteudo} usuario={usuario} abrirPerfil={() => abrirEdicao()}/> 
                 
                 <main className="flex-grow">
@@ -209,10 +220,10 @@ export default function App() {
                     </div>
 
                     {exibirDicaIOS && (
-                        <div className="fixed bottom-20 left-4 right-4 z-[60] bg-white dark:bg-zinc-900 border-t-4 border-orange-400 shadow-xl p-6 rounded-xl animate-in slide-in-from-bottom duration-500">
+                        <div className="fixed bottom-20 left-4 right-4 z-[60] bg-white dark:bg-zinc-900 border-t-4 border-primary-400 shadow-xl p-6 rounded-xl animate-in slide-in-from-bottom duration-500">
                             <h4 className="font-black text-neutral-900 dark:text-white uppercase mb-2">📲 Instale o App</h4>
                             <p className="text-sm mb-4">No seu iPhone: toque em <strong>Compartilhar</strong> 📤 e depois em <strong>Adicionar à Tela de Início</strong> ➕</p>
-                            <button onClick={() => setExibirDicaIOS(false)} className="w-full bg-orange-700 text-white font-black py-3 rounded-xl uppercase tracking-tighter">Entendi</button>
+                            <button onClick={() => setExibirDicaIOS(false)} className="w-full bg-primary-700 text-white font-black py-3 rounded-xl uppercase tracking-tighter">Entendi</button>
                         </div>
                     )}
                 </main>
@@ -233,13 +244,13 @@ export default function App() {
                                 <form onSubmit={salvarDadosPerfil} className="flex flex-col gap-4">
                                     <div className="space-y-1">
                                         <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">Nome Completo</label>
-                                        <input required className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold focus:ring-2 focus:ring-orange-400 transition-all"
+                                        <input required className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold focus:ring-2 focus:ring-primary-400 transition-all"
                                             value={complementoData.nome} onChange={e => setComplementoData({ ...complementoData, nome: e.target.value })} />
                                     </div>
 
                                     <div className="space-y-1">
                                         <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">E-mail</label>
-                                        <input required readOnly={!!usuario.googleId} className={`w-full px-4 py-3 rounded-xl border-none font-bold ${usuario.googleId ? 'bg-neutral-200 dark:bg-zinc-700 opacity-60 cursor-not-allowed' : 'bg-neutral-100 dark:bg-zinc-800 focus:ring-2 focus:ring-orange-400'}`}
+                                        <input required readOnly={!!usuario.googleId} className={`w-full px-4 py-3 rounded-xl border-none font-bold ${usuario.googleId ? 'bg-neutral-200 dark:bg-zinc-700 opacity-60 cursor-not-allowed' : 'bg-neutral-100 dark:bg-zinc-800 focus:ring-2 focus:ring-primary-400'}`}
                                             value={complementoData.email} onChange={e => setComplementoData({ ...complementoData, email: e.target.value })} />
                                         {usuario?.googleId && (
                                             <div className="flex items-center gap-2 mt-2 p-2 bg-amber-50 dark:bg-amber-900/10 text-amber-600 dark:text-amber-400 rounded-xl text-[10px] font-bold">
@@ -292,7 +303,7 @@ export default function App() {
                                         </select>
                                     </div>
 
-                                    <button type="submit" className="mt-4  py-4 rounded-xl uppercase tracking-tighter shadow-xl transition-all bg-orange-700 hover:bg-orange-400 text-white text-lg font-black hover:scale-110 active:scale-95 text-center ">
+                                    <button type="submit" className="mt-4  py-4 rounded-xl uppercase tracking-tighter shadow-xl transition-all bg-primary-700 hover:bg-primary-400 text-white text-lg font-black hover:scale-110 active:scale-95 text-center ">
                                         Salvar e Continuar
                                     </button>
                                 </form>

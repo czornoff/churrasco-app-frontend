@@ -54,7 +54,7 @@ export default function AdminRelatorio() {
     if (loading) return (
         <div className="flex flex-col h-screen justify-center items-center bg-neutral-50 dark:bg-zinc-950">
             <div className="text-6xl animate-bounce mb-4">🔥</div>
-            <h2 className="text-2xl font-black text-orange-700 uppercase tracking-tighter">Preparando a brasa...</h2>
+            <h2 className="text-2xl font-black text-primary-700 uppercase tracking-tighter">Preparando a brasa...</h2>
             <p className="text-neutral-500 font-bold animate-pulse">Carregando Relatórios</p>
         </div>
     );
@@ -71,7 +71,7 @@ export default function AdminRelatorio() {
                         <h1 className="text-3xl font-black text-neutral-900 dark:text-white mb-0 tracking-tight uppercase">
                             Relatórios
                         </h1>
-                        <p className="text-1 text-orange-700 dark:text-orange-400 font-medium mt-0">
+                        <p className="text-1 text-primary-700 dark:text-primary-400 font-medium mt-0">
                             Analise estatísticas de uso, cálculos gerados e tráfego do app
                         </p>
                     </div>
@@ -129,7 +129,7 @@ export default function AdminRelatorio() {
                     </div>
                     <button 
                         onClick={() => { setFiltroUsuario(''); setFiltroDataInicio(''); setFiltroDataFim(''); }}
-                        className="bg-red-500 hover:bg-red-800 text-white font-black py-3 rounded-xl uppercase text-sm tracking-widest transition-all
+                        className="bg-red-500 hover:bg-red-800 text-white font-black py-3 rounded-xl uppercase text-sm transition-all
                         hover:scale-110 active:scale-95"
                     >
                         Limpar Filtros
@@ -160,7 +160,7 @@ export default function AdminRelatorio() {
                                     <td className="px-6 py-4 text-sm font-bold text-neutral-600 dark:text-zinc-300">
                                         {new Date(log.dataConsulta).toLocaleString('pt-BR')}
                                     </td>
-                                    <td className="px-6 py-4 font-black uppercase tracking-tighter text-orange-700">
+                                    <td className="px-6 py-4 font-black uppercase tracking-tighter text-primary-700">
                                         {log.usuarioId?.nome || 'Anônimo'}
                                     </td>
                                     <td className="px-6 py-4 text-center whitespace-nowrap">
@@ -181,8 +181,7 @@ export default function AdminRelatorio() {
                                     <td className="px-6 py-4 text-right">
                                         <button 
                                             onClick={() => setLogSelecionado(log)}
-                                            className=" bg-orange-700 hover:bg-orange-400 text-white text-sm font-black px-4 py-2 rounded-xl uppercase tracking-widest dark:hover:text-white transition-all shadow-xl hover:scale-110 active:scale-95"
-
+                                            className=" bg-primary-700 hover:bg-primary-400 text-white text-sm font-black px-4 py-2 rounded-xl uppercase dark:hover:text-white transition-all shadow-xl hover:scale-110 active:scale-95"
                                         >
                                             👁️ Detalhes
                                         </button>
@@ -211,11 +210,11 @@ export default function AdminRelatorio() {
                                 {logSelecionado.resultadoFinal.map((item, idx) => {
                                     const isObs = item.subtipo === 'observacao';
                                     return (
-                                        <div key={idx} className={`flex justify-between items-center p-3 rounded-xl ${isObs ? 'bg-orange-50 dark:bg-orange-700/10 border border-orange-400 dark:border-orange-700/30' : 'bg-neutral-50 dark:bg-zinc-800'}`}>
-                                            <span className={`font-bold text-sm ${isObs ? 'text-orange-700 dark:text-orange-400' : 'text-neutral-700 dark:text-zinc-300'}`}>
+                                        <div key={idx} className={`flex justify-between items-center p-3 rounded-xl ${isObs ? 'bg-primary-50 dark:bg-primary-700/10 border border-primary-400 dark:border-primary-700/30' : 'bg-neutral-50 dark:bg-zinc-800'}`}>
+                                            <span className={`font-bold text-sm ${isObs ? 'text-primary-700 dark:text-primary-400' : 'text-neutral-700 dark:text-zinc-300'}`}>
                                                 {item.nome}
                                             </span>
-                                            <strong className={`font-black uppercase text-sm ${isObs ? 'text-orange-700 dark:text-orange-400' : 'text-neutral-900 dark:text-white'}`}>
+                                            <strong className={`font-black uppercase text-sm ${isObs ? 'text-primary-700 dark:text-primary-400' : 'text-neutral-900 dark:text-white'}`}>
                                                 {item.quantidade}
                                             </strong>
                                         </div>
@@ -226,7 +225,7 @@ export default function AdminRelatorio() {
 
                         <div className="p-6 bg-neutral-50 dark:bg-zinc-800/50 flex justify-center">
                             <button onClick={() => setLogSelecionado(null)} 
-                            className="w-full  bg-orange-700 hover:bg-orange-400 text-white font-black py-4 rounded-xl uppercase text-s tracking-widest transition-all hover:scale-110 active:scale-95">
+                            className="w-full  bg-primary-700 hover:bg-primary-400 text-white font-black py-4 rounded-xl uppercase text-s tracking-widest transition-all hover:scale-110 active:scale-95">
                                 Fechar Relatório
                             </button>
                         </div>

@@ -103,7 +103,7 @@ export default function Login() {
                             type="text" 
                             placeholder="Nome completo" 
                             required 
-                            className="w-full p-3 rounded-xl border border-neutral-200 dark:border-zinc-700 bg-transparent dark:text-white outline-none focus:ring-2 focus:ring-orange-400 transition-all placeholder:text-neutral-400 dark:placeholder:text-zinc-600"
+                            className="w-full p-3 rounded-xl border border-neutral-200 dark:border-zinc-700 bg-transparent dark:text-white outline-none focus:ring-2 focus:ring-primary-400 transition-all placeholder:text-neutral-400 dark:placeholder:text-zinc-600"
                             onChange={handleChange}
                         />
                     )}
@@ -112,7 +112,7 @@ export default function Login() {
                         type="email" 
                         placeholder="E-mail" 
                         required 
-                        className="w-full p-3 rounded-xl border border-neutral-200 dark:border-zinc-700 bg-transparent dark:text-white outline-none focus:ring-2 focus:ring-orange-400 transition-all placeholder:text-neutral-400 dark:placeholder:text-zinc-600"
+                        className="w-full p-3 rounded-xl border border-neutral-200 dark:border-zinc-700 bg-transparent dark:text-white outline-none focus:ring-2 focus:ring-primary-400 transition-all placeholder:text-neutral-400 dark:placeholder:text-zinc-600"
                         onChange={handleChange}
                     />
                     <input 
@@ -120,13 +120,13 @@ export default function Login() {
                         type="password" 
                         placeholder="Senha" 
                         required 
-                        className="w-full p-3 rounded-xl border border-neutral-200 dark:border-zinc-700 bg-transparent dark:text-white outline-none focus:ring-2 focus:ring-orange-400 transition-all placeholder:text-neutral-400 dark:placeholder:text-zinc-600"
+                        className="w-full p-3 rounded-xl border border-neutral-200 dark:border-zinc-700 bg-transparent dark:text-white outline-none focus:ring-2 focus:ring-primary-400 transition-all placeholder:text-neutral-400 dark:placeholder:text-zinc-600"
                         onChange={handleChange}
                     />
                     <button 
                         type="submit" 
                         className="w-full py-3 rounded-xl transition-all shadow-xl mt-2
-                        bg-orange-700 hover:bg-orange-400 text-white text-lg font-black hover:scale-110 active:scale-95 text-center no-underline"
+                        bg-primary-700 hover:bg-primary-400 text-white text-lg font-black hover:scale-110 active:scale-95 text-center no-underline"
                     >
                         {isRegistro ? 'Finalizar Cadastro' : 'Entrar'}
                     </button>
@@ -137,7 +137,7 @@ export default function Login() {
                         {isRegistro ? 'Já tem uma conta?' : 'Ainda não tem conta?'}
                         <span 
                             onClick={() => setIsRegistro(!isRegistro)} 
-                            className="ml-1 text-orange-700 dark:text-orange-400 font-bold cursor-pointer hover:underline"
+                            className="ml-1 text-primary-700 dark:text-primary-400 font-bold cursor-pointer hover:underline"
                         >
                             {isRegistro ? ' Faça Login' : ' Cadastre-se'}
                         </span>

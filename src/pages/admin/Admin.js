@@ -14,7 +14,7 @@ export default function Admin() {
                         <h1 className="text-3xl font-black text-neutral-900 dark:text-white mb-0 tracking-tight uppercase">
                             Painel Administrativo
                         </h1>
-                        <p className="text-1 text-orange-700 dark:text-orange-400 font-medium mt-0">
+                        <p className="text-1 text-primary-700 dark:text-primary-400 font-medium mt-0">
                             Bem-vindo à central de inteligência. Gerencie conteúdos, usuários e infraestrutura
                         </p>
                     </div>
@@ -24,7 +24,7 @@ export default function Admin() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 
                 {/* CARD: CONTEÚDO */}
-                <Link to="/admin/conteudo" className="group bg-white dark:bg-zinc-900 p-6 rounded-xl border border-neutral-200 dark:border-zinc-800 shadow-xl hover:shadow-xl hover:border-orange-400/50 transition-all duration-300 transform hover:-translate-y-1">
+                <Link to="/admin/conteudo" className="group bg-white dark:bg-zinc-900 p-6 rounded-xl border border-neutral-200 dark:border-zinc-800 shadow-xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:border-orange-400 dark:hover:border-orange-400">
                     <div className="flex items-start justify-between mb-4">
                         <span className="text-4xl group-hover:scale-125 transition-transform duration-300 block">📝</span>
                         <span className="bg-neutral-100 dark:bg-zinc-800 text-neutral-400 group-hover:text-orange-400 p-2 rounded-full transition-colors">
@@ -40,7 +40,7 @@ export default function Admin() {
                 </Link>
 
                 {/* CARD: ITENS */}
-                <Link to="/admin/item" className="group bg-white dark:bg-zinc-900 p-6 rounded-xl border border-neutral-200 dark:border-zinc-800 shadow-xl hover:shadow-xl hover:border-blue-500/50 transition-all duration-300 transform hover:-translate-y-1">
+                <Link to="/admin/item" className="group bg-white dark:bg-zinc-900 p-6 rounded-xl border border-neutral-200 dark:border-zinc-800 shadow-xl hover:shadow-xl hover:border-blue-500/50 transition-all duration-300 transform hover:-translate-y-1 hover:border-blue-400 dark:hover:border-blue-400">
                     <div className="flex items-start justify-between mb-4">
                         <span className="text-4xl group-hover:scale-125 transition-transform duration-300 block">⚙️</span>
                         <span className="bg-neutral-100 dark:bg-zinc-800 text-neutral-400 group-hover:text-blue-500 p-2 rounded-full transition-colors">
@@ -56,7 +56,7 @@ export default function Admin() {
                 </Link>
 
                 {/* CARD: IPS */}
-                <Link to="/admin/ips" className="group bg-white dark:bg-zinc-900 p-6 rounded-xl border border-neutral-200 dark:border-zinc-800 shadow-xl hover:shadow-xl hover:border-red-500/50 transition-all duration-300 transform hover:-translate-y-1">
+                <Link to="/admin/ips" className="group bg-white dark:bg-zinc-900 p-6 rounded-xl border border-neutral-200 dark:border-zinc-800 shadow-xl hover:shadow-xl hover:border-red-500/50 transition-all duration-300 transform hover:-translate-y-1 hover:border-red-400 dark:hover:border-red-400">
                     <div className="flex items-start justify-between mb-4">
                         <span className="text-4xl group-hover:scale-125 transition-transform duration-300 block">💻</span>
                         <span className="bg-neutral-100 dark:bg-zinc-800 text-neutral-400 group-hover:text-red-500 p-2 rounded-full transition-colors">
@@ -72,7 +72,7 @@ export default function Admin() {
                 </Link>
 
                 {/* CARD: USUÁRIOS */}
-                <Link to="/admin/usuarios" className="group bg-white dark:bg-zinc-900 p-6 rounded-xl border border-neutral-200 dark:border-zinc-800 shadow-xl hover:shadow-xl hover:border-emerald-500/50 transition-all duration-300 transform hover:-translate-y-1">
+                <Link to="/admin/usuarios" className="group bg-white dark:bg-zinc-900 p-6 rounded-xl border border-neutral-200 dark:border-zinc-800 shadow-xl hover:shadow-xl hover:border-emerald-500/50 transition-all duration-300 transform hover:-translate-y-1 hover:border-emerald-400 dark:hover:border-emerald-400">
                     <div className="flex items-start justify-between mb-4">
                         <span className="text-4xl group-hover:scale-125 transition-transform duration-300 block">👥</span>
                         <span className="bg-neutral-100 dark:bg-zinc-800 text-neutral-400 group-hover:text-emerald-500 p-2 rounded-full transition-colors">
@@ -88,7 +88,7 @@ export default function Admin() {
                 </Link>
 
                 {/* CARD: RELATÓRIOS */}
-                <Link to="/admin/relatorio" className="group bg-white dark:bg-zinc-900 p-6 rounded-xl border border-neutral-200 dark:border-zinc-800 shadow-xl hover:shadow-xl hover:border-purple-500/50 transition-all duration-300 transform hover:-translate-y-1">
+                <Link to="/admin/relatorio" className="group bg-white dark:bg-zinc-900 p-6 rounded-xl border border-neutral-200 dark:border-zinc-800 shadow-xl hover:shadow-xl hover:border-purple-500/50 transition-all duration-300 transform hover:-translate-y-1 hover:border-purple-400 dark:hover:border-purple-400">
                     <div className="flex items-start justify-between mb-4">
                         <span className="text-4xl group-hover:scale-125 transition-transform duration-300 block">📊</span>
                         <span className="bg-neutral-100 dark:bg-zinc-800 text-neutral-400 group-hover:text-purple-500 p-2 rounded-full transition-colors">

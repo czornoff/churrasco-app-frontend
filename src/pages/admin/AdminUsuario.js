@@ -78,7 +78,7 @@ export default function Usuarios() {
     if (loading) {
         return (
             <div className="flex flex-col justify-center items-center h-64 space-y-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-700"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-700"></div>
                 <h3 className="font-black text-neutral-400 uppercase tracking-widest text-xs">Carregando usuários...</h3>
             </div>
         );
@@ -96,7 +96,7 @@ export default function Usuarios() {
                         <h1 className="text-3xl font-black text-neutral-900 dark:text-white mb-0 tracking-tight uppercase">
                             Usuários
                         </h1>
-                        <p className="text-1 text-orange-700 dark:text-orange-400 font-medium mt-0">
+                        <p className="text-1 text-primary-700 dark:text-primary-400 font-medium mt-0">
                             Controle níveis de acesso, permissões de admin e visualize perfis
                         </p>
                     </div>
@@ -105,7 +105,7 @@ export default function Usuarios() {
             <div className="max-w-7xl mx-auto pb-2 flex justify-end">
                 <button 
                     onClick={() => setMostrarModalAdicao(true)} 
-                    className="flex gap-2 text-white font-black py-3 px-6 rounded-xl uppercase text-xs tracking-widest transition-all shadow-xl active:scale-95 items-end bg-orange-700 hover:bg-orange-400 hover:scale-110 active:scale-95"
+                    className="flex gap-2 text-white font-black py-3 px-6 rounded-xl uppercase text-xs tracking-widest transition-all shadow-xl active:scale-95 items-end bg-primary-700 hover:bg-primary-400 hover:scale-110 active:scale-95"
                 >
                     + Novo Usuário
                 </button>
@@ -130,10 +130,10 @@ export default function Usuarios() {
                                 <p className="text-xs text-neutral-500 font-bold truncate mb-3">{user.email}</p>
                                 
                                 <div className="flex flex-wrap gap-2">
-                                    <span className={`text-[10px] font-black px-2 py-1 rounded-xl uppercase ${user.role === 'admin' ? 'bg-orange-400 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>
+                                    <span className={`text-xs font-bold px-2 py-1 rounded-xl uppercase ${user.role === 'admin' ? 'bg-orange-400 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>
                                         {user.role}
                                     </span>
-                                    <span className={`text-[10px] font-black px-2 py-1 rounded-xl uppercase ${user.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                                    <span className={`text-xs font-bold px-2 py-1 rounded-xl uppercase ${user.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
                                         {user.status}
                                     </span>
                                 </div>
@@ -144,7 +144,7 @@ export default function Usuarios() {
                             <button 
                                 onClick={() => setUsuarioEditando(user)} 
                                 
-                                className="flex-1 bg-orange-700 hover:bg-orange-400 text-white text-xs font-[700] uppercase py-2 rounded-xl transition-colors hover:scale-110 active:scale-95"
+                                className="flex-1 bg-primary-700 hover:bg-primary-400 text-white text-xs font-[700] uppercase py-2 rounded-xl transition-colors hover:scale-110 active:scale-95"
                             >
                                 Detalhes / Editar
                             </button>
@@ -171,31 +171,34 @@ export default function Usuarios() {
                                 <button onClick={() => setUsuarioEditando(null)} className="text-neutral-400 hover:text-red-500 text-2xl">×</button>
                             </div>
                             
-                            <div className="grid grid-cols-2 gap-4 mb-8 bg-neutral-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-neutral-200 dark:border-zinc-800">
+                            <div className="space-y-1 mb-2">
+                                <p className="text-lg font-black dark:text-white">{usuarioEditando.nome}</p>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 mb-3 bg-neutral-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-neutral-200 dark:border-zinc-800 ">
                                 <div className="space-y-1">
-                                    <p className="text-[9px] font-black text-neutral-400 uppercase">Aniversário</p>
+                                    <p className="text-xs font-bold text-neutral-400 uppercase">Aniversário</p>
                                     <p className="text-sm font-bold dark:text-white">{formatarDataBR(usuarioEditando.birthday)}</p>
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-[9px] font-black text-neutral-400 uppercase">Localização</p>
+                                    <p className="text-xs font-bold text-neutral-400 uppercase">Localização</p>
                                     <p className="text-sm font-bold dark:text-white">{usuarioEditando.Cidade || '?'}/{usuarioEditando.UF || '?'}</p>
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-[9px] font-black text-neutral-400 uppercase">Gênero</p>
+                                    <p className="text-xs font-bold text-neutral-400 uppercase">Gênero</p>
                                     <p className="text-sm font-bold dark:text-white uppercase">{usuarioEditando.genero || 'N/I'}</p>
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-[9px] font-black text-neutral-400 uppercase">WhatsApp</p>
+                                    <p className="text-xs font-bold text-neutral-400 uppercase">WhatsApp</p>
                                     <p className="text-sm font-bold dark:text-white">{usuarioEditando.whatsApp || 'N/I'}</p>
                                 </div>
                             </div>
 
                             <form onSubmit={handleAtualizar} className="space-y-4">
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase ml-1">Nível de Permissão</label>
+                                    <label className="text-xs font-bold text-neutral-400 uppercase ml-1">Nível de Permissão</label>
                                     {usuarioEditando._id !== adminLogadoId ? (
                                         <select 
-                                            className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold focus:ring-2 focus:ring-orange-400 transition-all"
+                                            className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold transition-all outline-none focus:ring-2 focus:ring-primary-400"
                                             value={usuarioEditando.role}
                                             onChange={e => setUsuarioEditando({...usuarioEditando, role: e.target.value})}
                                         >
@@ -203,16 +206,16 @@ export default function Usuarios() {
                                             <option value="admin">Administrador</option>
                                         </select>
                                     ) : (
-                                        <div className="p-3 bg-orange-50 dark:bg-orange-700/20 text-orange-700 text-xs font-black rounded-xl border border-orange-400 dark:border-orange-700/30">
+                                        <div className="p-3 bg-primary-50 dark:bg-primary-700/20 text-primary-700 text-xs font-black rounded-xl border border-primary-400 dark:border-primary-700/30">
                                             ADMINISTRADOR (Você não pode alterar sua própria permissão)
                                         </div>
                                     )}
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase ml-1">Status da Conta</label>
+                                    <label className="text-xs font-bold text-neutral-400 uppercase ml-1">Status da Conta</label>
                                     <select 
-                                        className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold focus:ring-2 focus:ring-orange-400 transition-all"
+                                        className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold focus:ring-2 focus:ring-primary-400 transition-all"
                                         value={usuarioEditando.status || 'active'}
                                         onChange={e => setUsuarioEditando({...usuarioEditando, status: e.target.value})}
                                     >
@@ -223,10 +226,10 @@ export default function Usuarios() {
                                 </div>
 
                                 <div className="flex gap-3 pt-4">
-                                    <button type="submit" className="flex-1 bg-orange-700 hover:bg-orange-700 text-white font-black py-4 rounded-xl uppercase text-xs tracking-widest transition-all shadow-xl">
+                                    <button type="submit" className="flex-1 bg-primary-700 hover:bg-primary-700 text-white font-black py-4 rounded-xl uppercase text-xs tracking-widest transition-all shadow-xl hover:scale-110 active:scale-95">
                                         Salvar
                                     </button>
-                                    <button type="button" onClick={() => setUsuarioEditando(null)} className="px-6 bg-neutral-200 dark:bg-zinc-800 font-black py-4 rounded-xl uppercase text-xs tracking-widest transition-all">
+                                    <button type="button" onClick={() => setUsuarioEditando(null)} className="px-6 bg-neutral-200 dark:bg-zinc-800 font-black py-4 rounded-xl uppercase text-xs tracking-widest transition-all hover:scale-110 active:scale-95">
                                         Voltar
                                     </button>
                                 </div>
@@ -262,26 +265,26 @@ export default function Usuarios() {
                                 }
                             }}>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase ml-1">Nome Completo</label>
-                                    <input required className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold" 
+                                    <label className="text-sm font-bold text-neutral-400 uppercase ml-1">Nome Completo</label>
+                                    <input required className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 font-bold outline-none focus:ring-2 focus:ring-primary-400" 
                                         value={novoUsuario.nome} onChange={e => setNovoUsuario({...novoUsuario, nome: e.target.value})} />
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase ml-1">E-mail de Login</label>
-                                    <input type="email" required className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold" 
+                                    <label className="text-sm font-bold text-neutral-400 uppercase ml-1">E-mail de Login</label>
+                                    <input type="email" required className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold outline-none focus:ring-2 focus:ring-primary-400" 
                                         value={novoUsuario.email} onChange={e => setNovoUsuario({...novoUsuario, email: e.target.value})} />
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase ml-1">Senha Inicial</label>
-                                    <input type="password" required className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold" 
+                                    <label className="text-sm font-bold text-neutral-400 uppercase ml-1">Senha Inicial</label>
+                                    <input type="password" required className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold outline-none focus:ring-2 focus:ring-primary-400" 
                                         value={novoUsuario.senha} onChange={e => setNovoUsuario({...novoUsuario, senha: e.target.value})} />
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase ml-1">Nível de Permissão</label>
-                                    <select className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold" 
+                                    <label className="text-sm font-bold text-neutral-400 uppercase ml-1">Nível de Permissão</label>
+                                    <select className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-zinc-800 border-none font-bold outline-none focus:ring-2 focus:ring-primary-400" 
                                         value={novoUsuario.role} onChange={e => setNovoUsuario({...novoUsuario, role: e.target.value})}>
                                         <option value="user">Usuário Comum</option>
                                         <option value="admin">Administrador</option>
@@ -292,7 +295,7 @@ export default function Usuarios() {
                                     <button type="submit" 
                                     
                                     
-                                    className="flex-1 bg-orange-700 hover:bg-orange-400 text-white font-black py-4 rounded-xl uppercase text-xs tracking-widest transition-all hover:scale-110 active:scale-95">
+                                    className="flex-1 bg-primary-700 hover:bg-primary-400 text-white font-black py-4 rounded-xl uppercase text-xs tracking-widest transition-all hover:scale-110 active:scale-95">
                                         Criar Conta
                                     </button>
                                     <button type="button" onClick={() => setMostrarModalAdicao(false)} className="px-6 bg-neutral-100 dark:bg-zinc-800 font-black py-4 rounded-xl uppercase text-xs tracking-widest transition-all hover:scale-110 active:scale-95">

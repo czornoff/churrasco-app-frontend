@@ -62,7 +62,7 @@ export default function AdminIP({ limite }) {
                         <h1 className="text-3xl font-black text-neutral-900 dark:text-white mb-0 tracking-tight uppercase">
                             Segurança e IPs
                         </h1>
-                        <p className="text-1 text-orange-700 dark:text-orange-400 font-medium mt-0">
+                        <p className="text-1 text-primary-700 dark:text-primary-400 font-medium mt-0">
                             Gerencie bloqueios de segurança e liberação de acessos por IP após <span className="text-red-600 font-bold">{limite} consultas</span> não autenticadas
                         </p>
                     </div>
@@ -140,12 +140,12 @@ export default function AdminIP({ limite }) {
                 )}
             </section>
 
-            <footer className="mt-6 p-6 bg-orange-50 dark:bg-orange-700/10 rounded-xl border border-orange-400 dark:border-orange-700/20">
+            <footer className="mt-6 p-6 bg-primary-50 dark:bg-primary-700/10 rounded-xl border border-primary-400 dark:border-primary-700/20">
                 <div className="flex items-start gap-4">
                     <span className="text-xl">💡</span>
                     <div>
-                        <h4 className="text-sm font-black text-orange-700 dark:text-orange-400 uppercase tracking-tight">Dica de Administração</h4>
-                        <p className="text-xs text-orange-700 dark:text-orange-400 font-medium">
+                        <h4 className="text-sm font-black text-primary-700 dark:text-primary-400 uppercase tracking-tight">Dica de Administração</h4>
+                        <p className="text-xs text-primary-700 dark:text-primary-400 font-medium">
                             A liberação manual de um IP é útil para usuários legítimos que esqueceram de fazer login. 
                             Recomende sempre a criação de conta para consultas ilimitadas.
                         </p>

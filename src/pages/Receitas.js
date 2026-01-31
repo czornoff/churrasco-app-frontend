@@ -6,7 +6,7 @@ const Receitas = ({ dados }) => {
     if (!dados) return (
         <div className="h-screen flex flex-col justify-center items-center bg-neutral-50 dark:bg-zinc-950 transition-colors">
             <div className="text-6xl mb-6 animate-bounce">🔥</div>
-            <h2 className="text-2xl font-black text-orange-700 dark:text-orange-400 mb-2 uppercase">
+            <h2 className="text-2xl font-black text-primary-700 dark:text-primary-400 mb-2 uppercase">
                 Preparando a brasa...
             </h2>
             <p className="text-neutral-500 dark:text-zinc-400 font-medium animate-pulse">
@@ -24,17 +24,17 @@ const Receitas = ({ dados }) => {
                     <h1 className="text-3xl font-black text-neutral-900 dark:text-white mb-4 tracking-tight uppercase">
                         {dados.titulo || "Receitas de Sucesso"}
                     </h1>
-                    <p className="text-lg md:text-xl text-orange-700 dark:text-orange-400 font-medium">
+                    <p className="text-lg md:text-xl text-primary-700 dark:text-primary-400 font-medium">
                         {dados.subtitulo || "Acompanhamentos e preparos especiais"}
                     </p>
-                    <div className="w-24 h-1.5 bg-orange-700 mx-auto mt-6 rounded-full"></div>
+                    <div className="w-24 h-1.5 bg-primary-700 mx-auto mt-6 rounded-full"></div>
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {listaReceitas.map((r, index) => (
                         <div 
                             key={index} 
-                            className="flex flex-col bg-neutral-50 dark:bg-zinc-800/70 rounded-xl p-8 border border-neutral-200 dark:border-zinc-800 shadow-xl transition-all duration-300 hover:-translate-y-2"
+                            className="flex flex-col bg-neutral-50 dark:bg-zinc-800/70 rounded-xl p-8 border border-neutral-200 dark:border-zinc-800 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:border-primary-400"
                         >
                             <div className="flex items-center gap-4 mb-4">
                                 <span className="text-4xl">{r.icone || '🍳'}</span>
@@ -49,7 +49,7 @@ const Receitas = ({ dados }) => {
                             </div>
 
                             <button 
-                                className="w-full max-w-sm bg-orange-700 hover:bg-orange-400 text-white text-l font-black py-2 rounded-xl transition-all shadow-xl hover:scale-110 active:scale-95 text-center no-underline"
+                                className="w-full max-w-sm bg-primary-700 hover:bg-primary-400 text-white text-l font-black py-2 rounded-xl transition-all shadow-xl hover:scale-110 active:scale-95 text-center no-underline"
                                 onClick={() => setReceitaAtiva(r)}
                             >
                                 Ver Receita
@@ -86,7 +86,7 @@ const Receitas = ({ dados }) => {
 
                             <div className="space-y-8">
                                 <section>
-                                    <h4 className="text-orange-700 dark:text-orange-400 font-bold uppercase tracking-widest text-sm mb-4">
+                                    <h4 className="text-primary-700 dark:text-primary-400 font-bold uppercase tracking-widest text-sm mb-4">
                                         🛒 Ingredientes
                                     </h4>
                                     <p className="whitespace-pre-line text-neutral-700 dark:text-zinc-300 leading-relaxed bg-neutral-50 dark:bg-zinc-800/50 p-6 rounded-xl border border-neutral-200 dark:border-zinc-800">
@@ -97,7 +97,7 @@ const Receitas = ({ dados }) => {
                                 </section>
 
                                 <section>
-                                    <h4 className="text-orange-700 dark:text-orange-400 font-bold uppercase tracking-widest text-sm mb-4">
+                                    <h4 className="text-primary-700 dark:text-primary-400 font-bold uppercase tracking-widest text-sm mb-4">
                                         👨‍🍳 Modo de Preparo
                                     </h4>
                                     <div 

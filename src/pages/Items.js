@@ -17,17 +17,17 @@ export default function Items({ dados }) {
                     <h1 className="text-3xl font-black text-neutral-900 dark:text-white mb-4 tracking-tight uppercase">
                         {dados.titulo || 'Dicas de Mestre'}
                     </h1>
-                    <p className="text-lg md:text-xl text-orange-700 dark:text-orange-400 font-medium">
+                    <p className="text-lg md:text-xl text-primary-700 dark:text-primary-400 font-medium">
                         {dados.subtitulo || 'Truques para o churrasco perfeito'}
                     </p>
-                    <div className="w-24 h-1.5 bg-orange-700 mx-auto mt-6 rounded-full"></div>
+                    <div className="w-24 h-1.5 bg-primary-700 mx-auto mt-6 rounded-full"></div>
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {dados.itens.map((item, index) => (
                         <div 
                             key={index} 
-                            className="group bg-neutral-50 dark:bg-zinc-800/70 rounded-xl p-8 border border-neutral-200 dark:border-zinc-800 shadow-xl  transition-all duration-300 hover:-translate-y-2"
+                            className="group bg-neutral-50 dark:bg-zinc-800/70 rounded-xl p-8 border border-neutral-200 dark:border-zinc-800 shadow-xl  transition-all duration-300 hover:-translate-y-2 hover:border-primary-400"
                         >
                             <div className="flex items-center gap-4 mb-6">
                                 <span className="text-4xl group-hover:scale-125 transition-transform duration-300">
@@ -41,8 +41,8 @@ export default function Items({ dados }) {
                             <div 
                                 className="prose prose-neutral dark:prose-invert max-w-none 
                                         prose-p:text-neutral-600 dark:prose-p:text-zinc-400 
-                                        prose-p:leading-relaxed prose-strong:text-orange-700
-                                        dark:prose-strong:text-orange-400 prose-sm dark:text-zinc-300"
+                                        prose-p:leading-relaxed prose-strong:text-primary-700
+                                        dark:prose-strong:text-primary-400 prose-sm dark:text-zinc-300"
                                 dangerouslySetInnerHTML={{ __html: item.texto || '<p>Dica em breve...</p>' }} 
                             />
                         </div>

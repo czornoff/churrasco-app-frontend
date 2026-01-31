@@ -76,7 +76,7 @@ export default function OndeComprar({ conteudo }) {
                         <h1 className="text-3xl font-black text-neutral-900 dark:text-white mb-3 tracking-tight uppercase">
                             Onde Comprar
                         </h1>
-                        <p className="text-lg md:text-xl text-orange-700 dark:text-orange-400 font-medium">
+                        <p className="text-lg md:text-xl text-primary-700 dark:text-primary-400 font-medium">
                             Encontre os melhores suprimentos para o seu churrasco perto de você
                         </p>
                     </header>

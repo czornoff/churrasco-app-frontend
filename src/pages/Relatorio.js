@@ -55,7 +55,7 @@ export default function Relatorio({ usuario }) {
     if (loading) return (
         <div className="h-screen flex flex-col justify-center items-center bg-neutral-50 dark:bg-zinc-950 transition-colors">
             <div className="text-6xl mb-6 animate-bounce">🔥</div>
-            <h2 className="text-2xl font-black text-orange-700 dark:text-orange-400 mb-2 uppercase">
+            <h2 className="text-2xl font-black text-primary-700 dark:text-primary-400 mb-2 uppercase">
                 Preparando a brasa...
             </h2>
             <p className="text-neutral-500 dark:text-zinc-400 font-medium animate-pulse">
@@ -72,7 +72,7 @@ export default function Relatorio({ usuario }) {
                         <h1 className="text-3xl font-black text-neutral-800 dark:text-white leading-tight uppercase tracking-tighter">
                             📊 Relatório de Uso
                         </h1>
-                        <p className="text-lg md:text-xl text-orange-700 dark:text-orange-400 font-medium">
+                        <p className="text-lg md:text-xl text-primary-700 dark:text-primary-400 font-medium">
                             Análise de métricas e conversões do sistema.
                         </p>
                     </div>
@@ -85,7 +85,7 @@ export default function Relatorio({ usuario }) {
                                 type="date" 
                                 value={filtroDataInicio}
                                 onChange={(e) => setFiltroDataInicio(e.target.value)}
-                                className="bg-neutral-50 dark:bg-zinc-800 border-none rounded-xl text-xs font-bold text-neutral-700 dark:text-white focus:ring-2 focus:ring-orange-400"
+                                className="bg-neutral-50 dark:bg-zinc-800 border-none rounded-xl text-xs font-bold text-neutral-700 dark:text-white focus:ring-2 focus:ring-primary-400"
                             />
                         </div>
                         <div className="flex flex-col">
@@ -94,7 +94,7 @@ export default function Relatorio({ usuario }) {
                                 type="date" 
                                 value={filtroDataFim}
                                 onChange={(e) => setFiltroDataFim(e.target.value)}
-                                className="bg-neutral-50 dark:bg-zinc-800 border-none rounded-xl text-xs font-bold text-neutral-700 dark:text-white focus:ring-2 focus:ring-orange-400"
+                                className="bg-neutral-50 dark:bg-zinc-800 border-none rounded-xl text-xs font-bold text-neutral-700 dark:text-white focus:ring-2 focus:ring-primary-400"
                             />
                         </div>
                         <button 
@@ -136,7 +136,7 @@ export default function Relatorio({ usuario }) {
                             placeholder="Filtrar por nome..."
                             value={filtroUsuario}
                             onChange={(e) => setFiltroUsuario(e.target.value)}
-                            className="text-xs bg-neutral-50 dark:bg-zinc-800 border-none rounded-xl px-4 py-2 focus:ring-2 focus:ring-orange-400 w-48"
+                            className="text-xs bg-neutral-50 dark:bg-zinc-800 border-none rounded-xl px-4 py-2 focus:ring-2 focus:ring-primary-400 w-48"
                         />
                     </div>
                     
@@ -167,7 +167,7 @@ export default function Relatorio({ usuario }) {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex gap-2 text-[10px] font-bold">
-                                                <span className="bg-orange-400 dark:bg-orange-700/30 text-orange-700 px-2 py-0.5 rounded">🧔 {log.participantes.homens}</span>
+                                                <span className="bg-primary-400 dark:bg-primary-700/30 text-primary-700 px-2 py-0.5 rounded">🧔 {log.participantes.homens}</span>
                                                 <span className="bg-pink-100 dark:bg-pink-900/30 text-pink-600 px-2 py-0.5 rounded">👩 {log.participantes.mulheres}</span>
                                                 <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 px-2 py-0.5 rounded">👶 {log.participantes.criancas}</span>
                                                 <span className="bg-neutral-100 dark:bg-zinc-800 text-neutral-600 dark:text-zinc-400 px-2 py-0.5 rounded">⏱️ {log.horasDuracao}h</span>
@@ -179,7 +179,7 @@ export default function Relatorio({ usuario }) {
                                         <td className="px-6 py-4 text-center">
                                             <button 
                                                 onClick={() => setLogSelecionado(log)}
-                                                className="bg-neutral-900 dark:bg-zinc-100 text-white dark:text-neutral-900 px-4 py-2 rounded-xl text-[10px] font-black hover:bg-orange-700 dark:hover:bg-orange-400 hover:text-white transition-all scale-95 hover:scale-100"
+                                                className="bg-neutral-900 dark:bg-zinc-100 text-white dark:text-neutral-900 px-4 py-2 rounded-xl text-[10px] font-black hover:bg-primary-700 dark:hover:bg-primary-400 hover:text-white transition-all scale-95 hover:scale-100"
                                             >
                                                 DETALHES
                                             </button>
@@ -226,7 +226,7 @@ export default function Relatorio({ usuario }) {
                             <div className="p-6 bg-neutral-50 dark:bg-zinc-800/50">
                                 <button 
                                     onClick={() => setLogSelecionado(null)} 
-                                    className="w-full bg-neutral-red dark:bg-red-800 text-white dark:text-neutral-900 font-black py-4 rounded-xl hover:bg-orange-700 dark:hover:bg-orange-400 hover:text-white transition-all"
+                                    className="w-full bg-neutral-red dark:bg-red-800 text-white dark:text-neutral-900 font-black py-4 rounded-xl hover:bg-primary-700 dark:hover:bg-primary-400 hover:text-white transition-all"
                                 >
                                     FECHAR
                                 </button>

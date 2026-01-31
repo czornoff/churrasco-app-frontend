@@ -5,7 +5,7 @@ const API_URL = process.env.REACT_APP_API_URL;
 
 export default function Footer({ dados }) {
     return (
-        <footer className="bg-neutral-900 text-neutral-300 dark:bg-zinc-950 dark:text-zinc-400 pt-10 mt-16 border-t-4 border-orange-700 font-sans transition-colors duration-300">
+        <footer className="bg-neutral-900 text-neutral-300 dark:bg-zinc-950 dark:text-zinc-400 pt-10 mt-16 border-t-4 border-primary-700 font-sans transition-colors duration-300">
             <div className="max-w-7xl mx-auto flex flex-wrap justify-between px-5 gap-8">
                 
                 {/* Coluna 1: Logo e Descrição */}
@@ -16,7 +16,7 @@ export default function Footer({ dados }) {
                             alt={dados.nomeApp} 
                             className="h-9 w-auto"
                         />
-                        <span className="text-orange-700 text-xl font-bold uppercase tracking-wider leading-tight">
+                        <span className="text-primary-700 text-xl font-bold uppercase tracking-wider leading-tight">
                             {dados.nomeApp}
                         </span>
                     </div>
@@ -28,7 +28,7 @@ export default function Footer({ dados }) {
                             href="https://mandebem.com/politicadeprivacidade.html" 
                             target="_blank" 
                             rel="noopener noreferrer" 
-                            className="text-sm hover:text-orange-400 transition-colors"
+                            className="text-sm hover:text-primary-400 transition-colors"
                         >
                             Política de Privacidade
                         </a>
@@ -41,11 +41,11 @@ export default function Footer({ dados }) {
                         Links Úteis
                     </h4>
                     <nav className="flex flex-col gap-2">
-                        <Link to="/calculadora" className="text-sm hover:text-orange-400 transition-colors">Calculadora</Link>
-                        <Link to="/dicas" className="text-sm hover:text-orange-400 transition-colors">Dicas de Mestre</Link>
-                        <Link to="/produtos" className="text-sm hover:text-orange-400 transition-colors">Produtos</Link>
-                        <Link to="/receitas" className="text-sm hover:text-orange-400 transition-colors">Receitas</Link>
-                        <Link to="/sobre" className="text-sm hover:text-orange-400 transition-colors">Sobre Nós</Link>
+                        <Link to="/calculadora" className="text-sm hover:text-primary-400 transition-colors">Calculadora</Link>
+                        <Link to="/dicas" className="text-sm hover:text-primary-400 transition-colors">Dicas de Mestre</Link>
+                        <Link to="/produtos" className="text-sm hover:text-primary-400 transition-colors">Produtos</Link>
+                        <Link to="/receitas" className="text-sm hover:text-primary-400 transition-colors">Receitas</Link>
+                        <Link to="/sobre" className="text-sm hover:text-primary-400 transition-colors">Sobre Nós</Link>
                     </nav>
                 </div>
 
@@ -58,7 +58,7 @@ export default function Footer({ dados }) {
                         href={`mailto:${dados.email}`} 
                         target="_blank" 
                         rel="noreferrer" 
-                        className="text-orange-700 font-bold text-sm hover:underline"
+                        className="text-primary-700 font-bold text-sm hover:underline"
                     >
                         {dados.email}
                     </a>
@@ -67,7 +67,7 @@ export default function Footer({ dados }) {
                             href={dados.instagram} 
                             target="_blank" 
                             rel="noreferrer" 
-                            className="text-orange-700 font-bold hover:underline"
+                            className="text-primary-700 font-bold hover:underline"
                         >
                             Instagram
                         </a>
@@ -83,7 +83,7 @@ export default function Footer({ dados }) {
                         href='https://www.zornoff.com.br' 
                         target="_blank" 
                         rel="noreferrer" 
-                        className="text-orange-700 font-bold hover:underline"
+                        className="text-primary-700 font-bold hover:underline"
                     >
                         Zornoff
                     </a>.
