@@ -1,6 +1,7 @@
 {
     "short_name": "Cálculo de Churrasco",
     "name": "A solução inteligente para organizar seu churrasco sem desperdícios.",
+    "description": "A solução inteligente para organizar seu churrasco sem desperdícios.",
     "icons": [
         {
         "src": "favicon.ico",

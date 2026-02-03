@@ -165,8 +165,8 @@ export default function Header({ dados, usuario, abrirPerfil }) {
                                 <div className="flex items-center gap-4">
                                     <img src={usuario.avatar} alt="Avatar" className="w-12 h-12 rounded-full border-2 border-primary-700" />
                                     <div>
-                                        <p className="font-black uppercase tracking-tighter text-md leading-tight">{usuario.nome}</p>
-                                        <p className="text-xs text-primary-700 font-bold uppercase tracking-widest">{usuario.role}</p>
+                                        <p className="font-black uppercase tracking-tighter text-md leading-tight">{usuario?.nome}</p>
+                                        <p className="text-xs text-primary-700 font-bold uppercase tracking-widest">{usuario?.role}</p>
                                     </div>
                                 </div>
                             ) : (
@@ -187,7 +187,7 @@ export default function Header({ dados, usuario, abrirPerfil }) {
                                         {item.label}
                                     </Link>
                                 ))}
-                                {usuario.role !== 'admin' && (
+                                {usuario?.role !== 'admin' && usuario?._id && (
                                     <>
                                         <Link to={`/relatorio/${usuario._id}`} className="block p-3 text-xs font-bold uppercase" onClick={ () => setMenuAberto(false)}>📊 Relatórios</Link>
                                     </>
