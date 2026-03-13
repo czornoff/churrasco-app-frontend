@@ -1,44 +1,16 @@
-# Frontend - Calculadora de Churrasco
+# Cálculo de Churrasco
 
-Este é o diretório do frontend do seu projeto.
+O Cálculo de Churrasco nasceu da necessidade de transformar o planejamento de eventos em algo simples, preciso e sem desperdícios. Sabemos que organizar um churrasco envolve muito mais do que apenas comprar carne; trata-se de garantir a melhor experiência para cada convidado, do consumo de bebidas ao cálculo exato de acompanhamentos.
 
-## Instruções de instalação
+## O Que Nos Torna Diferentes?
+Diferente de calculadoras comuns, o Cálculo de Churrasco utiliza um algoritmo de Proporção Inteligente:
 
-1. Certifique-se de ter Node.js instalado em sua máquina.
-2. Clone este repositório para o seu ambiente local.
-3. Navegue até o diretório do projeto.
-4. Instale as dependências do projeto executando o seguinte comando: `npm install`
-5. Inicie o servidor de desenvolvimento executando o seguinte comando: `npm start`
+- **Ajuste por Perfil:** Diferenciamos o consumo entre homens, mulheres e crianças, garantindo que ninguém fique com fome e que não haja sobras excessivas.
+- **Gestão de Bebidas:** Nosso sistema calcula a cota de líquidos baseada na preferência por alcoólicos ou não alcoólicos, ajustando automaticamente os volumes totais.
+- **Personalização Total:** Através do nosso Painel Admin, as métricas podem ser calibradas para diferentes estilos de eventos, desde um churrasco rápido até uma celebração de dia inteiro.
+- **Facilidade no Compartilhamento:** Com um clique, você gera uma lista de compras detalhada e organizada, pronta para ser enviada via WhatsApp para os responsáveis pelas compras.
 
+## Nossa Missão
+Nossa missão é ser o braço direito do churrasqueiro. Queremos que você gaste menos tempo com planilhas e cálculos complexos e mais tempo aproveitando o braseiro com amigos e família.
 
-## Rotas
-
-Aqui estão as rotas do frontend:
-
-- GET /admin/usuario: Renderiza a página de listagem de usuários.
-- GET /: Renderiza a página da calculadora
-- GET /dicas: Renderiza a página de dicas
-- GET /produtos: Renderiza a página de produtos
-- GET /receitas: Renderiza a página de receitas
-- GET /utensilios: Renderiza a página de utensílios
-- GET /sobre: Renderiza a página sobre
-- GET /login: Efetua o acesso logado no sistema
-- GET /admin: Acessa o painel inicial da página de administração
-- GET /admin/item: Acessa a página de edição das configurações e opções
-- GET /admin/conteúdo: Acessa a página de edição dos conteúdos
-- GET /admin/relatório: Acessa a página de visualização do relatório
-- GET /admin/usuários: Acessa a página de edição dos usuários
-
-## Contribuição
-
-Contribuições são bem-vindas! Se você quiser contribuir para este projeto, siga estas etapas:
-
-1. Faça um fork deste repositório.
-2. Crie uma branch para sua contribuição: `git checkout -b minha-contribuicao`
-3. Faça suas alterações e faça commit: `git commit -am "Minha contribuição"`
-4. Faça push para a branch: `git push origin minha-contribuicao`
-5. Abra um pull request neste repositório.
-
-## Licença
-
-Este projeto está licenciado sob a Licença MIT. Consulte o arquivo `LICENSE` para obter mais informações.
+### Churrasco é celebração. O planejamento a gente resolve para você.
